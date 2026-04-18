@@ -3,6 +3,7 @@
 import { useFavourites } from '@/lib/favourites-context';
 import ProductCard from '@/components/ProductCard';
 import { Heart } from 'lucide-react';
+import Link from 'next/link';
 
 export default function FavouritesPage() {
   const { favourites } = useFavourites();
@@ -22,12 +23,12 @@ export default function FavouritesPage() {
             <p className="text-gray-500 mb-6">
               Start adding products to your favourites by clicking the heart icon on any product.
             </p>
-            <a
+            <Link
               href="/"
               className="inline-block bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition font-semibold"
             >
               Browse Products
-            </a>
+            </Link>
           </div>
         ) : (
           <>
