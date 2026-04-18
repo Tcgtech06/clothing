@@ -2,9 +2,10 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Grid, Award, Package, User } from 'lucide-react';
+import { Home, Grid, Award, Package, User, ShoppingCart } from 'lucide-react';
 import { useState } from 'react';
 import ProfileMenu from './ProfileMenu';
+import { useCart } from '@/lib/cart-context';
 
 const navItems = [
   { name: 'Home', href: '/', icon: Home },
@@ -17,6 +18,8 @@ export default function Navigation() {
   const pathname = usePathname();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showMobileProfile, setShowMobileProfile] = useState(false);
+  const { getCartCount } = useCart();
+  const cartCount = getCartCount();
 
   return (
     <>
@@ -39,8 +42,15 @@ export default function Navigation() {
             E-Shop
           </Link>
 
-          {/* Empty space for balance */}
-          <div className="w-10"></div>
+          {/* Cart Icon - Right Side */}
+          <Link href="/cart" className="relative">
+            <ShoppingCart className="w-6 h-6 text-gray-700" />
+            {cartCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
+                {cartCount}
+              </span>
+            )}
+          </Link>
         </div>
       </nav>
 
@@ -133,6 +143,16 @@ export default function Navigation() {
                   </div>
                 )}
               </div>
+
+              {/* Cart Icon */}
+              <Link href="/cart" className="relative ml-4">
+                <ShoppingCart className="w-6 h-6 text-gray-700 hover:text-primary transition" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
+                    {cartCount}
+                  </span>
+                )}
+              </Link>
             </div>
           </div>
         </div>

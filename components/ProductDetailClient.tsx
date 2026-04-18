@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Star, ShoppingCart, Heart, Share2, Check, Truck, Shield, RotateCcw, Minus, Plus } from 'lucide-react';
+import { Star, ShoppingCart, Heart, Share2, Check, Truck, Shield, RotateCcw, Minus, Plus, ArrowLeft } from 'lucide-react';
 import { Product } from '@/data/products';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -32,14 +32,18 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
     setTimeout(() => setShowAddedToCart(false), 2000);
   };
 
-  const handleBuyNow = () => {
-    addToCart(product, quantity, selectedColor, selectedSize);
-    router.push('/cart');
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Back Button */}
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-2 text-gray-600 hover:text-primary transition mb-4"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          <span className="font-medium">Back</span>
+        </button>
+
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-gray-600 mb-6">
           <Link href="/" className="hover:text-primary">Home</Link>
@@ -205,14 +209,8 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 mb-6">
               <button
-                onClick={handleBuyNow}
-                className="flex-1 bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition font-semibold flex items-center justify-center gap-2"
-              >
-                Buy Now
-              </button>
-              <button
                 onClick={handleAddToCart}
-                className="flex-1 bg-gray-800 text-white px-6 py-3 rounded-lg hover:bg-gray-900 transition font-semibold flex items-center justify-center gap-2"
+                className="flex-1 bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition font-semibold flex items-center justify-center gap-2"
               >
                 <ShoppingCart className="w-5 h-5" />
                 Add to Cart
