@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Navigation from '@/components/Navigation';
 import { CartProvider } from '@/lib/cart-context';
+import { FavouritesProvider } from '@/lib/favourites-context';
 
 export const metadata: Metadata = {
   title: 'E-Commerce PWA',
@@ -28,8 +29,10 @@ export default function RootLayout({
       </head>
       <body className="bg-gray-50">
         <CartProvider>
-          <Navigation />
-          <main className="pt-14 pb-20 md:pt-0 md:pb-0">{children}</main>
+          <FavouritesProvider>
+            <Navigation />
+            <main className="pt-14 pb-20 md:pt-0 md:pb-0">{children}</main>
+          </FavouritesProvider>
         </CartProvider>
       </body>
     </html>

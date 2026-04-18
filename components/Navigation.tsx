@@ -2,10 +2,11 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Grid, Award, Package, User, ShoppingCart } from 'lucide-react';
+import { Home, Grid, Award, Package, User, ShoppingCart, Heart } from 'lucide-react';
 import { useState } from 'react';
 import ProfileMenu from './ProfileMenu';
 import { useCart } from '@/lib/cart-context';
+import { useFavourites } from '@/lib/favourites-context';
 
 const navItems = [
   { name: 'Home', href: '/', icon: Home },
@@ -19,7 +20,9 @@ export default function Navigation() {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showMobileProfile, setShowMobileProfile] = useState(false);
   const { getCartCount } = useCart();
+  const { getFavouritesCount } = useFavourites();
   const cartCount = getCartCount();
+  const favouritesCount = getFavouritesCount();
 
   return (
     <>
@@ -42,15 +45,28 @@ export default function Navigation() {
             E-Shop
           </Link>
 
-          {/* Cart Icon - Right Side */}
-          <Link href="/cart" className="relative">
-            <ShoppingCart className="w-6 h-6 text-gray-700" />
-            {cartCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
-                {cartCount}
-              </span>
-            )}
-          </Link>
+          {/* Right Side Icons */}
+          <div className="flex items-center gap-3">
+            {/* Favourites Icon */}
+            <Link href="/favourites" className="relative">
+              <Heart className={`w-6 h-6 ${pathname === '/favourites' ? 'fill-red-500 text-red-500' : 'text-gray-700'}`} />
+              {favouritesCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
+                  {favouritesCount}
+                </span>
+              )}
+            </Link>
+
+            {/* Cart Icon */}
+            <Link href="/cart" className="relative">
+              <ShoppingCart className="w-6 h-6 text-gray-700" />
+              {cartCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
+          </div>
         </div>
       </nav>
 
@@ -83,9 +99,12 @@ export default function Navigation() {
                   </Link>
                 );
               })}
-              
-              {/* Profile Icon - Right Side for Desktop/Tablet */}
-              <div className="relative ml-4">
+            </div>
+            
+            {/* Right Side Icons */}
+            <div className="flex items-center gap-4">
+              {/* Profile Icon */}
+              <div className="relative">
                 <button
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
                   className="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-white hover:shadow-lg transition"
@@ -144,8 +163,18 @@ export default function Navigation() {
                 )}
               </div>
 
-              {/* Cart Icon */}
-              <Link href="/cart" className="relative ml-4">
+              {/* Favourites Icon */}
+              <Link href="/favourites" className="relative">
+                <Heart className={`w-6 h-6 hover:text-red-500 transition ${pathname === '/favourites' ? 'fill-red-500 text-red-500' : 'text-gray-700'}`} />
+                {favouritesCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
+                    {favouritesCount}
+                  </span>
+                )}
+              </Link>
+
+              {/* Cart Icon - Far Right */}
+              <Link href="/cart" className="relative">
                 <ShoppingCart className="w-6 h-6 text-gray-700 hover:text-primary transition" />
                 {cartCount > 0 && (
                   <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">

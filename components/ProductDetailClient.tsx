@@ -6,6 +6,7 @@ import { Product } from '@/data/products';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCart } from '@/lib/cart-context';
+import { useFavourites } from '@/lib/favourites-context';
 import { useRouter } from 'next/navigation';
 
 interface ProductDetailClientProps {
@@ -15,12 +16,19 @@ interface ProductDetailClientProps {
 export default function ProductDetailClient({ product }: ProductDetailClientProps) {
   const router = useRouter();
   const { addToCart } = useCart();
+  const { addToFavourites, removeFromFavourites, isFavourite } = useFavourites();
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedColor, setSelectedColor] = useState(product.colors?.[0] || '');
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || '');
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<'description' | 'reviews'>('description');
   const [showAddedToCart, setShowAddedToCart] = useState(false);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewName, setReviewName] = useState('');
+  const [reviewText, setReviewText] = useState('');
+  const [showReviewSuccess, setShowReviewSuccess] = useState(false);
+
+  const isProductFavourite = isFavourite(product.id);
 
   // Auto-slide images every 3 seconds
   useEffect(() => {
@@ -67,6 +75,25 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
       setShowAddedToCart(false);
       router.push('/checkout');
     }, 1000);
+  };
+
+  const handleSubmitReview = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Here you would typically send the review to your backend
+    console.log('Review submitted:', { reviewRating, reviewName, reviewText });
+    setShowReviewSuccess(true);
+    setReviewName('');
+    setReviewText('');
+    setReviewRating(5);
+    setTimeout(() => setShowReviewSuccess(false), 3000);
+  };
+
+  const handleToggleFavourite = () => {
+    if (isProductFavourite) {
+      removeFromFavourites(product.id);
+    } else {
+      addToFavourites(product);
+    }
   };
 
   return (
@@ -293,9 +320,16 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
             {/* Secondary Actions */}
             <div className="flex gap-3 mb-6">
-              <button className="flex-1 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition flex items-center justify-center gap-2 text-sm">
-                <Heart className="w-4 h-4" />
-                Wishlist
+              <button 
+                onClick={handleToggleFavourite}
+                className={`flex-1 border-2 px-4 py-2 rounded-lg transition flex items-center justify-center gap-2 text-sm ${
+                  isProductFavourite 
+                    ? 'border-red-500 bg-red-50 text-red-600' 
+                    : 'border-gray-300 hover:bg-gray-50'
+                }`}
+              >
+                <Heart className={`w-4 h-4 ${isProductFavourite ? 'fill-red-500' : ''}`} />
+                {isProductFavourite ? 'Remove from Favourites' : 'Add to Favourites'}
               </button>
             </div>
 
@@ -401,8 +435,83 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                   <p className="text-sm text-gray-600 mt-1">{product.reviews} reviews</p>
                 </div>
               </div>
+
+              {/* Write a Review Form */}
+              <div className="bg-gray-50 rounded-lg p-6 mb-6">
+                <h4 className="text-lg font-bold mb-4">Write a Review</h4>
+                {showReviewSuccess && (
+                  <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-800">
+                    ✓ Thank you! Your review has been submitted successfully.
+                  </div>
+                )}
+                <form onSubmit={handleSubmitReview}>
+                  {/* Rating Selection */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Your Rating
+                    </label>
+                    <div className="flex gap-2">
+                      {[1, 2, 3, 4, 5].map((rating) => (
+                        <button
+                          key={rating}
+                          type="button"
+                          onClick={() => setReviewRating(rating)}
+                          className="transition hover:scale-110"
+                        >
+                          <Star
+                            className={`w-8 h-8 ${
+                              rating <= reviewRating
+                                ? 'fill-yellow-400 text-yellow-400'
+                                : 'text-gray-300'
+                            }`}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Name Input */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Your Name
+                    </label>
+                    <input
+                      type="text"
+                      value={reviewName}
+                      onChange={(e) => setReviewName(e.target.value)}
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      placeholder="Enter your name"
+                    />
+                  </div>
+
+                  {/* Review Text */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Your Review
+                    </label>
+                    <textarea
+                      value={reviewText}
+                      onChange={(e) => setReviewText(e.target.value)}
+                      required
+                      rows={4}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+                      placeholder="Share your experience with this product..."
+                    />
+                  </div>
+
+                  {/* Submit Button */}
+                  <button
+                    type="submit"
+                    className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 transition font-semibold"
+                  >
+                    Submit Review
+                  </button>
+                </form>
+              </div>
               
               {/* Sample Reviews */}
+              <h4 className="text-lg font-bold mb-4">Customer Reviews</h4>
               <div className="space-y-4">
                 {[1, 2, 3].map((i) => (
                   <div key={i} className="border-b pb-4">

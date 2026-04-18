@@ -20,270 +20,280 @@ export interface Product {
 export const products: Product[] = [
   {
     id: 1,
-    name: 'Premium Wireless Headphones',
-    price: 24999,
-    originalPrice: 32999,
+    name: 'Floral Summer Maxi Dress',
+    price: 3499,
+    originalPrice: 4999,
     images: [
-      'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800',
-      'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=800',
-      'https://images.unsplash.com/photo-1487215078519-e21cc028cb29?w=800',
-      'https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=800'
+      'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=800',
+      'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800',
+      'https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=800',
+      'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=800'
     ],
     rating: 4.5,
     reviews: 128,
-    description: 'Experience superior sound quality with our premium wireless headphones. Featuring active noise cancellation, 30-hour battery life, and premium comfort padding.',
-    category: 'Electronics',
+    description: 'Beautiful floral print maxi dress perfect for summer occasions. Features a flowing silhouette, adjustable straps, and breathable fabric.',
+    category: 'Women Dresses',
     features: [
-      'Active Noise Cancellation',
-      '30-hour battery life',
-      'Premium comfort padding',
-      'Bluetooth 5.0 connectivity',
-      'Built-in microphone',
-      'Foldable design'
+      'Floral print design',
+      'Adjustable shoulder straps',
+      'Breathable cotton blend',
+      'Flowing maxi length',
+      'Side pockets',
+      'Machine washable'
     ],
     specifications: {
-      'Brand': 'AudioPro',
-      'Model': 'AP-X1000',
-      'Connectivity': 'Bluetooth 5.0',
-      'Battery Life': '30 hours',
-      'Weight': '250g',
-      'Color': 'Black'
+      'Brand': 'FashionHub',
+      'Material': '95% Cotton, 5% Spandex',
+      'Length': 'Maxi (Floor length)',
+      'Fit': 'Regular',
+      'Occasion': 'Casual, Party',
+      'Care': 'Machine wash cold'
     },
     inStock: true,
-    colors: ['Black', 'Silver', 'Blue']
+    colors: ['Blue Floral', 'Pink Floral', 'White Floral'],
+    sizes: ['XS', 'S', 'M', 'L', 'XL']
   },
   {
     id: 2,
-    name: 'Smart Watch Pro',
-    price: 32999,
-    originalPrice: 41999,
+    name: 'Elegant Evening Gown',
+    price: 5999,
+    originalPrice: 8999,
     images: [
-      'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800',
-      'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=800',
-      'https://images.unsplash.com/photo-1434494878577-86c23bcb06b9?w=800',
-      'https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=800'
+      'https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=800',
+      'https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=800',
+      'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=800',
+      'https://images.unsplash.com/photo-1612423284934-2850a4ea6b0f?w=800'
     ],
     rating: 4.8,
     reviews: 256,
-    description: 'Stay connected and track your fitness with our advanced smart watch. Features heart rate monitoring, GPS, and 7-day battery life.',
-    category: 'Wearables',
+    description: 'Stunning evening gown with elegant draping and a flattering silhouette. Perfect for formal events, weddings, and special occasions.',
+    category: 'Women Dresses',
     features: [
-      'Heart rate monitoring',
-      'Built-in GPS',
-      '7-day battery life',
-      'Water resistant (50m)',
-      'Sleep tracking',
-      'Multiple sport modes'
+      'Elegant draping design',
+      'Hidden back zipper',
+      'Premium satin fabric',
+      'Floor-length gown',
+      'Fully lined',
+      'Dry clean only'
     ],
     specifications: {
-      'Brand': 'TechFit',
-      'Model': 'TF-SW500',
-      'Display': '1.4" AMOLED',
-      'Battery': '7 days',
-      'Water Resistance': '5ATM',
-      'Compatibility': 'iOS & Android'
+      'Brand': 'Elegance',
+      'Material': '100% Polyester Satin',
+      'Length': 'Floor length',
+      'Fit': 'Fitted bodice, flowing skirt',
+      'Occasion': 'Formal, Wedding, Party',
+      'Care': 'Dry clean only'
     },
     inStock: true,
-    colors: ['Black', 'Rose Gold', 'Silver']
+    colors: ['Black', 'Navy Blue', 'Burgundy', 'Emerald Green'],
+    sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL']
   },
   {
     id: 3,
-    name: 'Wireless Earbuds',
-    price: 12499,
-    originalPrice: 16499,
+    name: 'Casual A-Line Midi Dress',
+    price: 2499,
+    originalPrice: 3499,
     images: [
-      'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=800',
-      'https://images.unsplash.com/photo-1606841837239-c5a1a4a07af7?w=800',
-      'https://images.unsplash.com/photo-1598331668826-20cecc596b86?w=800',
-      'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=800'
+      'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800',
+      'https://images.unsplash.com/photo-1591369822096-ffd140ec948f?w=800',
+      'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=800',
+      'https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?w=800'
     ],
     rating: 4.6,
     reviews: 342,
-    description: 'Compact and powerful wireless earbuds with crystal clear sound. Perfect for workouts and daily commutes.',
-    category: 'Audio',
+    description: 'Versatile A-line midi dress perfect for everyday wear. Features a comfortable fit, flattering cut, and easy-care fabric.',
+    category: 'Women Dresses',
     features: [
-      'True wireless design',
-      '24-hour total battery life',
-      'IPX7 water resistant',
-      'Touch controls',
-      'Quick charge support',
-      'Comfortable fit'
+      'Classic A-line silhouette',
+      'Midi length',
+      'Short sleeves',
+      'Round neckline',
+      'Side pockets',
+      'Easy care fabric'
     ],
     specifications: {
-      'Brand': 'SoundWave',
-      'Model': 'SW-EB200',
-      'Battery Life': '6 hours (24 with case)',
-      'Charging': 'USB-C',
-      'Water Resistance': 'IPX7',
-      'Bluetooth': '5.2'
+      'Brand': 'DailyWear',
+      'Material': '60% Cotton, 40% Polyester',
+      'Length': 'Midi (Below knee)',
+      'Fit': 'Regular A-line',
+      'Occasion': 'Casual, Office',
+      'Care': 'Machine wash'
     },
     inStock: true,
-    colors: ['White', 'Black']
+    colors: ['Navy', 'Black', 'Olive Green', 'Dusty Rose'],
+    sizes: ['S', 'M', 'L', 'XL']
   },
   {
     id: 4,
-    name: 'Ergonomic Laptop Stand',
-    price: 6499,
+    name: 'Bohemian Wrap Dress',
+    price: 2999,
     images: [
-      'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=800',
-      'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=800',
-      'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=800',
-      'https://images.unsplash.com/photo-1625225233840-695456021cde?w=800'
+      'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=800',
+      'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=800',
+      'https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=800',
+      'https://images.unsplash.com/photo-1550639525-c97d455acf70?w=800'
     ],
     rating: 4.3,
     reviews: 89,
-    description: 'Improve your posture and productivity with our adjustable laptop stand. Made from premium aluminum with multiple angle adjustments.',
-    category: 'Accessories',
+    description: 'Boho-chic wrap dress with a relaxed fit and beautiful print. Perfect for beach vacations and casual summer days.',
+    category: 'Women Dresses',
     features: [
-      'Adjustable height and angle',
-      'Premium aluminum construction',
-      'Non-slip rubber pads',
-      'Supports up to 17" laptops',
-      'Portable and foldable',
-      'Cable management'
+      'Wrap-style design',
+      'Adjustable tie waist',
+      'Flowing sleeves',
+      'Lightweight fabric',
+      'Bohemian print',
+      'Versatile styling'
     ],
     specifications: {
-      'Brand': 'DeskPro',
-      'Material': 'Aluminum Alloy',
-      'Weight': '800g',
-      'Max Load': '5kg',
-      'Compatibility': 'Up to 17" laptops',
-      'Dimensions': '28 x 24 x 15 cm'
+      'Brand': 'BohoStyle',
+      'Material': '100% Rayon',
+      'Length': 'Midi',
+      'Fit': 'Relaxed wrap',
+      'Occasion': 'Casual, Beach, Vacation',
+      'Care': 'Hand wash recommended'
     },
     inStock: true,
-    colors: ['Silver', 'Space Gray']
+    colors: ['Coral Print', 'Blue Print', 'Green Print'],
+    sizes: ['XS', 'S', 'M', 'L', 'XL']
   },
   {
     id: 5,
-    name: 'USB-C Hub 7-in-1',
-    price: 4999,
+    name: 'Little Black Cocktail Dress',
+    price: 4499,
     images: [
-      'https://images.unsplash.com/photo-1625948515291-69613efd103f?w=800',
-      'https://images.unsplash.com/photo-1591370874773-6702e8f12fd8?w=800',
-      'https://images.unsplash.com/photo-1624823183493-ed5832f48f18?w=800',
-      'https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?w=800'
+      'https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=800',
+      'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=800',
+      'https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=800',
+      'https://images.unsplash.com/photo-1612423284934-2850a4ea6b0f?w=800'
     ],
-    rating: 4.4,
+    rating: 4.7,
     reviews: 167,
-    description: 'Expand your connectivity with our versatile 7-in-1 USB-C hub. Features HDMI, USB 3.0, SD card reader, and more.',
-    category: 'Accessories',
+    description: 'Timeless little black dress perfect for cocktail parties and evening events. Features a fitted silhouette and elegant details.',
+    category: 'Women Dresses',
     features: [
-      '7 ports in one hub',
-      '4K HDMI output',
-      '3x USB 3.0 ports',
-      'SD/TF card reader',
-      '100W power delivery',
-      'Compact aluminum design'
+      'Classic LBD design',
+      'Fitted silhouette',
+      'Knee-length',
+      'Hidden back zipper',
+      'Sleeveless design',
+      'Versatile styling'
     ],
     specifications: {
-      'Brand': 'ConnectHub',
-      'Model': 'CH-7IN1',
-      'Ports': '7 (HDMI, USB-A x3, SD, TF, USB-C PD)',
-      'HDMI Output': '4K@30Hz',
-      'USB Speed': 'USB 3.0 (5Gbps)',
-      'Power Delivery': '100W'
+      'Brand': 'ClassicChic',
+      'Material': '95% Polyester, 5% Spandex',
+      'Length': 'Knee length',
+      'Fit': 'Fitted',
+      'Occasion': 'Cocktail, Party, Evening',
+      'Care': 'Dry clean'
     },
-    inStock: true
+    inStock: true,
+    colors: ['Black'],
+    sizes: ['XS', 'S', 'M', 'L', 'XL']
   },
   {
     id: 6,
-    name: 'Mechanical Gaming Keyboard',
-    price: 15999,
-    originalPrice: 20999,
+    name: 'Flowy Chiffon Dress',
+    price: 3999,
+    originalPrice: 5499,
     images: [
-      'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800',
-      'https://images.unsplash.com/photo-1595225476474-87563907a212?w=800',
-      'https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?w=800',
-      'https://images.unsplash.com/photo-1601445638532-3c6f6c3aa1d6?w=800'
+      'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800',
+      'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=800',
+      'https://images.unsplash.com/photo-1591369822096-ffd140ec948f?w=800',
+      'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=800'
     ],
-    rating: 4.7,
+    rating: 4.5,
     reviews: 423,
-    description: 'Dominate your games with our RGB mechanical keyboard. Features customizable switches, per-key RGB lighting, and programmable macros.',
-    category: 'Gaming',
+    description: 'Romantic flowy chiffon dress with delicate details. Perfect for garden parties, weddings, and spring events.',
+    category: 'Women Dresses',
     features: [
-      'Mechanical switches (Blue/Red/Brown)',
-      'Per-key RGB lighting',
-      'Programmable macros',
-      'Anti-ghosting technology',
-      'Detachable USB-C cable',
-      'Aluminum frame'
+      'Lightweight chiffon fabric',
+      'Flowy silhouette',
+      'Delicate pleating',
+      'Lined bodice',
+      'Flutter sleeves',
+      'Midi length'
     ],
     specifications: {
-      'Brand': 'GameMaster',
-      'Model': 'GM-K100',
-      'Switch Type': 'Mechanical (Hot-swappable)',
-      'Lighting': 'RGB per-key',
-      'Connection': 'USB-C',
-      'Layout': 'Full-size (104 keys)'
+      'Brand': 'RomanticStyle',
+      'Material': '100% Polyester Chiffon',
+      'Length': 'Midi',
+      'Fit': 'Flowy',
+      'Occasion': 'Wedding, Garden Party, Spring',
+      'Care': 'Hand wash cold'
     },
     inStock: true,
-    colors: ['Black', 'White']
+    colors: ['Blush Pink', 'Lavender', 'Mint Green', 'Champagne'],
+    sizes: ['XS', 'S', 'M', 'L', 'XL']
   },
   {
     id: 7,
-    name: 'Wireless Gaming Mouse',
-    price: 7499,
+    name: 'Professional Sheath Dress',
+    price: 3299,
     images: [
-      'https://images.unsplash.com/photo-1527814050087-3793815479db?w=800',
-      'https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=800',
-      'https://images.unsplash.com/photo-1563297007-0686b7003af7?w=800',
-      'https://images.unsplash.com/photo-1613141411244-0e4ac4f93d1d?w=800'
+      'https://images.unsplash.com/photo-1591369822096-ffd140ec948f?w=800',
+      'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=800',
+      'https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?w=800',
+      'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800'
     ],
-    rating: 4.5,
+    rating: 4.4,
     reviews: 234,
-    description: 'Precision gaming mouse with 16000 DPI sensor, customizable RGB lighting, and ultra-long battery life.',
-    category: 'Gaming',
+    description: 'Sophisticated sheath dress perfect for the office and professional settings. Features a tailored fit and classic design.',
+    category: 'Women Dresses',
     features: [
-      '16000 DPI sensor',
-      'Wireless 2.4GHz + Bluetooth',
-      '70-hour battery life',
-      'RGB lighting',
-      '6 programmable buttons',
-      'Ergonomic design'
+      'Tailored sheath silhouette',
+      'Knee-length',
+      'Short sleeves',
+      'Back slit for movement',
+      'Professional design',
+      'Wrinkle-resistant fabric'
     ],
     specifications: {
-      'Brand': 'GameMaster',
-      'Model': 'GM-M200',
-      'DPI': 'Up to 16000',
-      'Battery': '70 hours',
-      'Buttons': '6 programmable',
-      'Weight': '95g'
+      'Brand': 'WorkWear',
+      'Material': '70% Polyester, 25% Rayon, 5% Spandex',
+      'Length': 'Knee length',
+      'Fit': 'Tailored sheath',
+      'Occasion': 'Office, Business, Professional',
+      'Care': 'Machine wash'
     },
     inStock: true,
-    colors: ['Black', 'White']
+    colors: ['Navy', 'Black', 'Charcoal Gray', 'Burgundy'],
+    sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL']
   },
   {
     id: 8,
-    name: '27" 4K Monitor',
-    price: 37499,
-    originalPrice: 49999,
+    name: 'Vintage Polka Dot Dress',
+    price: 2799,
+    originalPrice: 3999,
     images: [
-      'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=800',
-      'https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=800',
-      'https://images.unsplash.com/photo-1585792180666-f7347c490ee2?w=800',
-      'https://images.unsplash.com/photo-1547082299-de196ea013d6?w=800'
+      'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=800',
+      'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=800',
+      'https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=800',
+      'https://images.unsplash.com/photo-1550639525-c97d455acf70?w=800'
     ],
     rating: 4.6,
     reviews: 178,
-    description: 'Stunning 4K display with HDR support, 144Hz refresh rate, and ultra-thin bezels. Perfect for gaming and content creation.',
-    category: 'Displays',
+    description: 'Charming vintage-inspired polka dot dress with a retro silhouette. Features a fitted bodice and full skirt for a classic look.',
+    category: 'Women Dresses',
     features: [
-      '4K UHD resolution (3840x2160)',
-      '144Hz refresh rate',
-      'HDR10 support',
-      '1ms response time',
-      'Ultra-thin bezels',
-      'VESA mount compatible'
+      'Vintage polka dot print',
+      'Fitted bodice',
+      'Full A-line skirt',
+      'Belt included',
+      'Knee-length',
+      'Retro styling'
     ],
     specifications: {
-      'Brand': 'ViewPro',
-      'Size': '27 inches',
-      'Resolution': '3840 x 2160',
-      'Refresh Rate': '144Hz',
-      'Panel Type': 'IPS',
-      'Response Time': '1ms'
+      'Brand': 'VintageVibes',
+      'Material': '97% Cotton, 3% Spandex',
+      'Length': 'Knee length',
+      'Fit': 'Fitted bodice, full skirt',
+      'Occasion': 'Casual, Retro Party, Date',
+      'Care': 'Machine wash'
     },
-    inStock: true
+    inStock: true,
+    colors: ['Black with White Dots', 'Navy with White Dots', 'Red with White Dots'],
+    sizes: ['XS', 'S', 'M', 'L', 'XL']
   }
 ];
 
