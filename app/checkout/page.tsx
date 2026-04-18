@@ -66,9 +66,18 @@ export default function CheckoutPage() {
 
       // Redirect to success page
       router.push(`/order-success?orderId=${docRef.id}`);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error placing order:', error);
-      alert('Failed to place order. Please try again.');
+      
+      // Provide specific error messages
+      if (error.code === 'permission-denied') {
+        alert('Firebase permission error. Please contact support or check Firebase setup.\n\nError: Missing or insufficient permissions.\n\nFor developers: Update Firestore security rules in Firebase Console.');
+      } else if (error.message) {
+        alert(`Failed to place order: ${error.message}`);
+      } else {
+        alert('Failed to place order. Please try again.');
+      }
+      
       setIsProcessing(false);
     }
   };

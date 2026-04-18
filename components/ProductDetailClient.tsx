@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Star, ShoppingCart, Heart, Share2, Check, Truck, Shield, RotateCcw, Minus, Plus, ArrowLeft } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Star, ShoppingCart, Heart, Share2, Check, Truck, Shield, RotateCcw, Minus, Plus, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Product } from '@/data/products';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -22,6 +22,40 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   const [activeTab, setActiveTab] = useState<'description' | 'reviews'>('description');
   const [showAddedToCart, setShowAddedToCart] = useState(false);
 
+  // Auto-slide images every 3 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSelectedImage((prev) => (prev + 1) % product.images.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [product.images.length]);
+
+  const handlePrevImage = () => {
+    setSelectedImage((prev) => (prev - 1 + product.images.length) % product.images.length);
+  };
+
+  const handleNextImage = () => {
+    setSelectedImage((prev) => (prev + 1) % product.images.length);
+  };
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: product.name,
+          text: `Check out ${product.name} - ₹${product.price.toLocaleString('en-IN')}`,
+          url: window.location.href,
+        });
+      } catch (err) {
+        console.log('Error sharing:', err);
+      }
+    } else {
+      // Fallback: copy to clipboard
+      navigator.clipboard.writeText(window.location.href);
+      alert('Link copied to clipboard!');
+    }
+  };
+
   const discount = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
@@ -29,7 +63,10 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   const handleAddToCart = () => {
     addToCart(product, quantity, selectedColor, selectedSize);
     setShowAddedToCart(true);
-    setTimeout(() => setShowAddedToCart(false), 2000);
+    setTimeout(() => {
+      setShowAddedToCart(false);
+      router.push('/checkout');
+    }, 1000);
   };
 
   return (
@@ -38,26 +75,17 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
         {/* Back Button */}
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-gray-600 hover:text-primary transition mb-4"
+          className="flex items-center gap-2 text-gray-600 hover:text-primary transition mb-6"
         >
           <ArrowLeft className="w-5 h-5" />
           <span className="font-medium">Back</span>
         </button>
 
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-gray-600 mb-6">
-          <Link href="/" className="hover:text-primary">Home</Link>
-          <span>/</span>
-          <Link href="/category" className="hover:text-primary">{product.category}</Link>
-          <span>/</span>
-          <span className="text-gray-800">{product.name}</span>
-        </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* Product Images */}
           <div className="bg-white rounded-lg shadow-md p-4 md:p-8">
-            {/* Main Image */}
-            <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden mb-4">
+            {/* Main Image with Share Button and Navigation */}
+            <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden mb-4 group">
               <Image
                 src={product.images[selectedImage]}
                 alt={product.name}
@@ -66,10 +94,49 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                 priority
               />
               {discount > 0 && (
-                <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full font-semibold text-sm">
+                <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full font-semibold text-sm z-10">
                   -{discount}%
                 </div>
               )}
+              
+              {/* Share Button - Top Right */}
+              <button
+                onClick={handleShare}
+                className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2 rounded-full hover:bg-white transition shadow-lg z-10"
+                aria-label="Share product"
+              >
+                <Share2 className="w-5 h-5 text-gray-700" />
+              </button>
+
+              {/* Navigation Arrows */}
+              <button
+                onClick={handlePrevImage}
+                className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm p-2 rounded-full hover:bg-white transition opacity-0 group-hover:opacity-100 shadow-lg"
+                aria-label="Previous image"
+              >
+                <ChevronLeft className="w-6 h-6 text-gray-700" />
+              </button>
+              <button
+                onClick={handleNextImage}
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm p-2 rounded-full hover:bg-white transition opacity-0 group-hover:opacity-100 shadow-lg"
+                aria-label="Next image"
+              >
+                <ChevronRight className="w-6 h-6 text-gray-700" />
+              </button>
+
+              {/* Image Indicators */}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+                {product.images.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedImage(index)}
+                    className={`w-2 h-2 rounded-full transition ${
+                      selectedImage === index ? 'bg-white w-6' : 'bg-white/50'
+                    }`}
+                    aria-label={`Go to image ${index + 1}`}
+                  />
+                ))}
+              </div>
             </div>
             
             {/* Thumbnail Gallery */}
@@ -229,10 +296,6 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               <button className="flex-1 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition flex items-center justify-center gap-2 text-sm">
                 <Heart className="w-4 h-4" />
                 Wishlist
-              </button>
-              <button className="flex-1 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition flex items-center justify-center gap-2 text-sm">
-                <Share2 className="w-4 h-4" />
-                Share
               </button>
             </div>
 
