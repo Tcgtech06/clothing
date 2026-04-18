@@ -1,12 +1,13 @@
 import { Star } from 'lucide-react';
 import CheckoutButton from './CheckoutButton';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface Product {
   id: number;
   name: string;
   price: number;
-  image: string;
+  images: string[];
   rating: number;
 }
 
@@ -15,9 +16,13 @@ export default function ProductCard({ product }: { product: Product }) {
     <div className="bg-white rounded-lg shadow-md hover:shadow-xl transition overflow-hidden group">
       {/* Product Image - Clickable */}
       <Link href={`/product/${product.id}`}>
-        <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center overflow-hidden cursor-pointer">
-          <div className="text-gray-400 text-sm">Product Image</div>
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition" />
+        <div className="relative h-48 bg-gray-100 flex items-center justify-center overflow-hidden cursor-pointer">
+          <Image
+            src={product.images[0]}
+            alt={product.name}
+            fill
+            className="object-cover group-hover:scale-105 transition duration-300"
+          />
         </div>
       </Link>
 

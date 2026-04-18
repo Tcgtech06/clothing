@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, Grid, Award, Package, User } from 'lucide-react';
 import { useState } from 'react';
+import ProfileMenu from './ProfileMenu';
 
 const navItems = [
   { name: 'Home', href: '/', icon: Home },
@@ -15,71 +16,23 @@ const navItems = [
 export default function Navigation() {
   const pathname = usePathname();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showMobileProfile, setShowMobileProfile] = useState(false);
 
   return (
     <>
+      {/* Mobile Profile Slide-in Menu */}
+      <ProfileMenu isOpen={showMobileProfile} onClose={() => setShowMobileProfile(false)} />
+
       {/* Mobile Navigation - Top Bar with Profile */}
-      <nav className="md:hidden fixed top-0 left-0 right-0 bg-white shadow-md z-50">
+      <nav className="md:hidden fixed top-0 left-0 right-0 bg-white shadow-md z-40">
         <div className="flex items-center justify-between px-4 h-14">
           {/* Profile Icon - Left Side */}
-          <div className="relative">
-            <button
-              onClick={() => setShowProfileMenu(!showProfileMenu)}
-              className="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-white hover:shadow-lg transition"
-            >
-              <User className="w-6 h-6" />
-            </button>
-            
-            {/* Profile Dropdown */}
-            {showProfileMenu && (
-              <div className="absolute top-12 left-0 bg-white rounded-lg shadow-xl border border-gray-200 py-2 w-64 z-50">
-                {/* User Info */}
-                <div className="px-4 py-3 border-b border-gray-200">
-                  <p className="font-semibold text-gray-800">John Doe</p>
-                  <p className="text-sm text-gray-500">john@example.com</p>
-                </div>
-                
-                {/* Stats */}
-                <div className="px-4 py-3 border-b border-gray-200">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-gray-600">Orders</span>
-                    <span className="font-semibold text-primary">12</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Loyalty Points</span>
-                    <span className="font-semibold text-orange-600">2,450</span>
-                  </div>
-                </div>
-                
-                {/* Menu Items */}
-                <Link
-                  href="/profile"
-                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  onClick={() => setShowProfileMenu(false)}
-                >
-                  My Profile
-                </Link>
-                <Link
-                  href="/orders"
-                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  onClick={() => setShowProfileMenu(false)}
-                >
-                  My Orders
-                </Link>
-                <Link
-                  href="/loyalty"
-                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  onClick={() => setShowProfileMenu(false)}
-                >
-                  Loyalty Points
-                </Link>
-                <hr className="my-2" />
-                <button className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100">
-                  Logout
-                </button>
-              </div>
-            )}
-          </div>
+          <button
+            onClick={() => setShowMobileProfile(true)}
+            className="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-white hover:shadow-lg transition"
+          >
+            <User className="w-6 h-6" />
+          </button>
 
           {/* Logo - Center */}
           <Link href="/" className="text-xl font-bold text-primary">
