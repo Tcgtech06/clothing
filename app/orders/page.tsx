@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Package, Truck, CheckCircle, Clock, X, MapPin } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { collection, query, orderBy, where, onSnapshot } from 'firebase/firestore';
+import Link from 'next/link';
 
 interface Order {
   id: string;
@@ -121,12 +122,12 @@ export default function OrdersPage() {
           <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-gray-800 mb-2">No orders yet</h3>
           <p className="text-gray-600 mb-6">Start shopping to see your orders here</p>
-          <a
+          <Link
             href="/"
             className="inline-block bg-primary text-white px-8 py-3 rounded-lg hover:bg-primary/90 transition font-semibold"
           >
             Start Shopping
-          </a>
+          </Link>
         </div>
       </div>
     );

@@ -18,7 +18,7 @@ function OrderSuccessContent() {
         
         <h1 className="text-3xl font-bold text-gray-800 mb-2">Order Placed Successfully!</h1>
         <p className="text-gray-600 mb-6">
-          Thank you for your order. We'll send you a confirmation email shortly.
+          Thank you for your order. We&apos;ll send you a confirmation email shortly.
         </p>
 
         {orderId && (
