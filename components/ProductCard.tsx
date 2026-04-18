@@ -44,9 +44,9 @@ export default function ProductCard({ product }: { product: Product }) {
         {/* Price and Add to Cart */}
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-2xl font-bold text-primary">${product.price}</p>
+            <p className="text-2xl font-bold text-primary">₹{product.price.toLocaleString('en-IN')}</p>
           </div>
-          <CheckoutButton productName={product.name} productPrice={product.price} />
+          <CheckoutButton productName={product.name} productPrice={product.price} productId={product.id} />
         </div>
       </div>
     </div>

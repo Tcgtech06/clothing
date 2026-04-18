@@ -21,8 +21,8 @@ export const products: Product[] = [
   {
     id: 1,
     name: 'Premium Wireless Headphones',
-    price: 299.99,
-    originalPrice: 399.99,
+    price: 24999,
+    originalPrice: 32999,
     images: [
       'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800',
       'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=800',
@@ -55,8 +55,8 @@ export const products: Product[] = [
   {
     id: 2,
     name: 'Smart Watch Pro',
-    price: 399.99,
-    originalPrice: 499.99,
+    price: 32999,
+    originalPrice: 41999,
     images: [
       'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800',
       'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=800',
@@ -89,8 +89,8 @@ export const products: Product[] = [
   {
     id: 3,
     name: 'Wireless Earbuds',
-    price: 149.99,
-    originalPrice: 199.99,
+    price: 12499,
+    originalPrice: 16499,
     images: [
       'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=800',
       'https://images.unsplash.com/photo-1606841837239-c5a1a4a07af7?w=800',
@@ -123,7 +123,7 @@ export const products: Product[] = [
   {
     id: 4,
     name: 'Ergonomic Laptop Stand',
-    price: 79.99,
+    price: 6499,
     images: [
       'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=800',
       'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=800',
@@ -156,7 +156,7 @@ export const products: Product[] = [
   {
     id: 5,
     name: 'USB-C Hub 7-in-1',
-    price: 59.99,
+    price: 4999,
     images: [
       'https://images.unsplash.com/photo-1625948515291-69613efd103f?w=800',
       'https://images.unsplash.com/photo-1591370874773-6702e8f12fd8?w=800',
@@ -188,8 +188,8 @@ export const products: Product[] = [
   {
     id: 6,
     name: 'Mechanical Gaming Keyboard',
-    price: 189.99,
-    originalPrice: 249.99,
+    price: 15999,
+    originalPrice: 20999,
     images: [
       'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800',
       'https://images.unsplash.com/photo-1595225476474-87563907a212?w=800',
@@ -222,7 +222,7 @@ export const products: Product[] = [
   {
     id: 7,
     name: 'Wireless Gaming Mouse',
-    price: 89.99,
+    price: 7499,
     images: [
       'https://images.unsplash.com/photo-1527814050087-3793815479db?w=800',
       'https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=800',
@@ -255,8 +255,8 @@ export const products: Product[] = [
   {
     id: 8,
     name: '27" 4K Monitor',
-    price: 449.99,
-    originalPrice: 599.99,
+    price: 37499,
+    originalPrice: 49999,
     images: [
       'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=800',
       'https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=800',

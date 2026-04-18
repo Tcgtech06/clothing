@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import Navigation from '@/components/Navigation';
+import { CartProvider } from '@/lib/cart-context';
 
 export const metadata: Metadata = {
   title: 'E-Commerce PWA',
@@ -26,8 +27,10 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
       </head>
       <body className="bg-gray-50">
-        <Navigation />
-        <main className="pt-14 pb-20 md:pt-0 md:pb-0">{children}</main>
+        <CartProvider>
+          <Navigation />
+          <main className="pt-14 pb-20 md:pt-0 md:pb-0">{children}</main>
+        </CartProvider>
       </body>
     </html>
   );

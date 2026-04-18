@@ -3,24 +3,39 @@
 import { useState } from 'react';
 import { Star, ShoppingCart, Heart, Share2, Check, Truck, Shield, RotateCcw, Minus, Plus } from 'lucide-react';
 import { Product } from '@/data/products';
-import CheckoutButton from './CheckoutButton';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useCart } from '@/lib/cart-context';
+import { useRouter } from 'next/navigation';
 
 interface ProductDetailClientProps {
   product: Product;
 }
 
 export default function ProductDetailClient({ product }: ProductDetailClientProps) {
+  const router = useRouter();
+  const { addToCart } = useCart();
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedColor, setSelectedColor] = useState(product.colors?.[0] || '');
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || '');
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<'description' | 'reviews'>('description');
+  const [showAddedToCart, setShowAddedToCart] = useState(false);
 
   const discount = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
+
+  const handleAddToCart = () => {
+    addToCart(product, quantity, selectedColor, selectedSize);
+    setShowAddedToCart(true);
+    setTimeout(() => setShowAddedToCart(false), 2000);
+  };
+
+  const handleBuyNow = () => {
+    addToCart(product, quantity, selectedColor, selectedSize);
+    router.push('/cart');
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -100,10 +115,10 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
             {/* Price */}
             <div className="mb-6">
               <div className="flex items-center gap-3">
-                <span className="text-3xl md:text-4xl font-bold text-primary">${product.price}</span>
+                <span className="text-3xl md:text-4xl font-bold text-primary">₹{product.price.toLocaleString('en-IN')}</span>
                 {product.originalPrice && (
                   <span className="text-xl md:text-2xl text-gray-400 line-through">
-                    ${product.originalPrice}
+                    ₹{product.originalPrice.toLocaleString('en-IN')}
                   </span>
                 )}
               </div>
@@ -189,12 +204,27 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 mb-6">
-              <CheckoutButton productName={product.name} productPrice={product.price * quantity} />
-              <button className="flex-1 bg-gray-800 text-white px-6 py-3 rounded-lg hover:bg-gray-900 transition font-semibold flex items-center justify-center gap-2">
+              <button
+                onClick={handleBuyNow}
+                className="flex-1 bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition font-semibold flex items-center justify-center gap-2"
+              >
+                Buy Now
+              </button>
+              <button
+                onClick={handleAddToCart}
+                className="flex-1 bg-gray-800 text-white px-6 py-3 rounded-lg hover:bg-gray-900 transition font-semibold flex items-center justify-center gap-2"
+              >
                 <ShoppingCart className="w-5 h-5" />
                 Add to Cart
               </button>
             </div>
+
+            {/* Added to Cart Message */}
+            {showAddedToCart && (
+              <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-800 text-center animate-fade-in">
+                ✓ Added to cart successfully!
+              </div>
+            )}
 
             {/* Secondary Actions */}
             <div className="flex gap-3 mb-6">
