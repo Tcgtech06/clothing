@@ -111,7 +111,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* Product Images */}
           <div className="bg-white rounded-lg shadow-md p-4 md:p-8">
-            {/* Main Image with Share Button and Navigation */}
+            {/* Main Image with Share and Favourite Buttons */}
             <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden mb-4 group">
               <Image
                 src={product.images[selectedImage]}
@@ -126,14 +126,28 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                 </div>
               )}
               
-              {/* Share Button - Top Right */}
-              <button
-                onClick={handleShare}
-                className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2 rounded-full hover:bg-white transition shadow-lg z-10"
-                aria-label="Share product"
-              >
-                <Share2 className="w-5 h-5 text-gray-700" />
-              </button>
+              {/* Top Right Icons */}
+              <div className="absolute top-4 right-4 flex gap-2 z-10">
+                {/* Favourite Button */}
+                <button
+                  onClick={handleToggleFavourite}
+                  className={`bg-white/90 backdrop-blur-sm p-2 rounded-full hover:bg-white transition shadow-lg ${
+                    isProductFavourite ? 'bg-red-50' : ''
+                  }`}
+                  aria-label={isProductFavourite ? 'Remove from favourites' : 'Add to favourites'}
+                >
+                  <Heart className={`w-5 h-5 ${isProductFavourite ? 'fill-red-500 text-red-500' : 'text-gray-700'}`} />
+                </button>
+
+                {/* Share Button */}
+                <button
+                  onClick={handleShare}
+                  className="bg-white/90 backdrop-blur-sm p-2 rounded-full hover:bg-white transition shadow-lg"
+                  aria-label="Share product"
+                >
+                  <Share2 className="w-5 h-5 text-gray-700" />
+                </button>
+              </div>
 
               {/* Navigation Arrows */}
               <button
@@ -317,21 +331,6 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                 ✓ Added to cart successfully!
               </div>
             )}
-
-            {/* Secondary Actions */}
-            <div className="flex gap-3 mb-6">
-              <button 
-                onClick={handleToggleFavourite}
-                className={`flex-1 border-2 px-4 py-2 rounded-lg transition flex items-center justify-center gap-2 text-sm ${
-                  isProductFavourite 
-                    ? 'border-red-500 bg-red-50 text-red-600' 
-                    : 'border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                <Heart className={`w-4 h-4 ${isProductFavourite ? 'fill-red-500' : ''}`} />
-                {isProductFavourite ? 'Remove from Favourites' : 'Add to Favourites'}
-              </button>
-            </div>
 
             {/* Features */}
             <div className="border-t pt-6">

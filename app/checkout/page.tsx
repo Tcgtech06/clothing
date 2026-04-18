@@ -1,17 +1,30 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCart } from '@/lib/cart-context';
 import { useRouter } from 'next/navigation';
-import { CreditCard, Wallet, MapPin, User, Phone, Mail } from 'lucide-react';
+import { CreditCard, Wallet, MapPin, User, Phone, Mail, Edit2, Plus, Check } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+
+interface SavedAddress {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  pincode: string;
+}
 
 export default function CheckoutPage() {
   const { cart, getCartTotal, clearCart } = useCart();
   const router = useRouter();
   const [paymentMethod, setPaymentMethod] = useState<'cod' | 'online'>('cod');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [savedAddress, setSavedAddress] = useState<SavedAddress | null>(null);
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
+  const [saveAddress, setSaveAddress] = useState(false);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -23,8 +36,33 @@ export default function CheckoutPage() {
     pincode: '',
   });
 
+  // Load saved address from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('shippingAddress');
+    if (saved) {
+      const parsedAddress = JSON.parse(saved);
+      setSavedAddress(parsedAddress);
+      setFormData(parsedAddress);
+    } else {
+      setIsEditingAddress(true);
+    }
+  }, []);
+
+  const handleSaveAddress = () => {
+    localStorage.setItem('shippingAddress', JSON.stringify(formData));
+    setSavedAddress(formData);
+    setIsEditingAddress(false);
+    setSaveAddress(false);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Save address if checkbox is checked
+    if (saveAddress && !savedAddress) {
+      handleSaveAddress();
+    }
+
     setIsProcessing(true);
 
     try {
@@ -98,119 +136,203 @@ export default function CheckoutPage() {
             <div className="lg:col-span-2 space-y-6">
               {/* Shipping Address */}
               <div className="bg-white rounded-lg shadow-md p-6">
-                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                  <MapPin className="w-5 h-5 text-primary" />
-                  Shipping Address
-                </h2>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Full Name *
-                    </label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-bold flex items-center gap-2">
+                    <MapPin className="w-5 h-5 text-primary" />
+                    Shipping Address
+                  </h2>
+                  {savedAddress && !isEditingAddress && (
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingAddress(true)}
+                      className="flex items-center gap-2 text-primary hover:text-primary/80 transition text-sm font-medium"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                      Edit
+                    </button>
+                  )}
+                </div>
+
+                {savedAddress && !isEditingAddress ? (
+                  /* Display Saved Address */
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <div className="flex items-start gap-3">
+                      <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                      <div className="flex-1">
+                        <p className="font-semibold text-gray-800">{savedAddress.name}</p>
+                        <p className="text-sm text-gray-600">{savedAddress.email} • {savedAddress.phone}</p>
+                        <p className="text-sm text-gray-600 mt-2">
+                          {savedAddress.address}, {savedAddress.city}, {savedAddress.state} - {savedAddress.pincode}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormData({
+                          name: '',
+                          email: '',
+                          phone: '',
+                          address: '',
+                          city: '',
+                          state: '',
+                          pincode: '',
+                        });
+                        setIsEditingAddress(true);
+                      }}
+                      className="mt-4 flex items-center gap-2 text-primary hover:text-primary/80 transition text-sm font-medium"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Use Different Address
+                    </button>
+                  </div>
+                ) : (
+                  /* Address Form */
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Full Name *
+                      </label>
+                      <div className="relative">
+                        <User className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                        <input
+                          type="text"
+                          required
+                          value={formData.name}
+                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                          placeholder="John Doe"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Email *
+                      </label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                        <input
+                          type="email"
+                          required
+                          value={formData.email}
+                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                          placeholder="john@example.com"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Phone Number *
+                      </label>
+                      <div className="relative">
+                        <Phone className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                        <input
+                          type="tel"
+                          required
+                          value={formData.phone}
+                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                          placeholder="+91 98765 43210"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Address *
+                      </label>
+                      <textarea
+                        required
+                        value={formData.address}
+                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                        rows={2}
+                        placeholder="House No, Street, Area"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        City *
+                      </label>
                       <input
                         type="text"
                         required
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                        placeholder="John Doe"
+                        value={formData.city}
+                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                        placeholder="Mumbai"
                       />
                     </div>
-                  </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Email *
-                    </label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        State *
+                      </label>
                       <input
-                        type="email"
+                        type="text"
                         required
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                        placeholder="john@example.com"
+                        value={formData.state}
+                        onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                        placeholder="Maharashtra"
                       />
                     </div>
-                  </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Phone Number *
-                    </label>
-                    <div className="relative">
-                      <Phone className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Pincode *
+                      </label>
                       <input
-                        type="tel"
+                        type="text"
                         required
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                        placeholder="+91 98765 43210"
+                        value={formData.pincode}
+                        onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                        placeholder="400001"
                       />
                     </div>
-                  </div>
 
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Address *
-                    </label>
-                    <textarea
-                      required
-                      value={formData.address}
-                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                      rows={2}
-                      placeholder="House No, Street, Area"
-                    />
-                  </div>
+                    {!savedAddress && (
+                      <div className="md:col-span-2">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={saveAddress}
+                            onChange={(e) => setSaveAddress(e.target.checked)}
+                            className="w-4 h-4 text-primary rounded focus:ring-2 focus:ring-primary"
+                          />
+                          <span className="text-sm text-gray-700">Save this address for future orders</span>
+                        </label>
+                      </div>
+                    )}
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      City *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.city}
-                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                      placeholder="Mumbai"
-                    />
+                    {savedAddress && isEditingAddress && (
+                      <div className="md:col-span-2 flex gap-3">
+                        <button
+                          type="button"
+                          onClick={handleSaveAddress}
+                          className="flex-1 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition font-medium"
+                        >
+                          Save Address
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setFormData(savedAddress);
+                            setIsEditingAddress(false);
+                          }}
+                          className="flex-1 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition font-medium"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    )}
                   </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      State *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.state}
-                      onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                      placeholder="Maharashtra"
-                    />
-                  </div>
-
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Pincode *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.pincode}
-                      onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                      placeholder="400001"
-                    />
-                  </div>
-                </div>
+                )}
               </div>
 
               {/* Payment Method */}
