@@ -141,16 +141,6 @@ export default function HeroSlideshow() {
           />
         ))}
       </div>
-
-      {/* Auto-play indicator */}
-      <div className="absolute top-4 right-4 z-10">
-        <button
-          onClick={() => setIsAutoPlaying(!isAutoPlaying)}
-          className="bg-white/30 hover:bg-white/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm transition"
-        >
-          {isAutoPlaying ? '⏸ Pause' : '▶ Play'}
-        </button>
-      </div>
     </section>
   );
 }

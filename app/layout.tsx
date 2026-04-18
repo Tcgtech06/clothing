@@ -27,7 +27,7 @@ export default function RootLayout({
       </head>
       <body className="bg-gray-50">
         <Navigation />
-        <main className="pb-20 md:pb-0">{children}</main>
+        <main className="pt-14 pb-20 md:pt-0 md:pb-0">{children}</main>
       </body>
     </html>
   );
