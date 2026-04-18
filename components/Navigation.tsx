@@ -32,7 +32,26 @@ export default function Navigation() {
             
             {/* Profile Dropdown */}
             {showProfileMenu && (
-              <div className="absolute top-12 left-0 bg-white rounded-lg shadow-xl border border-gray-200 py-2 w-48 z-50">
+              <div className="absolute top-12 left-0 bg-white rounded-lg shadow-xl border border-gray-200 py-2 w-64 z-50">
+                {/* User Info */}
+                <div className="px-4 py-3 border-b border-gray-200">
+                  <p className="font-semibold text-gray-800">John Doe</p>
+                  <p className="text-sm text-gray-500">john@example.com</p>
+                </div>
+                
+                {/* Stats */}
+                <div className="px-4 py-3 border-b border-gray-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm text-gray-600">Orders</span>
+                    <span className="font-semibold text-primary">12</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Loyalty Points</span>
+                    <span className="font-semibold text-orange-600">2,450</span>
+                  </div>
+                </div>
+                
+                {/* Menu Items */}
                 <Link
                   href="/profile"
                   className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
@@ -113,7 +132,26 @@ export default function Navigation() {
                 
                 {/* Profile Dropdown */}
                 {showProfileMenu && (
-                  <div className="absolute top-12 right-0 bg-white rounded-lg shadow-xl border border-gray-200 py-2 w-48 z-50">
+                  <div className="absolute top-12 right-0 bg-white rounded-lg shadow-xl border border-gray-200 py-2 w-64 z-50">
+                    {/* User Info */}
+                    <div className="px-4 py-3 border-b border-gray-200">
+                      <p className="font-semibold text-gray-800">John Doe</p>
+                      <p className="text-sm text-gray-500">john@example.com</p>
+                    </div>
+                    
+                    {/* Stats */}
+                    <div className="px-4 py-3 border-b border-gray-200">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm text-gray-600">Orders</span>
+                        <span className="font-semibold text-primary">12</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">Loyalty Points</span>
+                        <span className="font-semibold text-orange-600">2,450</span>
+                      </div>
+                    </div>
+                    
+                    {/* Menu Items */}
                     <Link
                       href="/profile"
                       className="block px-4 py-2 text-gray-700 hover:bg-gray-100"

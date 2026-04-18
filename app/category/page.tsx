@@ -1,23 +1,12 @@
 import ProductCard from '@/components/ProductCard';
 import { Filter } from 'lucide-react';
+import { products, getAllCategories } from '@/data/products';
 
-const categories = [
-  { id: 1, name: 'Electronics', count: 245 },
-  { id: 2, name: 'Fashion', count: 532 },
-  { id: 3, name: 'Home & Garden', count: 189 },
-  { id: 4, name: 'Sports & Outdoors', count: 321 },
-  { id: 5, name: 'Books', count: 876 },
-  { id: 6, name: 'Toys & Games', count: 234 },
-];
-
-const products = [
-  { id: 1, name: 'Wireless Mouse', price: 29.99, image: '/products/mouse.jpg', rating: 4.2 },
-  { id: 2, name: 'Gaming Keyboard', price: 129.99, image: '/products/keyboard.jpg', rating: 4.7 },
-  { id: 3, name: 'Monitor 27"', price: 349.99, image: '/products/monitor.jpg', rating: 4.6 },
-  { id: 4, name: 'Webcam HD', price: 79.99, image: '/products/webcam.jpg', rating: 4.4 },
-  { id: 5, name: 'Desk Lamp', price: 39.99, image: '/products/lamp.jpg', rating: 4.3 },
-  { id: 6, name: 'Phone Stand', price: 19.99, image: '/products/stand.jpg', rating: 4.5 },
-];
+const categories = getAllCategories().map((cat, index) => ({
+  id: index + 1,
+  name: cat,
+  count: products.filter(p => p.category === cat).length
+}));
 
 export default function CategoryPage() {
   return (
@@ -46,9 +35,9 @@ export default function CategoryPage() {
 
         {/* Products in Selected Category */}
         <div>
-          <h2 className="text-2xl font-bold mb-6 text-gray-800">Electronics</h2>
+          <h2 className="text-2xl font-bold mb-6 text-gray-800">All Products</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {products.map((product) => (
+            {products.slice(0, 6).map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>

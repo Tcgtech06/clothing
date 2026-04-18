@@ -1,5 +1,6 @@
 import { Star } from 'lucide-react';
 import CheckoutButton from './CheckoutButton';
+import Link from 'next/link';
 
 interface Product {
   id: number;
@@ -12,15 +13,21 @@ interface Product {
 export default function ProductCard({ product }: { product: Product }) {
   return (
     <div className="bg-white rounded-lg shadow-md hover:shadow-xl transition overflow-hidden group">
-      {/* Product Image */}
-      <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center overflow-hidden">
-        <div className="text-gray-400 text-sm">Product Image</div>
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition" />
-      </div>
+      {/* Product Image - Clickable */}
+      <Link href={`/product/${product.id}`}>
+        <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center overflow-hidden cursor-pointer">
+          <div className="text-gray-400 text-sm">Product Image</div>
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition" />
+        </div>
+      </Link>
 
       {/* Product Info */}
       <div className="p-4">
-        <h3 className="font-semibold text-gray-800 mb-2 line-clamp-2">{product.name}</h3>
+        <Link href={`/product/${product.id}`}>
+          <h3 className="font-semibold text-gray-800 mb-2 line-clamp-2 hover:text-primary transition cursor-pointer">
+            {product.name}
+          </h3>
+        </Link>
         
         {/* Rating */}
         <div className="flex items-center gap-1 mb-3">

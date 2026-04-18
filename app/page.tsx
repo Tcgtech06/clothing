@@ -1,14 +1,8 @@
 import ProductCard from '@/components/ProductCard';
 import HeroSlideshow from '@/components/HeroSlideshow';
+import { products } from '@/data/products';
 
-const featuredProducts = [
-  { id: 1, name: 'Premium Headphones', price: 299.99, image: '/products/headphones.jpg', rating: 4.5 },
-  { id: 2, name: 'Smart Watch', price: 399.99, image: '/products/watch.jpg', rating: 4.8 },
-  { id: 3, name: 'Wireless Earbuds', price: 149.99, image: '/products/earbuds.jpg', rating: 4.6 },
-  { id: 4, name: 'Laptop Stand', price: 79.99, image: '/products/stand.jpg', rating: 4.3 },
-  { id: 5, name: 'USB-C Hub', price: 59.99, image: '/products/hub.jpg', rating: 4.4 },
-  { id: 6, name: 'Mechanical Keyboard', price: 189.99, image: '/products/keyboard.jpg', rating: 4.7 },
-];
+const featuredProducts = products.slice(0, 6);
 
 export default function Home() {
   return (
