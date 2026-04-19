@@ -343,7 +343,7 @@ export default function AdminDashboard() {
   };
 
   const handleInitializePolls = async () => {
-    if (!confirm('This will initialize poll data (Best/Good/Average/Worst = 0) for all products that don\'t have it. Continue?')) {
+    if (!confirm('This will initialize poll data (Best/Good/Average/Worst = 0) for all products that don&apos;t have it. Continue?')) {
       return;
     }
     
@@ -609,7 +609,7 @@ export default function AdminDashboard() {
             </p>
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <p className="text-sm text-blue-800">
-                <strong>Note:</strong> If products don't show poll colors on the home page, click "Initialize Polls" to add poll data to all existing products.
+                <strong>Note:</strong> If products don&apos;t show poll colors on the home page, click &quot;Initialize Polls&quot; to add poll data to all existing products.
               </p>
             </div>
           </div>
