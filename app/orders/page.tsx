@@ -54,12 +54,12 @@ const getStatusColor = (status: string) => {
 
 const getTrackingSteps = (status: string) => {
   const allSteps = [
-    { key: 'placed', label: 'Order Placed', icon: '📦' },
-    { key: 'accepted', label: 'Order Accepted', icon: '✓' },
-    { key: 'shipped', label: 'Shipped', icon: '🚚' },
-    { key: 'nearby', label: 'Nearby Delivery', icon: '📍' },
-    { key: 'out-for-delivery', label: 'Out for Delivery', icon: '🏃' },
-    { key: 'delivered', label: 'Delivered', icon: '✅' },
+    { key: 'placed', label: 'Order Placed' },
+    { key: 'accepted', label: 'Order Accepted' },
+    { key: 'shipped', label: 'Shipped' },
+    { key: 'nearby', label: 'Nearby Delivery' },
+    { key: 'out-for-delivery', label: 'Out for Delivery' },
+    { key: 'delivered', label: 'Delivered' },
   ];
 
   // Map status to step index
@@ -201,12 +201,12 @@ export default function OrdersPage() {
                     <div className="relative flex justify-between" style={{ zIndex: 2 }}>
                       {getTrackingSteps(order.status).map((step, index) => (
                         <div key={index} className="flex flex-col items-center" style={{ flex: 1 }}>
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 text-lg transition-all duration-300 ${
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 font-bold transition-all duration-300 ${
                             step.status === 'completed' ? 'bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg scale-110' :
                             step.status === 'current' ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg scale-110 animate-pulse' :
                             'bg-gray-200 text-gray-400'
                           }`}>
-                            {step.icon}
+                            {step.status === 'completed' ? '✓' : index + 1}
                           </div>
                           <p className={`text-xs text-center max-w-[80px] transition-all ${
                             step.status === 'completed' || step.status === 'current' ? 'text-gray-800 font-semibold' : 'text-gray-400'

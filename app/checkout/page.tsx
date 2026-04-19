@@ -121,7 +121,9 @@ export default function CheckoutPage() {
   };
 
   if (cart.length === 0) {
-    router.push('/cart');
+    useEffect(() => {
+      router.push('/cart');
+    }, [router]);
     return null;
   }
 
