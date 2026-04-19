@@ -2,11 +2,12 @@
 
 import { useFavourites } from '@/lib/favourites-context';
 import ProductCard from '@/components/ProductCard';
-import { Heart } from 'lucide-react';
+import { Heart, X } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function FavouritesPage() {
-  const { favourites } = useFavourites();
+  const { favourites, removeFromFavourites } = useFavourites();
 
   return (
     <div className="min-h-screen bg-gray-50 pt-16 pb-20 md:pt-20 md:pb-8">
@@ -37,7 +38,17 @@ export default function FavouritesPage() {
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {favourites.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <div key={product.id} className="relative group">
+                  {/* Remove Button */}
+                  <button
+                    onClick={() => removeFromFavourites(product.id)}
+                    className="absolute top-2 right-2 z-10 bg-white/90 backdrop-blur-sm p-2 rounded-full hover:bg-red-50 transition shadow-lg group-hover:scale-110"
+                    aria-label="Remove from favourites"
+                  >
+                    <X className="w-5 h-5 text-red-500" />
+                  </button>
+                  <ProductCard product={product} />
+                </div>
               ))}
             </div>
           </>

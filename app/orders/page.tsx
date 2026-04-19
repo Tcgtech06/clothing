@@ -68,12 +68,9 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // For demo, using email from localStorage or default
-    const userEmail = 'john@example.com'; // In real app, get from auth
-
+    // Fetch all orders (no email filter since we don't have auth yet)
     const q = query(
       collection(db, 'orders'),
-      where('customerEmail', '==', userEmail),
       orderBy('createdAt', 'desc')
     );
 
@@ -86,6 +83,9 @@ export default function OrdersPage() {
         } as Order);
       });
       setOrders(ordersData);
+      setLoading(false);
+    }, (error) => {
+      console.error('Error fetching orders:', error);
       setLoading(false);
     });
 
