@@ -78,24 +78,6 @@ export default function ProfileMenu({ isOpen, onClose }: ProfileMenuProps) {
               <User className="w-5 h-5 text-gray-600" />
               <span className="font-medium text-gray-800">My Profile</span>
             </Link>
-            
-            <Link
-              href="/orders"
-              onClick={onClose}
-              className="flex items-center gap-3 p-4 rounded-lg hover:bg-gray-100 transition"
-            >
-              <Package className="w-5 h-5 text-gray-600" />
-              <span className="font-medium text-gray-800">My Orders</span>
-            </Link>
-            
-            <Link
-              href="/loyalty"
-              onClick={onClose}
-              className="flex items-center gap-3 p-4 rounded-lg hover:bg-gray-100 transition"
-            >
-              <Award className="w-5 h-5 text-gray-600" />
-              <span className="font-medium text-gray-800">Loyalty Points</span>
-            </Link>
           </nav>
 
           {/* Logout Button */}

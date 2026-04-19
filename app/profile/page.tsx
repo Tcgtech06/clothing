@@ -1,7 +1,8 @@
 'use client';
 
-import { User, Mail, Phone, MapPin, Edit2, Camera } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Edit2, Camera, Package, Award, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
@@ -160,13 +161,50 @@ export default function ProfilePage() {
             <p className="text-gray-600 mt-1">Total Orders</p>
           </div>
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <p className="text-3xl font-bold text-green-600">$1,234</p>
+            <p className="text-3xl font-bold text-green-600">₹1,234</p>
             <p className="text-gray-600 mt-1">Total Spent</p>
           </div>
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
             <p className="text-3xl font-bold text-orange-600">2,450</p>
             <p className="text-gray-600 mt-1">Loyalty Points</p>
           </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+          <Link href="/orders">
+            <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition cursor-pointer group">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center group-hover:bg-primary/20 transition">
+                    <Package className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-800">My Orders</h3>
+                    <p className="text-sm text-gray-600">View and track your orders</p>
+                  </div>
+                </div>
+                <ChevronRight className="w-6 h-6 text-gray-400 group-hover:text-primary transition" />
+              </div>
+            </div>
+          </Link>
+
+          <Link href="/loyalty">
+            <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition cursor-pointer group">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center group-hover:bg-orange-200 transition">
+                    <Award className="w-6 h-6 text-orange-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-800">Loyalty Points</h3>
+                    <p className="text-sm text-gray-600">Redeem your rewards</p>
+                  </div>
+                </div>
+                <ChevronRight className="w-6 h-6 text-gray-400 group-hover:text-orange-600 transition" />
+              </div>
+            </div>
+          </Link>
         </div>
       </div>
     </div>
