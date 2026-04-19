@@ -1,49 +1,128 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle, Package } from 'lucide-react';
-import { Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 
 function OrderSuccessContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const orderId = searchParams.get('orderId');
+  const [countdown, setCountdown] = useState(5);
+  const [showAnimation, setShowAnimation] = useState(false);
+
+  useEffect(() => {
+    // Trigger animation after a short delay
+    setTimeout(() => setShowAnimation(true), 100);
+
+    // Countdown timer
+    const countdownInterval = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(countdownInterval);
+          router.push('/orders');
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(countdownInterval);
+  }, [router]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
-        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <CheckCircle className="w-12 h-12 text-green-600" />
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center px-4">
+      <div className={`max-w-md w-full bg-white rounded-2xl shadow-2xl p-8 text-center transform transition-all duration-700 ${
+        showAnimation ? 'scale-100 opacity-100' : 'scale-75 opacity-0'
+      }`}>
+        {/* Animated Success Icon */}
+        <div className="relative mb-6">
+          <div className={`w-24 h-24 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto transform transition-all duration-500 ${
+            showAnimation ? 'scale-100 rotate-0' : 'scale-0 rotate-180'
+          }`}>
+            <CheckCircle className="w-16 h-16 text-white animate-bounce" />
+          </div>
+          {/* Confetti effect */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            {[...Array(8)].map((_, i) => (
+              <div
+                key={i}
+                className={`absolute w-2 h-2 bg-gradient-to-r from-yellow-400 to-pink-500 rounded-full transform transition-all duration-1000 ${
+                  showAnimation ? 'opacity-0' : 'opacity-100'
+                }`}
+                style={{
+                  transform: showAnimation 
+                    ? `translate(${Math.cos(i * 45 * Math.PI / 180) * 100}px, ${Math.sin(i * 45 * Math.PI / 180) * 100}px) scale(0)` 
+                    : 'translate(0, 0) scale(1)',
+                  transitionDelay: `${i * 50}ms`
+                }}
+              />
+            ))}
+          </div>
         </div>
         
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Order Placed Successfully!</h1>
-        <p className="text-gray-600 mb-6">
+        <h1 className={`text-3xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-3 transform transition-all duration-500 delay-200 ${
+          showAnimation ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+        }`}>
+          Order Placed Successfully! 🎉
+        </h1>
+        
+        <p className={`text-gray-600 mb-6 transform transition-all duration-500 delay-300 ${
+          showAnimation ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+        }`}>
           Thank you for your order. We&apos;ll send you a confirmation email shortly.
         </p>
 
         {orderId && (
-          <div className="bg-gray-50 rounded-lg p-4 mb-6">
+          <div className={`bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-4 mb-6 border border-green-200 transform transition-all duration-500 delay-400 ${
+            showAnimation ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+          }`}>
             <p className="text-sm text-gray-600 mb-1">Order ID</p>
-            <p className="font-mono font-semibold text-gray-800">{orderId.substring(0, 12).toUpperCase()}</p>
+            <p className="font-mono font-bold text-lg text-gray-800">{orderId.substring(0, 12).toUpperCase()}</p>
           </div>
         )}
 
-        <div className="space-y-3">
+        {/* Auto-redirect countdown */}
+        <div className={`mb-6 transform transition-all duration-500 delay-500 ${
+          showAnimation ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+        }`}>
+          <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-full text-sm font-medium">
+            <Package className="w-4 h-4 animate-pulse" />
+            Redirecting to orders in {countdown}s...
+          </div>
+        </div>
+
+        <div className={`space-y-3 transform transition-all duration-500 delay-600 ${
+          showAnimation ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+        }`}>
           <Link
             href="/orders"
-            className="block w-full bg-primary text-white py-3 rounded-lg hover:bg-primary/90 transition font-semibold"
+            className="block w-full bg-gradient-to-r from-green-500 to-blue-500 text-white py-3 rounded-xl hover:from-green-600 hover:to-blue-600 transition-all font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
           >
             <Package className="w-5 h-5 inline mr-2" />
-            Track Your Order
+            View My Orders Now
           </Link>
           
           <Link
             href="/"
-            className="block w-full border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition font-semibold"
+            className="block w-full border-2 border-gray-300 text-gray-700 py-3 rounded-xl hover:bg-gray-50 transition-all font-semibold hover:border-gray-400"
           >
             Continue Shopping
           </Link>
         </div>
+
+        {/* Success checkmark animation */}
+        <style jsx>{`
+          @keyframes checkmark {
+            0% {
+              stroke-dashoffset: 100;
+            }
+            100% {
+              stroke-dashoffset: 0;
+            }
+          }
+        `}</style>
       </div>
     </div>
   );
@@ -51,7 +130,14 @@ function OrderSuccessContent() {
 
 export default function OrderSuccessPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    }>
       <OrderSuccessContent />
     </Suspense>
   );
