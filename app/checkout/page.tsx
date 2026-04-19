@@ -25,6 +25,7 @@ export default function CheckoutPage() {
   const [savedAddress, setSavedAddress] = useState<SavedAddress | null>(null);
   const [isEditingAddress, setIsEditingAddress] = useState(false);
   const [saveAddress, setSaveAddress] = useState(false);
+  const [orderPlaced, setOrderPlaced] = useState(false);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -48,12 +49,12 @@ export default function CheckoutPage() {
     }
   }, []);
 
-  // Redirect if cart is empty
+  // Redirect if cart is empty (but not if order was just placed)
   useEffect(() => {
-    if (cart.length === 0) {
+    if (cart.length === 0 && !orderPlaced) {
       router.push('/cart');
     }
-  }, [cart.length, router]);
+  }, [cart.length, router, orderPlaced]);
 
   const handleSaveAddress = () => {
     localStorage.setItem('shippingAddress', JSON.stringify(formData));
@@ -105,12 +106,18 @@ export default function CheckoutPage() {
 
       // Save to Firebase
       const docRef = await addDoc(collection(db, 'orders'), orderData);
+      
+      console.log('Order created successfully:', docRef.id);
+      
+      // Mark order as placed to prevent cart redirect
+      setOrderPlaced(true);
 
       // Clear cart
       clearCart();
 
       // Redirect to success page
-      router.push(`/order-success?orderId=${docRef.id}`);
+      console.log('Redirecting to order success page...');
+      window.location.href = `/order-success?orderId=${docRef.id}`;
     } catch (error: any) {
       console.error('Error placing order:', error);
       

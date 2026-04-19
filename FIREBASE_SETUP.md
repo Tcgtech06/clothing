@@ -141,3 +141,73 @@ If you just want to test quickly, use **Option A** (Development Mode):
 5. Test your app immediately
 
 Remember to change to secure rules before going to production! 🔒
+
+---
+
+## Firebase Storage Setup (For Image Uploads)
+
+### Storage Rules
+
+1. Go to Firebase Console → **Storage** → **Rules**
+2. Replace with:
+
+```
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read: if true;
+      allow write: if true;
+    }
+  }
+}
+```
+
+3. Click **Publish**
+
+### CORS Configuration (Required for Image Uploads)
+
+If you get CORS errors when uploading images, you need to configure CORS:
+
+#### Using Google Cloud Console (Easiest):
+
+1. Go to https://console.cloud.google.com/
+2. Select project: **vilvah**
+3. Click **Cloud Shell** icon (>_) in top right
+4. Run these commands:
+
+```bash
+# Create CORS config
+cat > cors.json << 'EOF'
+[
+  {
+    "origin": ["*"],
+    "method": ["GET", "POST", "PUT", "DELETE", "HEAD"],
+    "maxAgeSeconds": 3600,
+    "responseHeader": ["Content-Type", "Access-Control-Allow-Origin"]
+  }
+]
+EOF
+
+# Apply CORS
+gsutil cors set cors.json gs://vilvah.firebasestorage.app
+
+# Verify
+gsutil cors get gs://vilvah.firebasestorage.app
+```
+
+5. Wait 2-3 minutes for changes to propagate
+6. Try uploading images again
+
+### Common Storage Errors:
+
+**Error: "CORS policy blocked"**
+- Solution: Configure CORS using the steps above
+
+**Error: "storage/unauthorized"**
+- Solution: Update Storage Rules (see above)
+
+**Error: "Failed to upload"**
+- Check file size (max 5MB)
+- Check file type (must be image)
+- Check browser console for specific error

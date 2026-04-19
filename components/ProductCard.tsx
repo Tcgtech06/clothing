@@ -1,7 +1,6 @@
 import { Star } from 'lucide-react';
 import CheckoutButton from './CheckoutButton';
 import Link from 'next/link';
-import Image from 'next/image';
 
 interface Product {
   id: number;
@@ -10,19 +9,22 @@ interface Product {
   images: string[];
   rating: number;
   loyaltyPoints?: number;
+  firestoreId?: string; // For Firestore products
 }
 
 export default function ProductCard({ product }: { product: Product }) {
+  // Use firestoreId if available, otherwise use numeric id
+  const productLink = product.firestoreId ? `/product/${product.firestoreId}` : `/product/${product.id}`;
+  
   return (
     <div className="bg-white rounded-lg shadow-md hover:shadow-xl transition overflow-hidden group">
-      {/* Product Image - Clickable */}
-      <Link href={`/product/${product.id}`}>
-        <div className="relative h-48 bg-gray-100 flex items-center justify-center overflow-hidden cursor-pointer">
-          <Image
+      {/* Product Image - Clickable - Full Size */}
+      <Link href={productLink}>
+        <div className="relative h-80 bg-gray-100 overflow-hidden cursor-pointer">
+          <img
             src={product.images[0]}
             alt={product.name}
-            fill
-            className="object-cover group-hover:scale-105 transition duration-300"
+            className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
           />
           {/* Loyalty Points Badge */}
           {product.loyaltyPoints && (
@@ -35,7 +37,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
       {/* Product Info */}
       <div className="p-4">
-        <Link href={`/product/${product.id}`}>
+        <Link href={productLink}>
           <h3 className="font-semibold text-gray-800 mb-2 line-clamp-2 hover:text-primary transition cursor-pointer">
             {product.name}
           </h3>

@@ -10,18 +10,15 @@ function OrderSuccessContent() {
   const router = useRouter();
   const orderId = searchParams.get('orderId');
   const [countdown, setCountdown] = useState(5);
-  const [showAnimation, setShowAnimation] = useState(false);
+  const [showAnimation, setShowAnimation] = useState(true);
 
   useEffect(() => {
-    // Trigger animation after a short delay
-    setTimeout(() => setShowAnimation(true), 100);
-
     // Countdown timer
     const countdownInterval = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
           clearInterval(countdownInterval);
-          router.push('/orders');
+          window.location.href = '/orders';
           return 0;
         }
         return prev - 1;
@@ -33,14 +30,10 @@ function OrderSuccessContent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center px-4">
-      <div className={`max-w-md w-full bg-white rounded-2xl shadow-2xl p-8 text-center transform transition-all duration-700 ${
-        showAnimation ? 'scale-100 opacity-100' : 'scale-75 opacity-0'
-      }`}>
+      <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8 text-center">
         {/* Animated Success Icon */}
         <div className="relative mb-6">
-          <div className={`w-24 h-24 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto transform transition-all duration-500 ${
-            showAnimation ? 'scale-100 rotate-0' : 'scale-0 rotate-180'
-          }`}>
+          <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto">
             <CheckCircle className="w-16 h-16 text-white animate-bounce" />
           </div>
           {/* Confetti effect */}
@@ -48,54 +41,42 @@ function OrderSuccessContent() {
             {[...Array(8)].map((_, i) => (
               <div
                 key={i}
-                className={`absolute w-2 h-2 bg-gradient-to-r from-yellow-400 to-pink-500 rounded-full transform transition-all duration-1000 ${
-                  showAnimation ? 'opacity-0' : 'opacity-100'
-                }`}
+                className="absolute w-2 h-2 bg-gradient-to-r from-yellow-400 to-pink-500 rounded-full animate-ping"
                 style={{
-                  transform: showAnimation 
-                    ? `translate(${Math.cos(i * 45 * Math.PI / 180) * 100}px, ${Math.sin(i * 45 * Math.PI / 180) * 100}px) scale(0)` 
-                    : 'translate(0, 0) scale(1)',
-                  transitionDelay: `${i * 50}ms`
+                  animationDelay: `${i * 100}ms`,
+                  animationDuration: '1s',
+                  left: `${50 + Math.cos(i * 45 * Math.PI / 180) * 40}%`,
+                  top: `${50 + Math.sin(i * 45 * Math.PI / 180) * 40}%`,
                 }}
               />
             ))}
           </div>
         </div>
         
-        <h1 className={`text-3xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-3 transform transition-all duration-500 delay-200 ${
-          showAnimation ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-        }`}>
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-3">
           Order Placed Successfully! 🎉
         </h1>
         
-        <p className={`text-gray-600 mb-6 transform transition-all duration-500 delay-300 ${
-          showAnimation ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-        }`}>
+        <p className="text-gray-600 mb-6">
           Thank you for your order. We&apos;ll send you a confirmation email shortly.
         </p>
 
         {orderId && (
-          <div className={`bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-4 mb-6 border border-green-200 transform transition-all duration-500 delay-400 ${
-            showAnimation ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-          }`}>
+          <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-4 mb-6 border border-green-200">
             <p className="text-sm text-gray-600 mb-1">Order ID</p>
             <p className="font-mono font-bold text-lg text-gray-800">{orderId.substring(0, 12).toUpperCase()}</p>
           </div>
         )}
 
         {/* Auto-redirect countdown */}
-        <div className={`mb-6 transform transition-all duration-500 delay-500 ${
-          showAnimation ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-        }`}>
+        <div className="mb-6">
           <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-full text-sm font-medium">
             <Package className="w-4 h-4 animate-pulse" />
             Redirecting to orders in {countdown}s...
           </div>
         </div>
 
-        <div className={`space-y-3 transform transition-all duration-500 delay-600 ${
-          showAnimation ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-        }`}>
+        <div className="space-y-3">
           <Link
             href="/orders"
             className="block w-full bg-gradient-to-r from-green-500 to-blue-500 text-white py-3 rounded-xl hover:from-green-600 hover:to-blue-600 transition-all font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"

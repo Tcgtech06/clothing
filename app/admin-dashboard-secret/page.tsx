@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { Package, TrendingUp, DollarSign, Users, Bell, X, Trash2, Plus, Edit, Image as ImageIcon, Upload } from 'lucide-react';
-import { db, storage } from '@/lib/firebase';
+import { db } from '@/lib/firebase';
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, addDoc, serverTimestamp } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 interface Order {
   id: string;
@@ -34,6 +33,9 @@ interface ProductData {
   inStock: boolean;
 }
 
+// ImgBB API key (free - get from https://api.imgbb.com/)
+const IMGBB_API_KEY = 'c609e2ff4c762257899c035c382f6503';
+
 export default function AdminDashboard() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [stats, setStats] = useState({
@@ -47,7 +49,7 @@ export default function AdminDashboard() {
   const [lastOrderCount, setLastOrderCount] = useState(0);
   const [activeTab, setActiveTab] = useState<'orders' | 'products'>('orders');
   const [showAddProduct, setShowAddProduct] = useState(false);
-  const [uploadingImages, setUploadingImages] = useState(false);
+  const [uploadingImages, setUploadingImages] = useState<boolean[]>([]);
   const [productForm, setProductForm] = useState<ProductData>({
     name: '',
     price: 0,
@@ -161,41 +163,79 @@ export default function AdminDashboard() {
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      alert('Please upload an image file');
+      alert('Please upload an image file (JPG, PNG, GIF, etc.)');
       return;
     }
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      alert('Image size should be less than 5MB');
+    // Validate file size (max 32MB for ImgBB)
+    if (file.size > 32 * 1024 * 1024) {
+      alert('Image size should be less than 32MB');
       return;
     }
+
+    // Set loading state for this specific image
+    const newUploadingStates = [...uploadingImages];
+    newUploadingStates[index] = true;
+    setUploadingImages(newUploadingStates);
 
     try {
-      setUploadingImages(true);
-      
-      // Create a unique filename
-      const timestamp = Date.now();
-      const filename = `products/${timestamp}_${file.name}`;
-      const storageRef = ref(storage, filename);
-      
-      // Upload file
-      await uploadBytes(storageRef, file);
-      
-      // Get download URL
-      const downloadURL = await getDownloadURL(storageRef);
-      
-      // Update form with the URL
-      const newImages = [...productForm.images];
-      newImages[index] = downloadURL;
-      setProductForm({ ...productForm, images: newImages });
-      
-      setUploadingImages(false);
-      alert('Image uploaded successfully!');
-    } catch (error) {
+      console.log('Starting upload for:', file.name);
+      console.log('File size:', (file.size / 1024).toFixed(2), 'KB');
+
+      // Convert image to base64
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = reader.result as string;
+          // Remove data:image/xxx;base64, prefix
+          const base64String = result.split(',')[1];
+          resolve(base64String);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      console.log('Image converted to base64, uploading to ImgBB...');
+
+      // Upload to ImgBB
+      const formData = new FormData();
+      formData.append('image', base64);
+      formData.append('key', IMGBB_API_KEY);
+
+      const response = await fetch('https://api.imgbb.com/1/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Upload failed: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        const imageUrl = data.data.url;
+        console.log('Upload successful! URL:', imageUrl);
+
+        // Update form with the URL
+        const newImages = [...productForm.images];
+        newImages[index] = imageUrl;
+        setProductForm({ ...productForm, images: newImages });
+
+        alert('Image uploaded successfully!');
+      } else {
+        throw new Error(data.error?.message || 'Upload failed');
+      }
+    } catch (error: any) {
       console.error('Error uploading image:', error);
-      alert('Failed to upload image. Please try again.');
-      setUploadingImages(false);
+      alert(`Failed to upload image: ${error.message}\n\nPlease try again or use a different image.`);
+    } finally {
+      // Reset loading state
+      const newUploadingStates = [...uploadingImages];
+      newUploadingStates[index] = false;
+      setUploadingImages(newUploadingStates);
+      // Reset file input
+      e.target.value = '';
     }
   };
 
@@ -203,16 +243,34 @@ export default function AdminDashboard() {
     try {
       // Validate form
       if (!productForm.name || !productForm.price || productForm.images[0] === '') {
-        alert('Please fill in all required fields');
+        alert('Please fill in all required fields (Name, Price, and at least one Image URL)');
+        return;
+      }
+
+      // Validate image URLs
+      const validImages = productForm.images.filter(img => {
+        const trimmed = img.trim();
+        return trimmed !== '' && (trimmed.startsWith('http://') || trimmed.startsWith('https://'));
+      });
+
+      if (validImages.length === 0) {
+        alert('Please provide at least one valid image URL (must start with http:// or https://)');
         return;
       }
 
       // Filter out empty strings from arrays
       const cleanedProduct = {
-        ...productForm,
-        images: productForm.images.filter(img => img.trim() !== ''),
+        name: productForm.name,
+        price: productForm.price,
+        originalPrice: productForm.originalPrice || productForm.price,
+        description: productForm.description,
+        category: productForm.category,
+        images: validImages,
         colors: productForm.colors.filter(c => c.trim() !== ''),
         sizes: productForm.sizes.filter(s => s.trim() !== ''),
+        loyaltyPoints: productForm.loyaltyPoints || 0,
+        stock: productForm.stock || 0,
+        inStock: productForm.stock > 0,
         rating: 4.5,
         reviews: 0,
         features: [],
@@ -220,8 +278,11 @@ export default function AdminDashboard() {
         createdAt: serverTimestamp(),
       };
 
-      await addDoc(collection(db, 'products'), cleanedProduct);
+      console.log('Adding product to Firestore:', cleanedProduct);
+
+      const docRef = await addDoc(collection(db, 'products'), cleanedProduct);
       
+      console.log('Product added successfully with ID:', docRef.id);
       alert('Product added successfully!');
       setShowAddProduct(false);
       
@@ -239,9 +300,10 @@ export default function AdminDashboard() {
         stock: 0,
         inStock: true,
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding product:', error);
-      alert('Failed to add product');
+      console.error('Error details:', error.message, error.code);
+      alert(`Failed to add product. Please check console for details.\n\nError: ${error.message}`);
     }
   };
 
@@ -689,37 +751,61 @@ export default function AdminDashboard() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Product Images *</label>
-                  <p className="text-xs text-gray-500 mb-2">Upload images or provide URLs (max 5MB per image)</p>
+                  <p className="text-xs text-gray-500 mb-3">
+                    Upload high-quality images (JPG, PNG, GIF) - Max 32MB per image. Images will be automatically uploaded to ImgBB.
+                  </p>
                   {productForm.images.map((img, index) => (
-                    <div key={index} className="mb-3 p-3 border border-gray-200 rounded-lg">
-                      <div className="flex gap-2 mb-2">
+                    <div key={index} className="mb-4 p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary transition">
+                      {/* Image Preview */}
+                      {img && img.startsWith('http') && (
+                        <div className="mb-3">
+                          <img 
+                            src={img} 
+                            alt={`Product ${index + 1}`}
+                            className="w-full h-48 object-cover rounded-lg border border-gray-200"
+                            onError={(e) => {
+                              e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ddd" width="100" height="100"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%23999"%3EError loading%3C/text%3E%3C/svg%3E';
+                            }}
+                          />
+                        </div>
+                      )}
+                      
+                      {/* Upload Button */}
+                      <label className="cursor-pointer block">
+                        <div className="flex items-center justify-center gap-3 px-4 py-3 bg-gradient-to-r from-primary to-blue-600 text-white rounded-lg hover:from-primary/90 hover:to-blue-700 transition">
+                          {uploadingImages[index] ? (
+                            <>
+                              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                              <span className="font-medium">Uploading...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="w-5 h-5" />
+                              <span className="font-medium">
+                                {img && img.startsWith('http') ? 'Change Image' : 'Upload Image'}
+                              </span>
+                            </>
+                          )}
+                        </div>
                         <input
-                          type="text"
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleImageUpload(e, index)}
+                          className="hidden"
+                          disabled={uploadingImages[index]}
+                        />
+                      </label>
+                      
+                      {/* Manual URL Input (Optional) */}
+                      <div className="mt-3">
+                        <input
+                          type="url"
                           value={img}
                           onChange={(e) => updateImageField(index, e.target.value)}
-                          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
-                          placeholder="https://images.unsplash.com/... or upload below"
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
+                          placeholder="Or paste image URL here..."
+                          disabled={uploadingImages[index]}
                         />
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <label className="flex-1 cursor-pointer">
-                          <div className="flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary transition">
-                            <Upload className="w-4 h-4 text-gray-600" />
-                            <span className="text-sm text-gray-600">Upload Image</span>
-                          </div>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => handleImageUpload(e, index)}
-                            className="hidden"
-                            disabled={uploadingImages}
-                          />
-                        </label>
-                        {img && (
-                          <div className="w-16 h-16 border border-gray-200 rounded overflow-hidden flex-shrink-0">
-                            <img src={img} alt="Preview" className="w-full h-full object-cover" />
-                          </div>
-                        )}
                       </div>
                     </div>
                   ))}
@@ -727,13 +813,10 @@ export default function AdminDashboard() {
                     type="button"
                     onClick={addImageField}
                     className="text-primary hover:text-primary/80 text-sm font-medium flex items-center gap-1"
-                    disabled={uploadingImages}
+                    disabled={uploadingImages.some(uploading => uploading)}
                   >
                     <Plus className="w-4 h-4" /> Add Another Image
                   </button>
-                  {uploadingImages && (
-                    <p className="text-sm text-blue-600 mt-2">Uploading image...</p>
-                  )}
                 </div>
 
                 <div>
