@@ -7,6 +7,10 @@ import ProductDetailClient from '@/components/ProductDetailClient';
 import { db } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 
+// Cache for individual products
+const productCache = new Map<string, any>();
+const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
+
 export default function ProductPage() {
   const params = useParams();
   const id = params.id as string;
@@ -20,6 +24,15 @@ export default function ProductPage() {
 
   const loadProduct = async () => {
     try {
+      // Check cache first
+      const cached = productCache.get(id);
+      if (cached && (Date.now() - cached.timestamp) < CACHE_DURATION) {
+        console.log('Using cached product:', id);
+        setProduct(cached.data);
+        setLoading(false);
+        return;
+      }
+
       // Try to get from static products first (numeric ID)
       const numericId = parseInt(id);
       if (!isNaN(numericId)) {
@@ -32,6 +45,7 @@ export default function ProductPage() {
       }
 
       // Try to get from Firestore (string ID)
+      console.log('Fetching product from Firestore:', id);
       const docRef = doc(db, 'products', id);
       const docSnap = await getDoc(docRef);
       
@@ -55,6 +69,12 @@ export default function ProductPage() {
           loyaltyPoints: data.loyaltyPoints || 0,
         };
         
+        // Cache the product
+        productCache.set(id, {
+          data: firestoreProduct,
+          timestamp: Date.now()
+        });
+        
         setProduct(firestoreProduct);
       } else {
         setNotFoundError(true);
@@ -69,10 +89,10 @@ export default function ProductPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading product...</p>
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600 text-sm">Loading...</p>
         </div>
       </div>
     );

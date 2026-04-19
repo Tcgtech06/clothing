@@ -1,6 +1,9 @@
-import { Star } from 'lucide-react';
+'use client';
+
+import { Coins } from 'lucide-react';
 import CheckoutButton from './CheckoutButton';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface Product {
   id: number;
@@ -9,15 +12,40 @@ interface Product {
   images: string[];
   rating: number;
   loyaltyPoints?: number;
-  firestoreId?: string; // For Firestore products
+  firestoreId?: string;
+  poll?: {
+    best: number;
+    good: number;
+    average: number;
+    worst: number;
+  };
 }
 
 export default function ProductCard({ product }: { product: Product }) {
+  const router = useRouter();
+  
   // Use firestoreId if available, otherwise use numeric id
   const productLink = product.firestoreId ? `/product/${product.firestoreId}` : `/product/${product.id}`;
   
+  // Prefetch on hover for instant navigation
+  const handleMouseEnter = () => {
+    router.prefetch(productLink);
+  };
+  
+  // Calculate poll percentages
+  const totalVotes = product.poll 
+    ? product.poll.best + product.poll.good + product.poll.average + product.poll.worst 
+    : 0;
+  
+  const getPercentage = (votes: number) => {
+    return totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
+  };
+  
   return (
-    <div className="bg-white rounded-lg shadow-md hover:shadow-xl transition overflow-hidden group">
+    <div 
+      className="bg-white rounded-lg shadow-md hover:shadow-xl transition overflow-hidden group"
+      onMouseEnter={handleMouseEnter}
+    >
       {/* Product Image - Clickable - Full Size */}
       <Link href={productLink}>
         <div className="relative h-80 bg-gray-100 overflow-hidden cursor-pointer">
@@ -25,11 +53,13 @@ export default function ProductCard({ product }: { product: Product }) {
             src={product.images[0]}
             alt={product.name}
             className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+            loading="lazy"
           />
           {/* Loyalty Points Badge */}
           {product.loyaltyPoints && (
-            <div className="absolute top-2 left-2 bg-gradient-to-r from-orange-500 to-yellow-500 text-white px-2 py-1 rounded-full text-xs font-bold shadow-lg flex items-center gap-1">
-              🎁 +{product.loyaltyPoints}
+            <div className="absolute top-2 left-2 bg-gradient-to-r from-amber-500 to-yellow-500 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg flex items-center gap-1.5">
+              <Coins className="w-4 h-4" />
+              <span>+{product.loyaltyPoints}</span>
             </div>
           )}
         </div>
@@ -43,12 +73,40 @@ export default function ProductCard({ product }: { product: Product }) {
           </h3>
         </Link>
         
-        {/* Rating */}
-        <div className="flex items-center gap-1 mb-3">
-          <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-          <span className="text-sm text-gray-600">{product.rating}</span>
-          <span className="text-xs text-gray-400">(128 reviews)</span>
-        </div>
+        {/* Poll Results */}
+        {product.poll && totalVotes > 0 ? (
+          <div className="mb-3">
+            <div className="flex items-center gap-1 mb-1.5">
+              <div className="flex-1 flex gap-1">
+                <div 
+                  className="h-2 bg-green-500 rounded-full transition-all" 
+                  style={{ width: `${getPercentage(product.poll.best)}%` }}
+                  title={`Best: ${product.poll.best} votes`}
+                />
+                <div 
+                  className="h-2 bg-blue-500 rounded-full transition-all" 
+                  style={{ width: `${getPercentage(product.poll.good)}%` }}
+                  title={`Good: ${product.poll.good} votes`}
+                />
+                <div 
+                  className="h-2 bg-yellow-500 rounded-full transition-all" 
+                  style={{ width: `${getPercentage(product.poll.average)}%` }}
+                  title={`Average: ${product.poll.average} votes`}
+                />
+                <div 
+                  className="h-2 bg-red-500 rounded-full transition-all" 
+                  style={{ width: `${getPercentage(product.poll.worst)}%` }}
+                  title={`Worst: ${product.poll.worst} votes`}
+                />
+              </div>
+            </div>
+            <p className="text-xs text-gray-500">{totalVotes} votes</p>
+          </div>
+        ) : (
+          <div className="mb-3">
+            <p className="text-xs text-gray-500">No votes yet</p>
+          </div>
+        )}
 
         {/* Price and Add to Cart */}
         <div className="flex items-center justify-between">

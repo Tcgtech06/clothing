@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Package, TrendingUp, DollarSign, Users, Bell, X, Trash2, Plus, Edit, Image as ImageIcon, Upload } from 'lucide-react';
+import { Package, TrendingUp, DollarSign, Users, Bell, X, Trash2, Plus, Edit, Image as ImageIcon, Upload, CheckCircle, Clock, Truck, MapPin, Navigation, PackageCheck } from 'lucide-react';
 import { db } from '@/lib/firebase';
-import { collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, addDoc, serverTimestamp, getDocs } from 'firebase/firestore';
 
 interface Order {
   id: string;
@@ -47,9 +47,10 @@ export default function AdminDashboard() {
   const [notifications, setNotifications] = useState<string[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [lastOrderCount, setLastOrderCount] = useState(0);
-  const [activeTab, setActiveTab] = useState<'orders' | 'products'>('orders');
+  const [activeTab, setActiveTab] = useState<'orders' | 'products' | 'inventory'>('orders');
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [uploadingImages, setUploadingImages] = useState<boolean[]>([]);
+  const [inventoryProducts, setInventoryProducts] = useState<any[]>([]);
   const [productForm, setProductForm] = useState<ProductData>({
     name: '',
     price: 0,
@@ -402,6 +403,16 @@ export default function AdminDashboard() {
             >
               Products
             </button>
+            <button
+              onClick={() => setActiveTab('inventory')}
+              className={`pb-2 px-4 font-semibold transition ${
+                activeTab === 'inventory'
+                  ? 'border-b-2 border-primary text-primary'
+                  : 'text-gray-600 hover:text-gray-800'
+              }`}
+            >
+              Inventory
+            </button>
           </div>
         </div>
       </div>
@@ -623,39 +634,45 @@ export default function AdminDashboard() {
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       onClick={() => updateOrderStatus(selectedOrder.id, 'accepted')}
-                      className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition text-sm font-medium"
+                      className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition text-sm font-medium flex items-center justify-center gap-2"
                     >
-                      ✓ Accept Order
+                      <CheckCircle className="w-4 h-4" />
+                      Accept Order
                     </button>
                     <button
                       onClick={() => updateOrderStatus(selectedOrder.id, 'processing')}
-                      className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition text-sm font-medium"
+                      className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition text-sm font-medium flex items-center justify-center gap-2"
                     >
-                      ⏳ Processing
+                      <Clock className="w-4 h-4" />
+                      Processing
                     </button>
                     <button
                       onClick={() => updateOrderStatus(selectedOrder.id, 'shipped')}
-                      className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition text-sm font-medium"
+                      className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition text-sm font-medium flex items-center justify-center gap-2"
                     >
-                      🚚 Shipped
+                      <Package className="w-4 h-4" />
+                      Shipped
                     </button>
                     <button
                       onClick={() => updateOrderStatus(selectedOrder.id, 'nearby')}
-                      className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition text-sm font-medium"
+                      className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition text-sm font-medium flex items-center justify-center gap-2"
                     >
-                      📍 Nearby Delivery
+                      <MapPin className="w-4 h-4" />
+                      Nearby Delivery
                     </button>
                     <button
                       onClick={() => updateOrderStatus(selectedOrder.id, 'out-for-delivery')}
-                      className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition text-sm font-medium"
+                      className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition text-sm font-medium flex items-center justify-center gap-2"
                     >
-                      🏃 Out for Delivery
+                      <Truck className="w-4 h-4" />
+                      Out for Delivery
                     </button>
                     <button
                       onClick={() => updateOrderStatus(selectedOrder.id, 'delivered')}
-                      className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition text-sm font-medium"
+                      className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition text-sm font-medium flex items-center justify-center gap-2"
                     >
-                      ✅ Delivered
+                      <PackageCheck className="w-4 h-4" />
+                      Delivered
                     </button>
                   </div>
                 </div>

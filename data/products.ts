@@ -6,6 +6,12 @@ export interface Product {
   images: string[];
   rating: number;
   reviews: number;
+  poll?: {
+    best: number;
+    good: number;
+    average: number;
+    worst: number;
+  };
   description: string;
   category: string;
   features: string[];
@@ -32,6 +38,12 @@ export const products: Product[] = [
     ],
     rating: 4.5,
     reviews: 128,
+    poll: {
+      best: 85,
+      good: 32,
+      average: 8,
+      worst: 3
+    },
     description: 'Beautiful floral print maxi dress perfect for summer occasions. Features a flowing silhouette, adjustable straps, and breathable fabric.',
     category: 'Women Dresses',
     features: [

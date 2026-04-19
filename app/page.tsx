@@ -7,22 +7,38 @@ import { products as staticProducts, Product as StaticProduct } from '@/data/pro
 import { db } from '@/lib/firebase';
 import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
 
+// Cache for products
+let cachedProducts: StaticProduct[] | null = null;
+let cacheTimestamp = 0;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
 export default function Home() {
   const [products, setProducts] = useState<StaticProduct[]>(staticProducts);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     loadProducts();
   }, []);
 
   const loadProducts = async () => {
+    // Check cache first
+    const now = Date.now();
+    if (cachedProducts && (now - cacheTimestamp) < CACHE_DURATION) {
+      console.log('Using cached products');
+      setProducts(cachedProducts);
+      return;
+    }
+
+    setLoading(true);
+    
     try {
-      // Try to load from Firestore
+      // Load Firestore products in background
       const q = query(
         collection(db, 'products'),
         orderBy('createdAt', 'desc'),
-        limit(20)
+        limit(10) // Reduced from 20 to 10 for faster loading
       );
+      
       const snapshot = await getDocs(q);
       
       if (!snapshot.empty) {
@@ -30,8 +46,8 @@ export default function Home() {
         snapshot.forEach((doc) => {
           const data = doc.data();
           firestoreProducts.push({
-            id: parseInt(doc.id.substring(0, 8), 16), // Convert Firestore ID to number
-            firestoreId: doc.id, // Store original Firestore ID for linking
+            id: parseInt(doc.id.substring(0, 8), 16),
+            firestoreId: doc.id,
             name: data.name || '',
             price: data.price || 0,
             originalPrice: data.originalPrice,
@@ -49,17 +65,18 @@ export default function Home() {
           } as any);
         });
         
-        // Combine Firestore products with static products
-        setProducts([...firestoreProducts, ...staticProducts]);
-        console.log('Loaded products from Firestore:', firestoreProducts.length);
+        // Combine and cache
+        const allProducts = [...firestoreProducts, ...staticProducts];
+        cachedProducts = allProducts;
+        cacheTimestamp = Date.now();
+        setProducts(allProducts);
+        
+        console.log('Loaded and cached products from Firestore:', firestoreProducts.length);
       } else {
-        // Use static products if Firestore is empty
         setProducts(staticProducts);
-        console.log('Using static products');
       }
     } catch (error) {
       console.error('Error loading products:', error);
-      // Fallback to static products
       setProducts(staticProducts);
     } finally {
       setLoading(false);
@@ -77,17 +94,15 @@ export default function Home() {
       <section className="max-w-7xl mx-auto px-4 py-12">
         <h2 className="text-3xl font-bold mb-8 text-gray-800">Featured Products</h2>
         
-        {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="bg-gray-200 animate-pulse rounded-lg h-96"></div>
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {featuredProducts.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+        
+        {loading && (
+          <div className="text-center mt-4">
+            <p className="text-sm text-gray-500">Loading more products...</p>
           </div>
         )}
       </section>

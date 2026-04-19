@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Star, ShoppingCart, Heart, Share2, Check, Truck, Shield, RotateCcw, Minus, Plus, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Star, ShoppingCart, Heart, Share2, Check, Truck, Shield, RotateCcw, Minus, Plus, ArrowLeft, ChevronLeft, ChevronRight, Coins } from 'lucide-react';
 import { Product } from '@/data/products';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCart } from '@/lib/cart-context';
 import { useFavourites } from '@/lib/favourites-context';
 import { useRouter } from 'next/navigation';
+import ProductPoll from './ProductPoll';
 
 interface ProductDetailClientProps {
   product: Product;
@@ -252,11 +253,11 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                 <p className="text-red-600 font-medium mt-2">Out of Stock</p>
               )}
               {product.loyaltyPoints && (
-                <div className="mt-3 inline-flex items-center gap-2 bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 px-3 py-2 rounded-lg">
-                  <span className="text-2xl">🎁</span>
+                <div className="mt-3 inline-flex items-center gap-2 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 px-3 py-2 rounded-lg">
+                  <Coins className="w-6 h-6 text-amber-600" />
                   <div>
                     <p className="text-xs text-gray-600">Earn Loyalty Points</p>
-                    <p className="text-sm font-bold text-orange-600">+{product.loyaltyPoints} points</p>
+                    <p className="text-sm font-bold text-amber-600">+{product.loyaltyPoints} points</p>
                   </div>
                 </div>
               )}
@@ -351,14 +352,13 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                   ✓ Added to cart successfully!
                 </div>
                 {showLoyaltyPoints && earnedPoints > 0 && (
-                  <div className="p-3 bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-lg text-center animate-fade-in">
-                    <div className="flex items-center justify-center gap-2">
-                      <span className="text-2xl">🎉</span>
+                  <div className="p-3 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-lg text-center animate-fade-in">
+                    <div className="flex items-center justify-center gap-3">
+                      <Coins className="w-8 h-8 text-amber-600" />
                       <div>
                         <p className="text-sm text-gray-700">You&apos;ll earn</p>
-                        <p className="text-lg font-bold text-orange-600">+{earnedPoints} Loyalty Points</p>
+                        <p className="text-lg font-bold text-amber-600">+{earnedPoints} Loyalty Points</p>
                       </div>
-                      <span className="text-2xl">🎁</span>
                     </div>
                   </div>
                 )}
@@ -437,7 +437,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               </ul>
 
               <h4 className="text-lg font-bold mb-3">Specifications</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                 {Object.entries(product.specifications).map(([key, value]) => (
                   <div key={key} className="flex justify-between border-b pb-2">
                     <span className="font-medium text-gray-700">{key}:</span>
@@ -445,6 +445,12 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                   </div>
                 ))}
               </div>
+
+              {/* Product Poll */}
+              <ProductPoll 
+                productId={product.id} 
+                initialPoll={product.poll}
+              />
             </div>
           ) : (
             <div>
