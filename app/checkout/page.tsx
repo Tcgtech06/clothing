@@ -48,6 +48,13 @@ export default function CheckoutPage() {
     }
   }, []);
 
+  // Redirect if cart is empty
+  useEffect(() => {
+    if (cart.length === 0) {
+      router.push('/cart');
+    }
+  }, [cart.length, router]);
+
   const handleSaveAddress = () => {
     localStorage.setItem('shippingAddress', JSON.stringify(formData));
     setSavedAddress(formData);
@@ -121,9 +128,6 @@ export default function CheckoutPage() {
   };
 
   if (cart.length === 0) {
-    useEffect(() => {
-      router.push('/cart');
-    }, [router]);
     return null;
   }
 

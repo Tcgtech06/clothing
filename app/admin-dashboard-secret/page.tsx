@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Package, TrendingUp, DollarSign, Users, Bell, X, Trash2, Plus, Edit, Image as ImageIcon } from 'lucide-react';
-import { db } from '@/lib/firebase';
+import { Package, TrendingUp, DollarSign, Users, Bell, X, Trash2, Plus, Edit, Image as ImageIcon, Upload } from 'lucide-react';
+import { db, storage } from '@/lib/firebase';
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, addDoc, serverTimestamp } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 interface Order {
   id: string;
@@ -46,6 +47,7 @@ export default function AdminDashboard() {
   const [lastOrderCount, setLastOrderCount] = useState(0);
   const [activeTab, setActiveTab] = useState<'orders' | 'products'>('orders');
   const [showAddProduct, setShowAddProduct] = useState(false);
+  const [uploadingImages, setUploadingImages] = useState(false);
   const [productForm, setProductForm] = useState<ProductData>({
     name: '',
     price: 0,
@@ -150,6 +152,50 @@ export default function AdminDashboard() {
     } catch (error) {
       console.error('Error deleting order:', error);
       alert('Failed to delete order');
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload an image file');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image size should be less than 5MB');
+      return;
+    }
+
+    try {
+      setUploadingImages(true);
+      
+      // Create a unique filename
+      const timestamp = Date.now();
+      const filename = `products/${timestamp}_${file.name}`;
+      const storageRef = ref(storage, filename);
+      
+      // Upload file
+      await uploadBytes(storageRef, file);
+      
+      // Get download URL
+      const downloadURL = await getDownloadURL(storageRef);
+      
+      // Update form with the URL
+      const newImages = [...productForm.images];
+      newImages[index] = downloadURL;
+      setProductForm({ ...productForm, images: newImages });
+      
+      setUploadingImages(false);
+      alert('Image uploaded successfully!');
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('Failed to upload image. Please try again.');
+      setUploadingImages(false);
     }
   };
 
@@ -642,25 +688,52 @@ export default function AdminDashboard() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Product Images (URLs) *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Product Images *</label>
+                  <p className="text-xs text-gray-500 mb-2">Upload images or provide URLs (max 5MB per image)</p>
                   {productForm.images.map((img, index) => (
-                    <div key={index} className="flex gap-2 mb-2">
-                      <input
-                        type="text"
-                        value={img}
-                        onChange={(e) => updateImageField(index, e.target.value)}
-                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
-                        placeholder="https://images.unsplash.com/..."
-                      />
+                    <div key={index} className="mb-3 p-3 border border-gray-200 rounded-lg">
+                      <div className="flex gap-2 mb-2">
+                        <input
+                          type="text"
+                          value={img}
+                          onChange={(e) => updateImageField(index, e.target.value)}
+                          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
+                          placeholder="https://images.unsplash.com/... or upload below"
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <label className="flex-1 cursor-pointer">
+                          <div className="flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary transition">
+                            <Upload className="w-4 h-4 text-gray-600" />
+                            <span className="text-sm text-gray-600">Upload Image</span>
+                          </div>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleImageUpload(e, index)}
+                            className="hidden"
+                            disabled={uploadingImages}
+                          />
+                        </label>
+                        {img && (
+                          <div className="w-16 h-16 border border-gray-200 rounded overflow-hidden flex-shrink-0">
+                            <img src={img} alt="Preview" className="w-full h-full object-cover" />
+                          </div>
+                        )}
+                      </div>
                     </div>
                   ))}
                   <button
                     type="button"
                     onClick={addImageField}
                     className="text-primary hover:text-primary/80 text-sm font-medium flex items-center gap-1"
+                    disabled={uploadingImages}
                   >
-                    <Plus className="w-4 h-4" /> Add Image
+                    <Plus className="w-4 h-4" /> Add Another Image
                   </button>
+                  {uploadingImages && (
+                    <p className="text-sm text-blue-600 mt-2">Uploading image...</p>
+                  )}
                 </div>
 
                 <div>
