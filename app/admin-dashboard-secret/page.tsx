@@ -5,6 +5,7 @@ import { Package, TrendingUp, DollarSign, Users, Bell, X, Trash2, Plus, Edit, Im
 import { db } from '@/lib/firebase';
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, addDoc, serverTimestamp, getDocs } from 'firebase/firestore';
 import InventoryTab from '@/components/InventoryTab';
+import { initializePollsForAllProducts } from '@/lib/init-polls';
 
 interface Order {
   id: string;
@@ -52,6 +53,7 @@ export default function AdminDashboard() {
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [uploadingImages, setUploadingImages] = useState<boolean[]>([]);
   const [inventoryProducts, setInventoryProducts] = useState<any[]>([]);
+  const [initializingPolls, setInitializingPolls] = useState(false);
   const [productForm, setProductForm] = useState<ProductData>({
     name: '',
     price: 0,
@@ -340,6 +342,23 @@ export default function AdminDashboard() {
     setProductForm({ ...productForm, sizes: newSizes });
   };
 
+  const handleInitializePolls = async () => {
+    if (!confirm('This will initialize poll data (Best/Good/Average/Worst = 0) for all products that don\'t have it. Continue?')) {
+      return;
+    }
+    
+    setInitializingPolls(true);
+    try {
+      const result = await initializePollsForAllProducts();
+      alert(`Poll initialization complete!\n\nUpdated: ${result.updated} products\nSkipped: ${result.skipped} products (already had polls)`);
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to initialize polls. Check console for details.');
+    } finally {
+      setInitializingPolls(false);
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'new':
@@ -558,17 +577,41 @@ export default function AdminDashboard() {
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-gray-800">Product Management</h2>
-              <button
-                onClick={() => setShowAddProduct(true)}
-                className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition font-semibold flex items-center gap-2"
-              >
-                <Plus className="w-5 h-5" />
-                Add New Product
-              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleInitializePolls}
+                  disabled={initializingPolls}
+                  className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition font-semibold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {initializingPolls ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Initializing...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="w-5 h-5" />
+                      Initialize Polls
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={() => setShowAddProduct(true)}
+                  className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition font-semibold flex items-center gap-2"
+                >
+                  <Plus className="w-5 h-5" />
+                  Add New Product
+                </button>
+              </div>
             </div>
-            <p className="text-gray-600">
+            <p className="text-gray-600 mb-4">
               Add new products to your store with images, descriptions, sizes, colors, and inventory management.
             </p>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <p className="text-sm text-blue-800">
+                <strong>Note:</strong> If products don't show poll colors on the home page, click "Initialize Polls" to add poll data to all existing products.
+              </p>
+            </div>
           </div>
         )}
 

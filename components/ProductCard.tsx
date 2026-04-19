@@ -75,72 +75,68 @@ export default function ProductCard({ product }: { product: Product }) {
         
         {/* Poll Results */}
         <div className="mb-3">
-          {product.poll && totalVotes > 0 ? (
+          {product.poll ? (
             <>
               <div className="flex items-center gap-1 mb-2">
-                <div className="flex-1 flex gap-1 h-2">
-                  {product.poll.best > 0 && (
-                    <div 
-                      className="bg-green-500 rounded-full transition-all" 
-                      style={{ width: `${getPercentage(product.poll.best)}%` }}
-                      title={`Best: ${product.poll.best} votes`}
-                    />
-                  )}
-                  {product.poll.good > 0 && (
-                    <div 
-                      className="bg-blue-500 rounded-full transition-all" 
-                      style={{ width: `${getPercentage(product.poll.good)}%` }}
-                      title={`Good: ${product.poll.good} votes`}
-                    />
-                  )}
-                  {product.poll.average > 0 && (
-                    <div 
-                      className="bg-yellow-500 rounded-full transition-all" 
-                      style={{ width: `${getPercentage(product.poll.average)}%` }}
-                      title={`Average: ${product.poll.average} votes`}
-                    />
-                  )}
-                  {product.poll.worst > 0 && (
-                    <div 
-                      className="bg-red-500 rounded-full transition-all" 
-                      style={{ width: `${getPercentage(product.poll.worst)}%` }}
-                      title={`Worst: ${product.poll.worst} votes`}
-                    />
-                  )}
+                <div className="flex-1 flex gap-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                  {totalVotes > 0 ? (
+                    <>
+                      {product.poll.best > 0 && (
+                        <div 
+                          className="bg-green-500 transition-all" 
+                          style={{ width: `${getPercentage(product.poll.best)}%` }}
+                          title={`Best: ${product.poll.best} votes`}
+                        />
+                      )}
+                      {product.poll.good > 0 && (
+                        <div 
+                          className="bg-blue-500 transition-all" 
+                          style={{ width: `${getPercentage(product.poll.good)}%` }}
+                          title={`Good: ${product.poll.good} votes`}
+                        />
+                      )}
+                      {product.poll.average > 0 && (
+                        <div 
+                          className="bg-yellow-500 transition-all" 
+                          style={{ width: `${getPercentage(product.poll.average)}%` }}
+                          title={`Average: ${product.poll.average} votes`}
+                        />
+                      )}
+                      {product.poll.worst > 0 && (
+                        <div 
+                          className="bg-red-500 transition-all" 
+                          style={{ width: `${getPercentage(product.poll.worst)}%` }}
+                          title={`Worst: ${product.poll.worst} votes`}
+                        />
+                      )}
+                    </>
+                  ) : null}
                 </div>
               </div>
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-3">
-                  {product.poll.best > 0 && (
-                    <div className="flex items-center gap-1">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="text-gray-600">{product.poll.best}</span>
-                    </div>
-                  )}
-                  {product.poll.good > 0 && (
-                    <div className="flex items-center gap-1">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                      <span className="text-gray-600">{product.poll.good}</span>
-                    </div>
-                  )}
-                  {product.poll.average > 0 && (
-                    <div className="flex items-center gap-1">
-                      <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                      <span className="text-gray-600">{product.poll.average}</span>
-                    </div>
-                  )}
-                  {product.poll.worst > 0 && (
-                    <div className="flex items-center gap-1">
-                      <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                      <span className="text-gray-600">{product.poll.worst}</span>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-gray-600">{product.poll.best || 0}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <span className="text-gray-600">{product.poll.good || 0}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                    <span className="text-gray-600">{product.poll.average || 0}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                    <span className="text-gray-600">{product.poll.worst || 0}</span>
+                  </div>
                 </div>
                 <span className="text-gray-500 font-medium">{totalVotes} votes</span>
               </div>
             </>
           ) : (
-            <p className="text-xs text-gray-500">No votes yet</p>
+            <p className="text-xs text-gray-500">No poll data</p>
           )}
         </div>
 
