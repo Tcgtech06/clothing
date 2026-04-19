@@ -9,6 +9,7 @@ interface Product {
   price: number;
   images: string[];
   rating: number;
+  loyaltyPoints?: number;
 }
 
 export default function ProductCard({ product }: { product: Product }) {
@@ -23,6 +24,12 @@ export default function ProductCard({ product }: { product: Product }) {
             fill
             className="object-cover group-hover:scale-105 transition duration-300"
           />
+          {/* Loyalty Points Badge */}
+          {product.loyaltyPoints && (
+            <div className="absolute top-2 left-2 bg-gradient-to-r from-orange-500 to-yellow-500 text-white px-2 py-1 rounded-full text-xs font-bold shadow-lg flex items-center gap-1">
+              🎁 +{product.loyaltyPoints}
+            </div>
+          )}
         </div>
       </Link>
 

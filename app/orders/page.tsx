@@ -53,13 +53,29 @@ const getStatusColor = (status: string) => {
 };
 
 const getTrackingSteps = (status: string) => {
-  const steps = [
-    { label: 'Order Placed', status: 'completed' },
-    { label: 'Processing', status: status === 'new' ? 'current' : 'completed' },
-    { label: 'Shipped', status: status === 'shipped' || status === 'delivered' ? 'completed' : status === 'processing' ? 'current' : 'pending' },
-    { label: 'Delivered', status: status === 'delivered' ? 'completed' : status === 'shipped' ? 'current' : 'pending' },
+  const allSteps = [
+    { key: 'placed', label: 'Order Placed', icon: '📦' },
+    { key: 'accepted', label: 'Order Accepted', icon: '✓' },
+    { key: 'shipped', label: 'Shipped', icon: '🚚' },
+    { key: 'nearby', label: 'Nearby Delivery', icon: '📍' },
+    { key: 'out-for-delivery', label: 'Out for Delivery', icon: '🏃' },
+    { key: 'delivered', label: 'Delivered', icon: '✅' },
   ];
-  return steps;
+
+  // Map status to step index
+  let currentStepIndex = 0;
+  if (status === 'new' || status === 'placed') currentStepIndex = 0;
+  else if (status === 'accepted') currentStepIndex = 1;
+  else if (status === 'processing') currentStepIndex = 1;
+  else if (status === 'shipped') currentStepIndex = 2;
+  else if (status === 'nearby') currentStepIndex = 3;
+  else if (status === 'out-for-delivery') currentStepIndex = 4;
+  else if (status === 'delivered') currentStepIndex = 5;
+
+  return allSteps.map((step, index) => ({
+    ...step,
+    status: index < currentStepIndex ? 'completed' : index === currentStepIndex ? 'current' : 'pending'
+  }));
 };
 
 export default function OrdersPage() {
@@ -168,30 +184,38 @@ export default function OrdersPage() {
                   </div>
                 </div>
 
-                {/* Tracking Progress */}
-                <div className="mb-4">
-                  <div className="flex items-center justify-between">
-                    {getTrackingSteps(order.status).map((step, index) => (
-                      <div key={index} className="flex-1 flex flex-col items-center">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 ${
-                          step.status === 'completed' ? 'bg-green-500 text-white' :
-                          step.status === 'current' ? 'bg-primary text-white' :
-                          'bg-gray-200 text-gray-400'
-                        }`}>
-                          {step.status === 'completed' ? '✓' : index + 1}
+                {/* Tracking Progress - Horizontal Flow */}
+                <div className="mb-6 px-4">
+                  <div className="relative">
+                    {/* Progress Line */}
+                    <div className="absolute top-5 left-0 right-0 h-1 bg-gray-200" style={{ zIndex: 0 }}></div>
+                    <div 
+                      className="absolute top-5 left-0 h-1 bg-gradient-to-r from-green-500 to-blue-500 transition-all duration-500" 
+                      style={{ 
+                        width: `${(getTrackingSteps(order.status).filter(s => s.status === 'completed').length / (getTrackingSteps(order.status).length - 1)) * 100}%`,
+                        zIndex: 1
+                      }}
+                    ></div>
+                    
+                    {/* Steps */}
+                    <div className="relative flex justify-between" style={{ zIndex: 2 }}>
+                      {getTrackingSteps(order.status).map((step, index) => (
+                        <div key={index} className="flex flex-col items-center" style={{ flex: 1 }}>
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 text-lg transition-all duration-300 ${
+                            step.status === 'completed' ? 'bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg scale-110' :
+                            step.status === 'current' ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg scale-110 animate-pulse' :
+                            'bg-gray-200 text-gray-400'
+                          }`}>
+                            {step.icon}
+                          </div>
+                          <p className={`text-xs text-center max-w-[80px] transition-all ${
+                            step.status === 'completed' || step.status === 'current' ? 'text-gray-800 font-semibold' : 'text-gray-400'
+                          }`}>
+                            {step.label}
+                          </p>
                         </div>
-                        <p className={`text-xs text-center ${
-                          step.status === 'completed' || step.status === 'current' ? 'text-gray-800 font-semibold' : 'text-gray-400'
-                        }`}>
-                          {step.label}
-                        </p>
-                        {index < 3 && (
-                          <div className={`h-1 w-full mt-4 ${
-                            step.status === 'completed' ? 'bg-green-500' : 'bg-gray-200'
-                          }`} style={{ position: 'absolute', top: '16px', left: '50%', width: 'calc(100% - 32px)' }} />
-                        )}
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 </div>
 

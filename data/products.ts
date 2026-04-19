@@ -15,6 +15,7 @@ export interface Product {
   inStock: boolean;
   colors?: string[];
   sizes?: string[];
+  loyaltyPoints?: number; // Points earned when purchasing this product
 }
 
 export const products: Product[] = [
@@ -51,7 +52,8 @@ export const products: Product[] = [
     },
     inStock: true,
     colors: ['Blue Floral', 'Pink Floral', 'White Floral'],
-    sizes: ['XS', 'S', 'M', 'L', 'XL']
+    sizes: ['XS', 'S', 'M', 'L', 'XL'],
+    loyaltyPoints: 350
   },
   {
     id: 2,
@@ -86,7 +88,8 @@ export const products: Product[] = [
     },
     inStock: true,
     colors: ['Black', 'Navy Blue', 'Burgundy', 'Emerald Green'],
-    sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL']
+    sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+    loyaltyPoints: 600
   },
   {
     id: 3,
@@ -121,7 +124,8 @@ export const products: Product[] = [
     },
     inStock: true,
     colors: ['Navy', 'Black', 'Olive Green', 'Dusty Rose'],
-    sizes: ['S', 'M', 'L', 'XL']
+    sizes: ['S', 'M', 'L', 'XL'],
+    loyaltyPoints: 250
   },
   {
     id: 4,
@@ -155,7 +159,8 @@ export const products: Product[] = [
     },
     inStock: true,
     colors: ['Coral Print', 'Blue Print', 'Green Print'],
-    sizes: ['XS', 'S', 'M', 'L', 'XL']
+    sizes: ['XS', 'S', 'M', 'L', 'XL'],
+    loyaltyPoints: 300
   },
   {
     id: 5,
@@ -189,7 +194,8 @@ export const products: Product[] = [
     },
     inStock: true,
     colors: ['Black'],
-    sizes: ['XS', 'S', 'M', 'L', 'XL']
+    sizes: ['XS', 'S', 'M', 'L', 'XL'],
+    loyaltyPoints: 450
   },
   {
     id: 6,
@@ -224,7 +230,8 @@ export const products: Product[] = [
     },
     inStock: true,
     colors: ['Blush Pink', 'Lavender', 'Mint Green', 'Champagne'],
-    sizes: ['XS', 'S', 'M', 'L', 'XL']
+    sizes: ['XS', 'S', 'M', 'L', 'XL'],
+    loyaltyPoints: 400
   },
   {
     id: 7,
@@ -258,7 +265,8 @@ export const products: Product[] = [
     },
     inStock: true,
     colors: ['Navy', 'Black', 'Charcoal Gray', 'Burgundy'],
-    sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL']
+    sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+    loyaltyPoints: 330
   },
   {
     id: 8,
@@ -293,7 +301,8 @@ export const products: Product[] = [
     },
     inStock: true,
     colors: ['Black with White Dots', 'Navy with White Dots', 'Red with White Dots'],
-    sizes: ['XS', 'S', 'M', 'L', 'XL']
+    sizes: ['XS', 'S', 'M', 'L', 'XL'],
+    loyaltyPoints: 280
   }
 ];
 

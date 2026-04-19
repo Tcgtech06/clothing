@@ -23,6 +23,8 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<'description' | 'reviews'>('description');
   const [showAddedToCart, setShowAddedToCart] = useState(false);
+  const [showLoyaltyPoints, setShowLoyaltyPoints] = useState(false);
+  const [earnedPoints, setEarnedPoints] = useState(0);
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewName, setReviewName] = useState('');
   const [reviewText, setReviewText] = useState('');
@@ -70,11 +72,19 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
   const handleAddToCart = () => {
     addToCart(product, quantity, selectedColor, selectedSize);
+    
+    // Calculate loyalty points earned
+    const points = (product.loyaltyPoints || 0) * quantity;
+    setEarnedPoints(points);
+    
     setShowAddedToCart(true);
+    setShowLoyaltyPoints(true);
+    
     setTimeout(() => {
       setShowAddedToCart(false);
+      setShowLoyaltyPoints(false);
       router.push('/checkout');
-    }, 1000);
+    }, 2000);
   };
 
   const handleSubmitReview = (e: React.FormEvent) => {
@@ -241,6 +251,15 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               ) : (
                 <p className="text-red-600 font-medium mt-2">Out of Stock</p>
               )}
+              {product.loyaltyPoints && (
+                <div className="mt-3 inline-flex items-center gap-2 bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 px-3 py-2 rounded-lg">
+                  <span className="text-2xl">🎁</span>
+                  <div>
+                    <p className="text-xs text-gray-600">Earn Loyalty Points</p>
+                    <p className="text-sm font-bold text-orange-600">+{product.loyaltyPoints} points</p>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Description */}
@@ -327,8 +346,22 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
             {/* Added to Cart Message */}
             {showAddedToCart && (
-              <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-800 text-center animate-fade-in">
-                ✓ Added to cart successfully!
+              <div className="mb-4 space-y-2">
+                <div className="p-3 bg-green-50 border border-green-200 rounded-lg text-green-800 text-center animate-fade-in">
+                  ✓ Added to cart successfully!
+                </div>
+                {showLoyaltyPoints && earnedPoints > 0 && (
+                  <div className="p-3 bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-lg text-center animate-fade-in">
+                    <div className="flex items-center justify-center gap-2">
+                      <span className="text-2xl">🎉</span>
+                      <div>
+                        <p className="text-sm text-gray-700">You&apos;ll earn</p>
+                        <p className="text-lg font-bold text-orange-600">+{earnedPoints} Loyalty Points</p>
+                      </div>
+                      <span className="text-2xl">🎁</span>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

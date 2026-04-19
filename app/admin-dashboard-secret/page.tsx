@@ -12,7 +12,7 @@ interface Order {
   customerPhone?: string;
   shippingAddress?: string;
   createdAt: any;
-  status: 'new' | 'processing' | 'shipped' | 'delivered';
+  status: 'new' | 'accepted' | 'processing' | 'shipped' | 'nearby' | 'out-for-delivery' | 'delivered';
   total: number;
   items: number;
   products: string[];
@@ -348,24 +348,42 @@ export default function AdminDashboard() {
 
                 <div>
                   <p className="text-sm text-gray-600 mb-2">Update Status</p>
-                  <div className="flex gap-2 flex-wrap">
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => updateOrderStatus(selectedOrder.id, 'accepted')}
+                      className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition text-sm font-medium"
+                    >
+                      ✓ Accept Order
+                    </button>
                     <button
                       onClick={() => updateOrderStatus(selectedOrder.id, 'processing')}
-                      className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition"
+                      className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition text-sm font-medium"
                     >
-                      Mark Processing
+                      ⏳ Processing
                     </button>
                     <button
                       onClick={() => updateOrderStatus(selectedOrder.id, 'shipped')}
-                      className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition"
+                      className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition text-sm font-medium"
                     >
-                      Mark Shipped
+                      🚚 Shipped
+                    </button>
+                    <button
+                      onClick={() => updateOrderStatus(selectedOrder.id, 'nearby')}
+                      className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition text-sm font-medium"
+                    >
+                      📍 Nearby Delivery
+                    </button>
+                    <button
+                      onClick={() => updateOrderStatus(selectedOrder.id, 'out-for-delivery')}
+                      className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition text-sm font-medium"
+                    >
+                      🏃 Out for Delivery
                     </button>
                     <button
                       onClick={() => updateOrderStatus(selectedOrder.id, 'delivered')}
-                      className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
+                      className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition text-sm font-medium"
                     >
-                      Mark Delivered
+                      ✅ Delivered
                     </button>
                   </div>
                 </div>
