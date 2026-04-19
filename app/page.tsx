@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import ProductCard from '@/components/ProductCard';
 import HeroSlideshow from '@/components/HeroSlideshow';
 import { products as staticProducts, Product as StaticProduct } from '@/data/products';
+import { CATEGORIES } from '@/data/categories';
 import { db } from '@/lib/firebase';
 import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
 
@@ -112,7 +113,7 @@ export default function Home() {
       <section className="max-w-7xl mx-auto px-4 py-12">
         <h2 className="text-3xl font-bold mb-8 text-gray-800">Shop by Category</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {['Women Dresses', 'Men Clothing', 'Accessories', 'Footwear'].map((category) => (
+          {CATEGORIES.map((category) => (
             <div
               key={category}
               className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition cursor-pointer text-center"

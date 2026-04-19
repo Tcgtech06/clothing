@@ -6,6 +6,7 @@ import { db } from '@/lib/firebase';
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, addDoc, serverTimestamp, getDocs } from 'firebase/firestore';
 import InventoryTab from '@/components/InventoryTab';
 import { initializePollsForAllProducts } from '@/lib/init-polls';
+import { CATEGORIES } from '@/data/categories';
 
 interface Order {
   id: string;
@@ -809,10 +810,9 @@ export default function AdminDashboard() {
                     onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
                   >
-                    <option>Women Dresses</option>
-                    <option>Men Clothing</option>
-                    <option>Accessories</option>
-                    <option>Footwear</option>
+                    {CATEGORIES.map((category) => (
+                      <option key={category} value={category}>{category}</option>
+                    ))}
                   </select>
                 </div>
 
