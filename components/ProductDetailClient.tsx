@@ -217,24 +217,6 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
             <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">{product.name}</h1>
             
             {/* Rating */}
-            <div className="flex items-center gap-2 mb-4">
-              <div className="flex items-center">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className={`w-5 h-5 ${
-                      i < Math.floor(product.rating)
-                        ? 'fill-yellow-400 text-yellow-400'
-                        : 'text-gray-300'
-                    }`}
-                  />
-                ))}
-              </div>
-              <span className="text-gray-600">
-                {product.rating} ({product.reviews} reviews)
-              </span>
-            </div>
-
             {/* Price */}
             <div className="mb-6">
               <div className="flex items-center gap-3">
@@ -448,31 +430,15 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
               {/* Product Poll */}
               <ProductPoll 
-                productId={product.id} 
+                productId={product.id}
+                firestoreId={(product as any).firestoreId}
                 initialPoll={product.poll}
               />
             </div>
           ) : (
             <div>
               <h3 className="text-xl font-bold mb-4">Customer Reviews</h3>
-              <div className="flex items-center gap-4 mb-6">
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-primary">{product.rating}</div>
-                  <div className="flex items-center justify-center mt-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`w-4 h-4 ${
-                          i < Math.floor(product.rating)
-                            ? 'fill-yellow-400 text-yellow-400'
-                            : 'text-gray-300'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <p className="text-sm text-gray-600 mt-1">{product.reviews} reviews</p>
-                </div>
-              </div>
+              <p className="text-gray-600 mb-6">{product.reviews} customer reviews</p>
 
               {/* Write a Review Form */}
               <div className="bg-gray-50 rounded-lg p-6 mb-6">
@@ -483,31 +449,6 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                   </div>
                 )}
                 <form onSubmit={handleSubmitReview}>
-                  {/* Rating Selection */}
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Your Rating
-                    </label>
-                    <div className="flex gap-2">
-                      {[1, 2, 3, 4, 5].map((rating) => (
-                        <button
-                          key={rating}
-                          type="button"
-                          onClick={() => setReviewRating(rating)}
-                          className="transition hover:scale-110"
-                        >
-                          <Star
-                            className={`w-8 h-8 ${
-                              rating <= reviewRating
-                                ? 'fill-yellow-400 text-yellow-400'
-                                : 'text-gray-300'
-                            }`}
-                          />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
                   {/* Name Input */}
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700 mb-2">

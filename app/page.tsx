@@ -54,6 +54,7 @@ export default function Home() {
             images: data.images || [],
             rating: data.rating || 4.5,
             reviews: data.reviews || 0,
+            poll: data.poll || { best: 0, good: 0, average: 0, worst: 0 },
             description: data.description || '',
             category: data.category || '',
             features: data.features || [],

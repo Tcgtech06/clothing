@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Package, TrendingUp, DollarSign, Users, Bell, X, Trash2, Plus, Edit, Image as ImageIcon, Upload, CheckCircle, Clock, Truck, MapPin, Navigation, PackageCheck } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, addDoc, serverTimestamp, getDocs } from 'firebase/firestore';
+import InventoryTab from '@/components/InventoryTab';
 
 interface Order {
   id: string;
@@ -274,6 +275,7 @@ export default function AdminDashboard() {
         inStock: productForm.stock > 0,
         rating: 4.5,
         reviews: 0,
+        poll: { best: 0, good: 0, average: 0, worst: 0 },
         features: [],
         specifications: {},
         createdAt: serverTimestamp(),
@@ -568,6 +570,11 @@ export default function AdminDashboard() {
               Add new products to your store with images, descriptions, sizes, colors, and inventory management.
             </p>
           </div>
+        )}
+
+        {/* Inventory Tab */}
+        {activeTab === 'inventory' && (
+          <InventoryTab />
         )}
       </div>
 

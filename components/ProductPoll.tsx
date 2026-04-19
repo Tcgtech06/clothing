@@ -1,10 +1,13 @@
 'use client';
 
-import { useState } from 'react';
-import { ThumbsUp, ThumbsDown, Meh, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ThumbsUp, ThumbsDown, Meh } from 'lucide-react';
+import { db } from '@/lib/firebase';
+import { doc, updateDoc, increment, onSnapshot } from 'firebase/firestore';
 
 interface PollProps {
   productId: string | number;
+  firestoreId?: string;
   initialPoll?: {
     best: number;
     good: number;
@@ -14,10 +17,28 @@ interface PollProps {
   onVote?: (vote: 'best' | 'good' | 'average' | 'worst') => void;
 }
 
-export default function ProductPoll({ productId, initialPoll, onVote }: PollProps) {
+export default function ProductPoll({ productId, firestoreId, initialPoll, onVote }: PollProps) {
   const [poll, setPoll] = useState(initialPoll || { best: 0, good: 0, average: 0, worst: 0 });
   const [userVote, setUserVote] = useState<string | null>(null);
   const [showThankYou, setShowThankYou] = useState(false);
+  const [isVoting, setIsVoting] = useState(false);
+
+  // Real-time listener for poll updates
+  useEffect(() => {
+    if (!firestoreId) return;
+
+    const productRef = doc(db, 'products', firestoreId);
+    const unsubscribe = onSnapshot(productRef, (doc) => {
+      if (doc.exists()) {
+        const data = doc.data();
+        if (data.poll) {
+          setPoll(data.poll);
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, [firestoreId]);
 
   const totalVotes = poll.best + poll.good + poll.average + poll.worst;
 
@@ -25,7 +46,7 @@ export default function ProductPoll({ productId, initialPoll, onVote }: PollProp
     return totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
   };
 
-  const handleVote = (voteType: 'best' | 'good' | 'average' | 'worst') => {
+  const handleVote = async (voteType: 'best' | 'good' | 'average' | 'worst') => {
     // Check if user already voted (stored in localStorage)
     const votedProducts = JSON.parse(localStorage.getItem('votedProducts') || '{}');
     
@@ -34,22 +55,41 @@ export default function ProductPoll({ productId, initialPoll, onVote }: PollProp
       return;
     }
 
-    // Update poll
-    const newPoll = { ...poll, [voteType]: poll[voteType] + 1 };
-    setPoll(newPoll);
-    setUserVote(voteType);
+    if (!firestoreId) {
+      alert('Cannot vote on static products. Please try a product added by admin.');
+      return;
+    }
 
-    // Save vote to localStorage
-    votedProducts[productId] = voteType;
-    localStorage.setItem('votedProducts', JSON.stringify(votedProducts));
+    setIsVoting(true);
 
-    // Show thank you message
-    setShowThankYou(true);
-    setTimeout(() => setShowThankYou(false), 3000);
+    try {
+      // Update in Firestore
+      const productRef = doc(db, 'products', firestoreId);
+      await updateDoc(productRef, {
+        [`poll.${voteType}`]: increment(1)
+      });
+      
+      console.log('Vote saved to Firestore:', voteType);
 
-    // Call parent callback if provided
-    if (onVote) {
-      onVote(voteType);
+      // Save vote to localStorage
+      votedProducts[productId] = voteType;
+      localStorage.setItem('votedProducts', JSON.stringify(votedProducts));
+
+      setUserVote(voteType);
+
+      // Show thank you message
+      setShowThankYou(true);
+      setTimeout(() => setShowThankYou(false), 3000);
+
+      // Call parent callback if provided
+      if (onVote) {
+        onVote(voteType);
+      }
+    } catch (error) {
+      console.error('Error saving vote:', error);
+      alert('Failed to save vote. Please try again.');
+    } finally {
+      setIsVoting(false);
     }
   };
 
@@ -135,33 +175,40 @@ export default function ProductPoll({ productId, initialPoll, onVote }: PollProp
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={() => handleVote('best')}
-              className="flex items-center justify-center gap-2 px-4 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg transition font-medium"
+              disabled={isVoting}
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ThumbsUp className="w-4 h-4" />
               Best
             </button>
             <button
               onClick={() => handleVote('good')}
-              className="flex items-center justify-center gap-2 px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition font-medium"
+              disabled={isVoting}
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ThumbsUp className="w-4 h-4" />
               Good
             </button>
             <button
               onClick={() => handleVote('average')}
-              className="flex items-center justify-center gap-2 px-4 py-3 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition font-medium"
+              disabled={isVoting}
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Meh className="w-4 h-4" />
               Average
             </button>
             <button
               onClick={() => handleVote('worst')}
-              className="flex items-center justify-center gap-2 px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg transition font-medium"
+              disabled={isVoting}
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ThumbsDown className="w-4 h-4" />
               Worst
             </button>
           </div>
+          {isVoting && (
+            <p className="text-sm text-gray-500 mt-2 text-center">Saving your vote...</p>
+          )}
         </div>
       ) : (
         <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg text-center">
