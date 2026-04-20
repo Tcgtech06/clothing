@@ -27,25 +27,25 @@ export default function ProfileMenu({ isOpen, onClose }: ProfileMenuProps) {
       >
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="bg-gradient-to-r from-primary to-secondary p-6 text-white">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold">My Account</h2>
+          <div className="bg-gradient-to-r from-primary to-secondary p-4 text-white flex-shrink-0">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-lg font-bold">My Account</h2>
               <button
                 onClick={onClose}
                 className="p-2 hover:bg-white/20 rounded-full transition"
               >
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5" />
               </button>
             </div>
             
             {/* User Info */}
             <div className="flex items-center gap-3">
-              <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center text-primary text-2xl font-bold">
+              <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-primary text-xl font-bold">
                 J
               </div>
               <div>
-                <p className="font-semibold text-lg">John Doe</p>
-                <p className="text-sm text-white/80">john@example.com</p>
+                <p className="font-semibold text-base">John Doe</p>
+                <p className="text-xs text-white/80">john@example.com</p>
               </div>
             </div>
           </div>
@@ -55,20 +55,18 @@ export default function ProfileMenu({ isOpen, onClose }: ProfileMenuProps) {
             <Link
               href="/profile"
               onClick={onClose}
-              className="flex items-center gap-3 p-4 rounded-lg hover:bg-gray-100 transition"
+              className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition mb-3"
             >
               <User className="w-5 h-5 text-gray-600" />
               <span className="font-medium text-gray-800">My Profile</span>
             </Link>
-          </nav>
 
-          {/* Logout Button */}
-          <div className="p-4 border-t">
-            <button className="w-full flex items-center justify-center gap-3 p-4 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition font-medium">
+            {/* Logout Button - Moved here */}
+            <button className="w-full flex items-center gap-3 p-3 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition font-medium">
               <LogOut className="w-5 h-5" />
               Logout
             </button>
-          </div>
+          </nav>
         </div>
       </div>
     </>
