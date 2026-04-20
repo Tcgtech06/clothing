@@ -6,13 +6,9 @@ import HeroSlideshow from '@/components/HeroSlideshow';
 import { products as staticProducts, Product as StaticProduct } from '@/data/products';
 import { CATEGORIES } from '@/data/categories';
 import { db } from '@/lib/firebase';
-import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
 
-// Cache for products
-let cachedProducts: StaticProduct[] | null = null;
-let cacheTimestamp = 0;
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-
+// No caching - always fetch fresh data
 export default function Home() {
   const [products, setProducts] = useState<StaticProduct[]>(staticProducts);
   const [loading, setLoading] = useState(false);
@@ -22,65 +18,59 @@ export default function Home() {
   }, []);
 
   const loadProducts = async () => {
-    // Check cache first
-    const now = Date.now();
-    if (cachedProducts && (now - cacheTimestamp) < CACHE_DURATION) {
-      console.log('Using cached products');
-      setProducts(cachedProducts);
-      return;
-    }
-
     setLoading(true);
     
     try {
-      // Load Firestore products in background
+      // Load Firestore products with real-time listener
       const q = query(
         collection(db, 'products'),
         orderBy('createdAt', 'desc'),
-        limit(10) // Reduced from 20 to 10 for faster loading
+        limit(10)
       );
       
-      const snapshot = await getDocs(q);
-      
-      if (!snapshot.empty) {
-        const firestoreProducts: StaticProduct[] = [];
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          firestoreProducts.push({
-            id: parseInt(doc.id.substring(0, 8), 16),
-            firestoreId: doc.id,
-            name: data.name || '',
-            price: data.price || 0,
-            originalPrice: data.originalPrice,
-            images: data.images || [],
-            rating: data.rating || 4.5,
-            reviews: data.reviews || 0,
-            poll: data.poll || { best: 0, good: 0, average: 0, worst: 0 },
-            description: data.description || '',
-            category: data.category || '',
-            features: data.features || [],
-            specifications: data.specifications || {},
-            inStock: data.inStock !== false,
-            colors: data.colors || [],
-            sizes: data.sizes || [],
-            loyaltyPoints: data.loyaltyPoints || 0,
-          } as any);
-        });
-        
-        // Combine and cache
-        const allProducts = [...firestoreProducts, ...staticProducts];
-        cachedProducts = allProducts;
-        cacheTimestamp = Date.now();
-        setProducts(allProducts);
-        
-        console.log('Loaded and cached products from Firestore:', firestoreProducts.length);
-      } else {
-        setProducts(staticProducts);
-      }
+      // Use onSnapshot for real-time updates
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        if (!snapshot.empty) {
+          const firestoreProducts: StaticProduct[] = [];
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            firestoreProducts.push({
+              id: parseInt(doc.id.substring(0, 8), 16),
+              firestoreId: doc.id,
+              name: data.name || '',
+              price: data.price || 0,
+              originalPrice: data.originalPrice,
+              images: data.images || [],
+              rating: data.rating || 4.5,
+              reviews: data.reviews || 0,
+              poll: data.poll || { best: 0, good: 0, average: 0, worst: 0 },
+              description: data.description || '',
+              category: data.category || '',
+              features: data.features || [],
+              specifications: data.specifications || {},
+              inStock: data.inStock !== false,
+              colors: data.colors || [],
+              sizes: data.sizes || [],
+              loyaltyPoints: data.loyaltyPoints || 0,
+            } as any);
+          });
+          
+          // Combine with static products
+          const allProducts = [...firestoreProducts, ...staticProducts];
+          setProducts(allProducts);
+          
+          console.log('Real-time update: Loaded products from Firestore:', firestoreProducts.length);
+        } else {
+          setProducts(staticProducts);
+        }
+        setLoading(false);
+      });
+
+      // Cleanup listener on unmount
+      return () => unsubscribe();
     } catch (error) {
       console.error('Error loading products:', error);
       setProducts(staticProducts);
-    } finally {
       setLoading(false);
     }
   };
