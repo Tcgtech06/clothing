@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Package, TrendingUp, DollarSign, Users, Bell, X, Trash2, Plus, Edit, Image as ImageIcon, Upload, CheckCircle, Clock, Truck, MapPin, Navigation, PackageCheck } from 'lucide-react';
+import { Package, TrendingUp, DollarSign, Users, Bell, X, Trash2, Plus, Edit, Image as ImageIcon, Upload, CheckCircle, Clock, Truck, MapPin, Navigation, PackageCheck, Eye, Search } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, addDoc, serverTimestamp, getDocs } from 'firebase/firestore';
 import InventoryTab from '@/components/InventoryTab';
@@ -55,6 +55,9 @@ export default function AdminDashboard() {
   const [uploadingImages, setUploadingImages] = useState<boolean[]>([]);
   const [inventoryProducts, setInventoryProducts] = useState<any[]>([]);
   const [initializingPolls, setInitializingPolls] = useState(false);
+  const [firestoreProducts, setFirestoreProducts] = useState<any[]>([]);
+  const [editingProduct, setEditingProduct] = useState<any | null>(null);
+  const [productSearch, setProductSearch] = useState('');
   const [productForm, setProductForm] = useState<ProductData>({
     name: '',
     price: 0,
@@ -100,6 +103,17 @@ export default function AdminDashboard() {
 
     return () => unsubscribe();
   }, [lastOrderCount]);
+
+  // Real-time products listener
+  useEffect(() => {
+    const unsubscribe = onSnapshot(
+      query(collection(db, 'products'), orderBy('createdAt', 'desc')),
+      (snapshot) => {
+        setFirestoreProducts(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+      }
+    );
+    return () => unsubscribe();
+  }, []);
 
   const playNotificationSound = () => {
     try {
@@ -313,6 +327,68 @@ export default function AdminDashboard() {
     }
   };
 
+  const deleteProduct = async (productId: string) => {
+    if (!confirm('Delete this product? This cannot be undone.')) return;
+    try {
+      await deleteDoc(doc(db, 'products', productId));
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      alert('Failed to delete product');
+    }
+  };
+
+  const handleEditProduct = (product: any) => {
+    setEditingProduct(product);
+    setProductForm({
+      name: product.name || '',
+      price: product.price || 0,
+      originalPrice: product.originalPrice || 0,
+      description: product.description || '',
+      category: product.category || 'Women Dresses',
+      images: product.images?.length ? product.images : [''],
+      colors: product.colors?.length ? product.colors : [''],
+      sizes: product.sizes?.length ? product.sizes : [''],
+      loyaltyPoints: product.loyaltyPoints || 0,
+      stock: product.stock || 0,
+      inStock: product.inStock ?? true,
+    });
+    setShowAddProduct(true);
+  };
+
+  const handleUpdateProduct = async () => {
+    if (!editingProduct) return;
+    try {
+      const validImages = productForm.images.filter(img => img.trim().startsWith('http'));
+      if (!productForm.name || !productForm.price || validImages.length === 0) {
+        alert('Please fill in Name, Price, and at least one Image URL');
+        return;
+      }
+      await updateDoc(doc(db, 'products', editingProduct.id), {
+        name: productForm.name,
+        price: productForm.price,
+        originalPrice: productForm.originalPrice || productForm.price,
+        description: productForm.description,
+        category: productForm.category,
+        images: validImages,
+        colors: productForm.colors.filter(c => c.trim() !== ''),
+        sizes: productForm.sizes.filter(s => s.trim() !== ''),
+        loyaltyPoints: productForm.loyaltyPoints || 0,
+        stock: productForm.stock || 0,
+        inStock: productForm.stock > 0,
+      });
+      alert('Product updated successfully!');
+      setShowAddProduct(false);
+      setEditingProduct(null);
+      setProductForm({
+        name: '', price: 0, originalPrice: 0, description: '',
+        category: 'Women Dresses', images: [''], colors: [''],
+        sizes: [''], loyaltyPoints: 0, stock: 0, inStock: true,
+      });
+    } catch (error: any) {
+      alert(`Failed to update product: ${error.message}`);
+    }
+  };
+
   const addImageField = () => {
     setProductForm({ ...productForm, images: [...productForm.images, ''] });
   };
@@ -344,7 +420,7 @@ export default function AdminDashboard() {
   };
 
   const handleInitializePolls = async () => {
-    if (!confirm('This will initialize poll data (Best/Good/Average/Worst = 0) for all products that don&apos;t have it. Continue?')) {
+    if (!confirm('This will initialize poll data (Best/Good/Average/Worst = 0) for all products that don\'t have it. Continue?')) {
       return;
     }
     
@@ -575,44 +651,130 @@ export default function AdminDashboard() {
 
         {/* Products Tab */}
         {activeTab === 'products' && (
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-800">Product Management</h2>
-              <div className="flex gap-3">
-                <button
-                  onClick={handleInitializePolls}
-                  disabled={initializingPolls}
-                  className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition font-semibold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {initializingPolls ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Initializing...
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle className="w-5 h-5" />
-                      Initialize Polls
-                    </>
-                  )}
-                </button>
-                <button
-                  onClick={() => setShowAddProduct(true)}
-                  className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition font-semibold flex items-center gap-2"
-                >
-                  <Plus className="w-5 h-5" />
-                  Add New Product
-                </button>
+          <div className="space-y-6">
+            {/* Header */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                <h2 className="text-xl font-bold text-gray-800">Product Management</h2>
+                <div className="flex gap-3 flex-wrap">
+                  <button
+                    onClick={handleInitializePolls}
+                    disabled={initializingPolls}
+                    className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition font-semibold flex items-center gap-2 disabled:opacity-50"
+                  >
+                    {initializingPolls ? (
+                      <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>Initializing...</>
+                    ) : (
+                      <><CheckCircle className="w-4 h-4" />Initialize Polls</>
+                    )}
+                  </button>
+                  <button
+                    onClick={() => { setEditingProduct(null); setShowAddProduct(true); }}
+                    className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition font-semibold flex items-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />Add New Product
+                  </button>
+                </div>
+              </div>
+
+              {/* Search */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  value={productSearch}
+                  onChange={(e) => setProductSearch(e.target.value)}
+                  placeholder="Search products..."
+                  className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                />
               </div>
             </div>
-            <p className="text-gray-600 mb-4">
-              Add new products to your store with images, descriptions, sizes, colors, and inventory management.
-            </p>
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-sm text-blue-800">
-                <strong>Note:</strong> If products don&apos;t show poll colors on the home page, click &quot;Initialize Polls&quot; to add poll data to all existing products.
-              </p>
-            </div>
+
+            {/* Products List */}
+            {firestoreProducts.length === 0 ? (
+              <div className="bg-white rounded-lg shadow-md p-12 text-center">
+                <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-gray-600 mb-2">No products added yet</h3>
+                <p className="text-gray-500 mb-4">Click &quot;Add New Product&quot; to add your first product</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {firestoreProducts
+                  .filter(p => p.name?.toLowerCase().includes(productSearch.toLowerCase()))
+                  .map((product) => (
+                  <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+                    {/* Product Image */}
+                    <div className="relative h-48 bg-gray-100">
+                      {product.images?.[0] ? (
+                        <img
+                          src={product.images[0]}
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => { e.currentTarget.src = 'https://via.placeholder.com/400x300?text=No+Image'; }}
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <ImageIcon className="w-12 h-12 text-gray-300" />
+                        </div>
+                      )}
+                      {/* Category Badge */}
+                      <span className="absolute top-2 left-2 bg-primary text-white text-xs px-2 py-1 rounded-full font-medium">
+                        {product.category}
+                      </span>
+                      {/* Stock Badge */}
+                      <span className={`absolute top-2 right-2 text-xs px-2 py-1 rounded-full font-medium ${
+                        product.stock > 10 ? 'bg-green-100 text-green-700' :
+                        product.stock > 0 ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-red-100 text-red-700'
+                      }`}>
+                        {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
+                      </span>
+                    </div>
+
+                    {/* Product Info */}
+                    <div className="p-4">
+                      <h3 className="font-semibold text-gray-800 mb-1 truncate">{product.name}</h3>
+                      <p className="text-sm text-gray-500 mb-2 line-clamp-2">{product.description}</p>
+                      <div className="flex items-center justify-between mb-3">
+                        <div>
+                          <span className="text-lg font-bold text-primary">₹{product.price?.toLocaleString('en-IN')}</span>
+                          {product.originalPrice > product.price && (
+                            <span className="text-sm text-gray-400 line-through ml-2">₹{product.originalPrice?.toLocaleString('en-IN')}</span>
+                          )}
+                        </div>
+                        <span className="text-xs text-gray-500">{product.loyaltyPoints || 0} pts</span>
+                      </div>
+
+                      {/* Colors & Sizes */}
+                      {product.colors?.length > 0 && (
+                        <p className="text-xs text-gray-500 mb-1">Colors: {product.colors.join(', ')}</p>
+                      )}
+                      {product.sizes?.length > 0 && (
+                        <p className="text-xs text-gray-500 mb-3">Sizes: {product.sizes.join(', ')}</p>
+                      )}
+
+                      {/* Action Buttons */}
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleEditProduct(product)}
+                          className="flex-1 flex items-center justify-center gap-1.5 bg-blue-50 text-blue-600 border border-blue-200 px-3 py-2 rounded-lg hover:bg-blue-100 transition text-sm font-medium"
+                        >
+                          <Edit className="w-4 h-4" />
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => deleteProduct(product.id)}
+                          className="flex-1 flex items-center justify-center gap-1.5 bg-red-50 text-red-600 border border-red-200 px-3 py-2 rounded-lg hover:bg-red-100 transition text-sm font-medium"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -744,13 +906,22 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* Add Product Modal */}
+      {/* Add / Edit Product Modal */}
       {showAddProduct && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
           <div className="bg-white rounded-lg max-w-3xl w-full my-8">
             <div className="p-6 max-h-[85vh] overflow-y-auto">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-bold text-gray-800">Add New Product</h3>
+                <h3 className="text-2xl font-bold text-gray-800">
+                  {editingProduct ? 'Edit Product' : 'Add New Product'}
+                </h3>
+                <button
+                  onClick={() => { setShowAddProduct(false); setEditingProduct(null); }}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>              <h3 className="text-2xl font-bold text-gray-800">Add New Product</h3>
                 <button
                   onClick={() => setShowAddProduct(false)}
                   className="text-gray-500 hover:text-gray-700"
@@ -955,13 +1126,13 @@ export default function AdminDashboard() {
 
                 <div className="flex gap-3 pt-4">
                   <button
-                    onClick={handleAddProduct}
+                    onClick={editingProduct ? handleUpdateProduct : handleAddProduct}
                     className="flex-1 bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition font-semibold"
                   >
-                    Add Product
+                    {editingProduct ? 'Update Product' : 'Add Product'}
                   </button>
                   <button
-                    onClick={() => setShowAddProduct(false)}
+                    onClick={() => { setShowAddProduct(false); setEditingProduct(null); }}
                     className="flex-1 border border-gray-300 px-6 py-3 rounded-lg hover:bg-gray-50 transition font-semibold"
                   >
                     Cancel

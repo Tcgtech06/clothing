@@ -1,11 +1,12 @@
 # Firestore Security Rules
 
-Update your Firestore security rules in Firebase Console:
+## ACTION REQUIRED - Update in Firebase Console
 
 1. Go to https://console.firebase.google.com/
 2. Select project: **vilvah**
 3. Click **Firestore Database** → **Rules** tab
-4. Replace with the rules below and click **Publish**
+4. Replace ALL existing rules with the rules below
+5. Click **Publish**
 
 ```javascript
 rules_version = '2';
@@ -30,7 +31,7 @@ service cloud.firestore {
       allow read, create, update, delete: if request.auth != null;
     }
 
-    // Reviews - public read, auth write (own reviews only)
+    // Reviews - public read, any authenticated user can create
     match /reviews/{reviewId} {
       allow read: if true;
       allow create: if request.auth != null;

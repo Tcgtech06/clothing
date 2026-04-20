@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import ProductPoll from './ProductPoll';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp, query, where, orderBy, onSnapshot } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, where, onSnapshot } from 'firebase/firestore';
 
 interface ProductDetailClientProps {
   product: Product;
@@ -39,15 +39,21 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
   const productKey = (product as any).firestoreId || String(product.id);
 
-  // Load reviews from Firestore in real-time
+  // Load reviews from Firestore in real-time (no orderBy to avoid index requirement)
   useEffect(() => {
     const q = query(
       collection(db, 'reviews'),
-      where('productId', '==', productKey),
-      orderBy('createdAt', 'desc')
+      where('productId', '==', productKey)
     );
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      setReviews(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+      const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      // Sort client-side by createdAt descending
+      data.sort((a, b) => {
+        const aTime = a.createdAt?.toDate?.()?.getTime() || 0;
+        const bTime = b.createdAt?.toDate?.()?.getTime() || 0;
+        return bTime - aTime;
+      });
+      setReviews(data);
     });
     return () => unsubscribe();
   }, [productKey]);
