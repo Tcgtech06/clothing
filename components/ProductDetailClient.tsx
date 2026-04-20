@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Star, ShoppingCart, Heart, Share2, Check, Truck, Shield, RotateCcw, Minus, Plus, ArrowLeft, ChevronLeft, ChevronRight, Coins } from 'lucide-react';
+import { Star, ShoppingCart, Heart, Share2, Check, Truck, Shield, RotateCcw, Minus, Plus, ArrowLeft, ChevronLeft, ChevronRight, Coins, MessageSquare, User as UserIcon } from 'lucide-react';
 import { Product } from '@/data/products';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -10,6 +10,8 @@ import { useFavourites } from '@/lib/favourites-context';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import ProductPoll from './ProductPoll';
+import { db } from '@/lib/firebase';
+import { collection, addDoc, serverTimestamp, query, where, orderBy, onSnapshot } from 'firebase/firestore';
 
 interface ProductDetailClientProps {
   product: Product;
@@ -32,6 +34,23 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   const [reviewName, setReviewName] = useState('');
   const [reviewText, setReviewText] = useState('');
   const [showReviewSuccess, setShowReviewSuccess] = useState(false);
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviews, setReviews] = useState<any[]>([]);
+
+  const productKey = (product as any).firestoreId || String(product.id);
+
+  // Load reviews from Firestore in real-time
+  useEffect(() => {
+    const q = query(
+      collection(db, 'reviews'),
+      where('productId', '==', productKey),
+      orderBy('createdAt', 'desc')
+    );
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setReviews(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+    });
+    return () => unsubscribe();
+  }, [productKey]);
 
   const isProductFavourite = isFavourite(product.id);
 
@@ -95,21 +114,33 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
     }, 2000);
   };
 
-  const handleSubmitReview = (e: React.FormEvent) => {
+  const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!user) {
       router.push('/signup');
       return;
     }
-    
-    // Here you would typically send the review to your backend
-    console.log('Review submitted:', { reviewRating, reviewName, reviewText });
-    setShowReviewSuccess(true);
-    setReviewName('');
-    setReviewText('');
-    setReviewRating(5);
-    setTimeout(() => setShowReviewSuccess(false), 3000);
+
+    setReviewSubmitting(true);
+    try {
+      await addDoc(collection(db, 'reviews'), {
+        productId: productKey,
+        productName: product.name,
+        userId: user.uid,
+        userName: reviewName || user.displayName || 'Anonymous',
+        reviewText,
+        createdAt: serverTimestamp(),
+      });
+      setShowReviewSuccess(true);
+      setReviewName('');
+      setReviewText('');
+      setTimeout(() => setShowReviewSuccess(false), 3000);
+    } catch (err) {
+      console.error('Error submitting review:', err);
+    } finally {
+      setReviewSubmitting(false);
+    }
   };
 
   const handleToggleFavourite = () => {
@@ -456,37 +487,37 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           ) : (
             <div>
               <h3 className="text-xl font-bold mb-4">Customer Reviews</h3>
-              <p className="text-gray-600 mb-6">{product.reviews} customer reviews</p>
+              <p className="text-gray-600 mb-6">{reviews.length} customer {reviews.length === 1 ? 'review' : 'reviews'}</p>
 
               {/* Write a Review Form */}
               <div className="bg-gray-50 rounded-lg p-6 mb-6">
-                <h4 className="text-lg font-bold mb-4">Write a Review</h4>
+                <h4 className="text-lg font-bold mb-4 flex items-center gap-2">
+                  <MessageSquare className="w-5 h-5 text-primary" />
+                  Write a Review
+                </h4>
                 {showReviewSuccess && (
-                  <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-800">
-                    ✓ Thank you! Your review has been submitted successfully.
+                  <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 flex items-center gap-2">
+                    <Check className="w-4 h-4" />
+                    Thank you! Your review has been submitted successfully.
                   </div>
                 )}
                 <form onSubmit={handleSubmitReview}>
                   {/* Name Input */}
                   <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Your Name
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Your Name</label>
                     <input
                       type="text"
                       value={reviewName}
                       onChange={(e) => setReviewName(e.target.value)}
                       required
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                      placeholder="Enter your name"
+                      placeholder={user?.displayName || 'Enter your name'}
                     />
                   </div>
 
                   {/* Review Text */}
                   <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Your Review
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Your Review</label>
                     <textarea
                       value={reviewText}
                       onChange={(e) => setReviewText(e.target.value)}
@@ -497,36 +528,45 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                     />
                   </div>
 
-                  {/* Submit Button */}
                   <button
                     type="submit"
-                    className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 transition font-semibold"
+                    disabled={reviewSubmitting}
+                    className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Submit Review
+                    {reviewSubmitting ? 'Submitting...' : 'Submit Review'}
                   </button>
                 </form>
               </div>
-              
-              {/* Sample Reviews */}
-              <h4 className="text-lg font-bold mb-4">Customer Reviews</h4>
-              <div className="space-y-4">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="border-b pb-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="flex">
-                        {[...Array(5)].map((_, j) => (
-                          <Star key={j} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                        ))}
+
+              {/* Reviews List from Firebase */}
+              {reviews.length === 0 ? (
+                <div className="text-center py-10 text-gray-500">
+                  <MessageSquare className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                  <p className="font-medium">No reviews yet</p>
+                  <p className="text-sm">Be the first to review this product!</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {reviews.map((review) => (
+                    <div key={review.id} className="bg-white border border-gray-100 rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
+                          <UserIcon className="w-5 h-5 text-primary" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-800 text-sm">{review.userName}</p>
+                          <p className="text-xs text-gray-400">
+                            {review.createdAt?.toDate
+                              ? review.createdAt.toDate().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+                              : 'Just now'}
+                          </p>
+                        </div>
                       </div>
-                      <span className="font-semibold">Customer {i}</span>
-                      <span className="text-sm text-gray-500">• 2 days ago</span>
+                      <p className="text-gray-700 text-sm leading-relaxed">{review.reviewText}</p>
                     </div>
-                    <p className="text-gray-700">
-                      Great product! Highly recommended. The quality is excellent and it works perfectly.
-                    </p>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
