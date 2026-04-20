@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { db } from '@/lib/firebase';
 import { collection, getDocs, doc, updateDoc } from 'firebase/firestore';
 
@@ -88,7 +89,7 @@ export default function InitPollsPage() {
         )}
 
         <div className="mt-6 pt-6 border-t">
-          <a href="/" className="text-primary hover:underline">← Back to Home</a>
+          <Link href="/" className="text-primary hover:underline">← Back to Home</Link>
         </div>
       </div>
     </div>
