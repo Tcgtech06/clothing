@@ -71,14 +71,21 @@ export default function SignupPage() {
       router.push('/');
     } catch (error: any) {
       console.error('Signup error:', error);
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
+      
       if (error.code === 'auth/email-already-in-use') {
         setError('Email already in use');
       } else if (error.code === 'auth/invalid-email') {
         setError('Invalid email address');
       } else if (error.code === 'auth/weak-password') {
         setError('Password is too weak');
+      } else if (error.code === 'permission-denied' || error.message.includes('permission')) {
+        setError('Account created but failed to save profile. Please update your profile after login.');
+        // Still redirect to home since auth account was created
+        setTimeout(() => router.push('/'), 2000);
       } else {
-        setError('Failed to create account. Please try again.');
+        setError(`Failed to create account: ${error.message}`);
       }
     } finally {
       setLoading(false);
