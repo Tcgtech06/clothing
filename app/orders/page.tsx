@@ -5,6 +5,8 @@ import { Package, Truck, CheckCircle, Clock, X, MapPin } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { collection, query, orderBy, where, onSnapshot } from 'firebase/firestore';
 import Link from 'next/link';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { useAuth } from '@/lib/auth-context';
 
 interface Order {
   id: string;
@@ -82,6 +84,7 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
     // Fetch all orders (no email filter since we don't have auth yet)
@@ -150,12 +153,13 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8 text-gray-800">My Orders</h1>
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <h1 className="text-3xl font-bold mb-8 text-gray-800">My Orders</h1>
 
-        <div className="space-y-4">
-          {orders.map((order) => (
+          <div className="space-y-4">
+            {orders.map((order) => (
             <div
               key={order.id}
               className="bg-white rounded-lg shadow-md hover:shadow-lg transition overflow-hidden"
@@ -344,6 +348,6 @@ export default function OrdersPage() {
           </div>
         </div>
       )}
-    </div>
+    </ProtectedRoute>
   );
 }

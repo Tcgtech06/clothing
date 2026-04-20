@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import { CreditCard, Wallet, MapPin, User, Phone, Mail, Edit2, Plus, Check } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { useAuth } from '@/lib/auth-context';
 
 interface SavedAddress {
   name: string;
@@ -139,11 +141,12 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8 text-gray-800">Checkout</h1>
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <h1 className="text-3xl font-bold mb-8 text-gray-800">Checkout</h1>
 
-        <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Shipping & Payment Details */}
             <div className="lg:col-span-2 space-y-6">
@@ -440,6 +443,6 @@ export default function CheckoutPage() {
           </div>
         </form>
       </div>
-    </div>
+    </ProtectedRoute>
   );
 }

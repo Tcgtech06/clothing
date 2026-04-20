@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { useCart } from '@/lib/cart-context';
 import { useFavourites } from '@/lib/favourites-context';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/auth-context';
 import ProductPoll from './ProductPoll';
 
 interface ProductDetailClientProps {
@@ -16,6 +17,7 @@ interface ProductDetailClientProps {
 
 export default function ProductDetailClient({ product }: ProductDetailClientProps) {
   const router = useRouter();
+  const { user } = useAuth();
   const { addToCart } = useCart();
   const { addToFavourites, removeFromFavourites, isFavourite } = useFavourites();
   const [selectedImage, setSelectedImage] = useState(0);
@@ -72,6 +74,11 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
     : 0;
 
   const handleAddToCart = () => {
+    if (!user) {
+      router.push('/signup');
+      return;
+    }
+    
     addToCart(product, quantity, selectedColor, selectedSize);
     
     // Calculate loyalty points earned
@@ -90,6 +97,12 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
   const handleSubmitReview = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!user) {
+      router.push('/signup');
+      return;
+    }
+    
     // Here you would typically send the review to your backend
     console.log('Review submitted:', { reviewRating, reviewName, reviewText });
     setShowReviewSuccess(true);
@@ -100,6 +113,11 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   };
 
   const handleToggleFavourite = () => {
+    if (!user) {
+      router.push('/signup');
+      return;
+    }
+    
     if (isProductFavourite) {
       removeFromFavourites(product.id);
     } else {

@@ -1,4 +1,5 @@
 import { Award, Gift, Star, TrendingUp } from 'lucide-react';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 export default function LoyaltyPage() {
   const userPoints = 2450;
@@ -20,9 +21,10 @@ export default function LoyaltyPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8 text-gray-800">Loyalty Points</h1>
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <h1 className="text-3xl font-bold mb-8 text-gray-800">Loyalty Points</h1>
 
         {/* Points Summary Card */}
         <div className="bg-gradient-to-r from-primary to-secondary text-white rounded-xl p-6 md:p-8 mb-8 shadow-lg">
@@ -106,6 +108,6 @@ export default function LoyaltyPage() {
           </div>
         </div>
       </div>
-    </div>
+    </ProtectedRoute>
   );
 }

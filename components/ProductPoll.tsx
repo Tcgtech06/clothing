@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { ThumbsUp, ThumbsDown, Meh } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { doc, updateDoc, increment, onSnapshot } from 'firebase/firestore';
+import { useAuth } from '@/lib/auth-context';
+import { useRouter } from 'next/navigation';
 
 interface PollProps {
   productId: string | number;
@@ -18,6 +20,8 @@ interface PollProps {
 }
 
 export default function ProductPoll({ productId, firestoreId, initialPoll, onVote }: PollProps) {
+  const { user } = useAuth();
+  const router = useRouter();
   const [poll, setPoll] = useState(initialPoll || { best: 0, good: 0, average: 0, worst: 0 });
   const [userVote, setUserVote] = useState<string | null>(null);
   const [showThankYou, setShowThankYou] = useState(false);
@@ -47,6 +51,11 @@ export default function ProductPoll({ productId, firestoreId, initialPoll, onVot
   };
 
   const handleVote = async (voteType: 'best' | 'good' | 'average' | 'worst') => {
+    if (!user) {
+      router.push('/signup');
+      return;
+    }
+    
     // Check if user already voted (stored in localStorage)
     const votedProducts = JSON.parse(localStorage.getItem('votedProducts') || '{}');
     
