@@ -1,6 +1,6 @@
 'use client';
 
-import { User, Package, Award, LogOut, X } from 'lucide-react';
+import { User, LogOut, X } from 'lucide-react';
 import Link from 'next/link';
 
 interface ProfileMenuProps {
@@ -14,14 +14,14 @@ export default function ProfileMenu({ isOpen, onClose }: ProfileMenuProps) {
       {/* Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-50 md:hidden"
+          className="fixed inset-0 bg-black/50 z-50"
           onClick={onClose}
         />
       )}
 
       {/* Slide-in Menu */}
       <div
-        className={`fixed top-0 left-0 h-full w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out md:hidden ${
+        className={`fixed top-0 left-0 h-full w-72 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -47,24 +47,6 @@ export default function ProfileMenu({ isOpen, onClose }: ProfileMenuProps) {
                 <p className="font-semibold text-lg">John Doe</p>
                 <p className="text-sm text-white/80">john@example.com</p>
               </div>
-            </div>
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-2 gap-4 p-6 border-b">
-            <div className="text-center">
-              <div className="flex items-center justify-center mb-2">
-                <Package className="w-5 h-5 text-primary" />
-              </div>
-              <p className="text-2xl font-bold text-gray-800">12</p>
-              <p className="text-sm text-gray-600">Orders</p>
-            </div>
-            <div className="text-center">
-              <div className="flex items-center justify-center mb-2">
-                <Award className="w-5 h-5 text-orange-600" />
-              </div>
-              <p className="text-2xl font-bold text-gray-800">2,450</p>
-              <p className="text-sm text-gray-600">Points</p>
             </div>
           </div>
 
