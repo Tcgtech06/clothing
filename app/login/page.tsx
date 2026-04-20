@@ -4,35 +4,78 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
-import { auth } from '@/lib/firebase';
+import { auth, db } from '@/lib/firebase';
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
+  const [emailOrPhone, setEmailOrPhone] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     setLoading(true);
 
     try {
+      const input = emailOrPhone.trim();
+      let email = input;
+
+      // Check if input is a phone number (all digits or starts with +)
+      const isPhone = /^[\d+]/.test(input) && !input.includes('@');
+      
+      if (isPhone) {
+        // Search for user by phone number in Firestore
+        try {
+          const usersRef = collection(db, 'users');
+          const q = query(usersRef, where('phone', '==', input));
+          const querySnapshot = await getDocs(q);
+          
+          if (querySnapshot.empty) {
+            setError('No account found with this phone number');
+            setLoading(false);
+            return;
+          }
+          
+          // Get the email associated with this phone number
+          const userData = querySnapshot.docs[0].data();
+          email = userData.email;
+          
+          if (!email) {
+            setError('Account found but email is missing. Please contact support.');
+            setLoading(false);
+            return;
+          }
+        } catch (firestoreError: any) {
+          console.error('Firestore error:', firestoreError);
+          setError('Error searching for account. Please try again.');
+          setLoading(false);
+          return;
+        }
+      }
+
+      // Attempt login with email
       await signInWithEmailAndPassword(auth, email, password);
-      router.push('/');
+      setSuccess('Login successful! Redirecting...');
+      setTimeout(() => router.push('/'), 1500);
     } catch (error: any) {
       console.error('Login error:', error);
       if (error.code === 'auth/user-not-found') {
-        setError('No account found with this email');
+        setError('No account found with this email or phone number');
       } else if (error.code === 'auth/wrong-password') {
-        setError('Incorrect password');
+        setError('Incorrect password. Please try again.');
       } else if (error.code === 'auth/invalid-email') {
         setError('Invalid email address');
+      } else if (error.code === 'auth/invalid-credential') {
+        setError('Invalid email/phone or password');
       } else {
-        setError('Failed to login. Please try again.');
+        setError('Failed to login. Please check your credentials.');
       }
     } finally {
       setLoading(false);
@@ -41,12 +84,14 @@ export default function LoginPage() {
 
   const handleGoogleLogin = async () => {
     setError('');
+    setSuccess('');
     setLoading(true);
 
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
-      router.push('/');
+      setSuccess('Login successful! Redirecting...');
+      setTimeout(() => router.push('/'), 1500);
     } catch (error: any) {
       console.error('Google login error:', error);
       setError('Failed to login with Google. Please try again.');
@@ -68,29 +113,42 @@ export default function LoginPage() {
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Login</h2>
 
+          {/* Success Message */}
+          {success && (
+            <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-600 text-sm flex items-center gap-2">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              {success}
+            </div>
+          )}
+
           {/* Error Message */}
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm flex items-center gap-2">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
               {error}
             </div>
           )}
 
           {/* Email/Password Form */}
           <form onSubmit={handleEmailLogin} className="space-y-4 mb-6">
-            {/* Email Input */}
+            {/* Email or Phone Input */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address
+                Email or Phone Number
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  type="text"
+                  value={emailOrPhone}
+                  onChange={(e) => setEmailOrPhone(e.target.value)}
                   required
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                  placeholder="Enter your email"
+                  placeholder="Enter your email or phone"
                 />
               </div>
             </div>
@@ -107,13 +165,14 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent appearance-none"
                   placeholder="Enter your password"
+                  autoComplete="current-password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 pointer-events-auto"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
