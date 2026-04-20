@@ -1,7 +1,7 @@
 # Firestore Security Rules
 
 ## Current Issue
-The signup is failing with "Missing or insufficient permissions" because Firestore security rules are blocking write access.
+The login is failing with "Missing or insufficient permissions" when trying to search for users by phone number. This is because Firestore security rules are blocking the query.
 
 ## Solution
 Update your Firestore security rules in Firebase Console:
@@ -21,9 +21,13 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Users collection - users can read/write their own data
+    // Users collection - allow queries for phone/email lookup during login
     match /users/{userId} {
+      // Allow reading user data if authenticated
       allow read: if request.auth != null;
+      // Allow querying by phone number for login (unauthenticated)
+      allow list: if true;
+      // Allow writing only to own user document
       allow write: if request.auth != null && request.auth.uid == userId;
     }
     
@@ -49,7 +53,8 @@ service cloud.firestore {
 ### What These Rules Do:
 
 1. **Users Collection**:
-   - Any authenticated user can read user documents
+   - Anyone can list/query user documents (needed for phone number login lookup)
+   - Any authenticated user can read individual user documents
    - Users can only write to their own user document (userId must match their auth.uid)
 
 2. **Products Collection**:
@@ -61,6 +66,7 @@ service cloud.firestore {
    - Users can access all orders (for admin dashboard)
 
 ### After Publishing Rules:
+- Phone number login will work correctly
 - Signup will work correctly
 - User data will be saved to Firestore
 - No more "Missing or insufficient permissions" error
