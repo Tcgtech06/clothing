@@ -147,7 +147,7 @@ export default function CheckoutPage() {
           <h1 className="text-3xl font-bold mb-8 text-gray-800">Checkout</h1>
 
           <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Shipping & Payment Details */}
             <div className="lg:col-span-2 space-y-6">
               {/* Shipping Address */}
@@ -170,7 +170,6 @@ export default function CheckoutPage() {
                 </div>
 
                 {savedAddress && !isEditingAddress ? (
-                  /* Display Saved Address */
                   <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                     <div className="flex items-start gap-3">
                       <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
@@ -203,7 +202,6 @@ export default function CheckoutPage() {
                     </button>
                   </div>
                 ) : (
-                  /* Address Form */
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="md:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -440,8 +438,9 @@ export default function CheckoutPage() {
                 </button>
               </div>
             </div>
-          </div>
-        </form>
+            </div>
+          </form>
+        </div>
       </div>
     </ProtectedRoute>
   );
