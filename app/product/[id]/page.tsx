@@ -53,12 +53,14 @@ export default function ProductPage() {
         const data = docSnap.data();
         const firestoreProduct = {
           id: numericId || parseInt(docSnap.id.substring(0, 8), 16),
+          firestoreId: docSnap.id,
           name: data.name || '',
           price: data.price || 0,
           originalPrice: data.originalPrice,
           images: data.images || [],
           rating: data.rating || 4.5,
           reviews: data.reviews || 0,
+          poll: data.poll || { best: 0, good: 0, average: 0, worst: 0 },
           description: data.description || '',
           category: data.category || '',
           features: data.features || [],
