@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Filter, ChevronDown, X, SlidersHorizontal, Shirt, ShoppingBag, Watch, Footprints, Tag, ArrowUpDown } from 'lucide-react';
+import { Filter, ChevronDown, X, SlidersHorizontal, Watch, Footprints, Tag, ShoppingBag } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { products as staticProducts } from '@/data/products';
@@ -11,13 +11,29 @@ import type { Product } from '@/data/products';
 
 type SortOption = 'default' | 'price-low-high' | 'price-high-low' | 'rating';
 
-import type { LucideIcon } from 'lucide-react';
+// Custom SVG icons for male/female
+const WomanIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="3.5" r="2.5"/>
+    <path d="M8 9.5C8 8.12 9.12 7 10.5 7h3C14.88 7 16 8.12 16 9.5v4l-1.5 1L12 22l-2.5-7.5L8 13.5V9.5z"/>
+    <path d="M9.5 13.5L8 20h8l-1.5-6.5"/>
+  </svg>
+);
 
-const categoryIcons: Record<string, LucideIcon> = {
-  'Women Dresses': Shirt,
-  'Men Clothing': ShoppingBag,
-  'Accessories': Watch,
-  'Footwear': Footprints,
+const ManIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="3.5" r="2.5"/>
+    <path d="M9 7h6l1.5 7H15l-1 8h-4l-1-8H7.5L9 7z"/>
+  </svg>
+);
+
+type CategoryIconComponent = React.ComponentType<{ className?: string }>;
+
+const categoryIcons: Record<string, CategoryIconComponent> = {
+  'Women Dresses': WomanIcon,
+  'Men Clothing': ManIcon,
+  'Accessories': ({ className }) => <Watch className={className} />,
+  'Footwear': ({ className }) => <Footprints className={className} />,
 };
 
 export default function CategoryPage() {
