@@ -7,6 +7,7 @@ import { useState } from 'react';
 import ProfileMenu from './ProfileMenu';
 import { useCart } from '@/lib/cart-context';
 import { useFavourites } from '@/lib/favourites-context';
+import { useAuth } from '@/lib/auth-context';
 
 const navItems = [
   { name: 'Home', href: '/', icon: Home },
@@ -21,8 +22,18 @@ export default function Navigation() {
   const [showMobileProfile, setShowMobileProfile] = useState(false);
   const { getCartCount } = useCart();
   const { getFavouritesCount } = useFavourites();
+  const { user, userData, logout } = useAuth();
   const cartCount = getCartCount();
   const favouritesCount = getFavouritesCount();
+
+  const handleLogout = async () => {
+    await logout();
+    setShowProfileMenu(false);
+  };
+
+  const displayName = userData?.displayName || user?.displayName || 'User';
+  const displayEmail = userData?.email || user?.email || 'user@example.com';
+  const initial = displayName.charAt(0).toUpperCase();
 
   return (
     <>
@@ -124,8 +135,8 @@ export default function Navigation() {
                     <div className="absolute top-12 right-0 bg-white rounded-lg shadow-xl border border-gray-200 py-2 w-64 z-50">
                       {/* User Info */}
                       <div className="px-4 py-3 border-b border-gray-200">
-                        <p className="font-semibold text-gray-800">John Doe</p>
-                        <p className="text-sm text-gray-500">john@example.com</p>
+                        <p className="font-semibold text-gray-800">{displayName}</p>
+                        <p className="text-sm text-gray-500">{displayEmail}</p>
                       </div>
                       
                       {/* Menu Items */}
@@ -139,7 +150,10 @@ export default function Navigation() {
                       
                       <hr className="my-2" />
                       
-                      <button className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 font-medium">
+                      <button 
+                        onClick={handleLogout}
+                        className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 font-medium"
+                      >
                         Logout
                       </button>
                     </div>

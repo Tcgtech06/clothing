@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Mail, Lock, User, Eye, EyeOff, Phone } from 'lucide-react';
 import { auth, db } from '@/lib/firebase';
 import { createUserWithEmailAndPassword, updateProfile, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -93,14 +93,20 @@ export default function SignupPage() {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
 
-      // Save user data to Firestore
-      await setDoc(doc(db, 'users', result.user.uid), {
-        name: result.user.displayName || '',
-        email: result.user.email || '',
-        phone: '',
-        createdAt: new Date(),
-        loyaltyPoints: 0,
-      }, { merge: true });
+      // Check if user document exists, if not create it
+      const userDocRef = doc(db, 'users', result.user.uid);
+      const userDoc = await getDoc(userDocRef);
+      
+      if (!userDoc.exists()) {
+        // Save user data to Firestore for new users
+        await setDoc(userDocRef, {
+          name: result.user.displayName || '',
+          email: result.user.email || '',
+          phone: '',
+          createdAt: new Date(),
+          loyaltyPoints: 0,
+        });
+      }
 
       router.push('/');
     } catch (error: any) {

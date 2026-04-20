@@ -2,6 +2,7 @@
 
 import { User, LogOut, X } from 'lucide-react';
 import Link from 'next/link';
+import { useAuth } from '@/lib/auth-context';
 
 interface ProfileMenuProps {
   isOpen: boolean;
@@ -9,6 +10,17 @@ interface ProfileMenuProps {
 }
 
 export default function ProfileMenu({ isOpen, onClose }: ProfileMenuProps) {
+  const { user, userData, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    onClose();
+  };
+
+  const displayName = userData?.displayName || user?.displayName || 'User';
+  const displayEmail = userData?.email || user?.email || 'user@example.com';
+  const initial = displayName.charAt(0).toUpperCase();
+
   return (
     <>
       {/* Overlay */}
@@ -41,11 +53,11 @@ export default function ProfileMenu({ isOpen, onClose }: ProfileMenuProps) {
             {/* User Info */}
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-primary text-xl font-bold">
-                J
+                {initial}
               </div>
               <div>
-                <p className="font-semibold text-base">John Doe</p>
-                <p className="text-xs text-white/80">john@example.com</p>
+                <p className="font-semibold text-base">{displayName}</p>
+                <p className="text-xs text-white/80">{displayEmail}</p>
               </div>
             </div>
           </div>
@@ -62,7 +74,10 @@ export default function ProfileMenu({ isOpen, onClose }: ProfileMenuProps) {
             </Link>
 
             {/* Logout Button - Moved here */}
-            <button className="w-full flex items-center gap-3 p-3 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition font-medium">
+            <button 
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 p-3 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition font-medium"
+            >
               <LogOut className="w-5 h-5" />
               Logout
             </button>

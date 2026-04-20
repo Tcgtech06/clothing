@@ -3,13 +3,16 @@
 import { User, Mail, Phone, MapPin, Edit2, Camera, Package, Award, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 import Link from 'next/link';
+import { useAuth } from '@/lib/auth-context';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
-export default function ProfilePage() {
+function ProfilePageContent() {
+  const { user, userData } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState({
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    phone: '+1 234 567 8900',
+    name: userData?.displayName || user?.displayName || '',
+    email: userData?.email || user?.email || '',
+    phone: userData?.phone || '',
     address: '123 Main Street, New York, NY 10001',
   });
 
@@ -208,5 +211,13 @@ export default function ProfilePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ProfilePage() {
+  return (
+    <ProtectedRoute>
+      <ProfilePageContent />
+    </ProtectedRoute>
   );
 }
