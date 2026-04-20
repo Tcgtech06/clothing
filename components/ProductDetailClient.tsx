@@ -453,7 +453,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                     : 'border-transparent text-gray-600 hover:text-gray-800'
                 }`}
               >
-                Reviews ({product.reviews})
+                Reviews ({reviews.length})
               </button>
             </div>
           </div>
