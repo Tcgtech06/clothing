@@ -160,10 +160,10 @@ export default function OrdersPage() {
 
           <div className="space-y-4">
             {orders.map((order) => (
-            <div
-              key={order.id}
-              className="bg-white rounded-lg shadow-md hover:shadow-lg transition overflow-hidden"
-            >
+              <div
+                key={order.id}
+                className="bg-white rounded-lg shadow-md hover:shadow-lg transition overflow-hidden"
+              >
               <div className="p-6">
                 {/* Order Header */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
@@ -264,7 +264,8 @@ export default function OrdersPage() {
                 </div>
               </div>
             </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
