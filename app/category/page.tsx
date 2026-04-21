@@ -49,7 +49,7 @@ export default function CategoryPage() {
         id: doc.id as any,
         firestoreId: doc.id,
         ...doc.data(),
-      } as Product));
+      } as unknown as Product));
       setAllProducts([...staticProducts, ...firestoreProducts]);
     });
     return () => unsubscribe();

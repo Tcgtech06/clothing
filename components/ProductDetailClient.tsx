@@ -46,7 +46,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
       where('productId', '==', productKey)
     );
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      const data: any[] = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       // Sort client-side by createdAt descending
       data.sort((a, b) => {
         const aTime = a.createdAt?.toDate?.()?.getTime() || 0;
