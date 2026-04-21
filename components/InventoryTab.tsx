@@ -64,7 +64,8 @@ export default function InventoryTab() {
       const cartData = JSON.parse(localStorage.getItem('cart') || '[]');
       const cartQty: { [key: string]: number } = {};
       cartData.forEach((item: any) => {
-        const productId = item.firestoreId || item.id.toString();
+        const productId = item.firestoreId || (item.id != null ? item.id.toString() : null);
+        if (!productId) return;
         cartQty[productId] = (cartQty[productId] || 0) + (item.quantity || 1);
       });
       setCartQuantities(cartQty);
