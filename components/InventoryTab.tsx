@@ -44,6 +44,10 @@ export default function InventoryTab() {
           };
         }));
         setLoading(false);
+      },
+      (error) => {
+        console.warn('Products listener error:', error.code);
+        setLoading(false);
       }
     );
     return () => unsub();
@@ -51,6 +55,7 @@ export default function InventoryTab() {
 
   // Live orders from Firestore
   useEffect(() => {
+    const auth = (db as any).app.options;
     const unsub = onSnapshot(collection(db, 'orders'), (snap) => {
       const orderedQty: { [key: string]: number } = {};
       snap.docs.forEach(d => {
@@ -63,6 +68,8 @@ export default function InventoryTab() {
         }
       });
       setOrderedQuantities(orderedQty);
+    }, (error) => {
+      console.warn('Orders listener error (user may not be authenticated):', error.code);
     });
     return () => unsub();
   }, []);

@@ -285,7 +285,8 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* Stats */}
+        {/* Stats - only show on orders tab */}
+        {activeTab === 'orders' && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {[
             { label: 'Total Orders', value: stats.totalOrders, icon: Package, color: 'text-blue-500' },
@@ -302,6 +303,7 @@ export default function AdminDashboard() {
             </div>
           ))}
         </div>
+        )}
 
         {/* Orders Tab */}
         {activeTab === 'orders' && (
