@@ -12,6 +12,7 @@ import {
   updateDoc, deleteDoc, addDoc, serverTimestamp
 } from 'firebase/firestore';
 import InventoryTab from '@/components/InventoryTab';
+import AnalyticsTab from '@/components/AnalyticsTab';
 import { initializePollsForAllProducts } from '@/lib/init-polls';
 import { CATEGORIES } from '@/data/categories';
 
@@ -56,7 +57,7 @@ export default function AdminDashboard() {
   const [notifications, setNotifications] = useState<string[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [lastOrderCount, setLastOrderCount] = useState(0);
-  const [activeTab, setActiveTab] = useState<'orders' | 'products' | 'inventory'>('orders');
+  const [activeTab, setActiveTab] = useState<'orders' | 'products' | 'inventory' | 'analytics'>('orders');
   const [showProductModal, setShowProductModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any | null>(null);
   const [productForm, setProductForm] = useState<ProductForm>(emptyForm);
@@ -252,7 +253,7 @@ export default function AdminDashboard() {
             </div>
           </div>
           <div className="flex gap-4 mt-4 border-b">
-            {(['orders', 'products', 'inventory'] as const).map(tab => (
+            {(['orders', 'products', 'inventory', 'analytics'] as const).map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -445,6 +446,9 @@ export default function AdminDashboard() {
 
         {/* Inventory Tab */}
         {activeTab === 'inventory' && <InventoryTab />}
+
+        {/* Analytics Tab */}
+        {activeTab === 'analytics' && <AnalyticsTab />}
       </div>
 
       {/* Order Detail Modal */}
