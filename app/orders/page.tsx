@@ -342,11 +342,11 @@ export default function OrdersPage() {
           reason: returnRequestData.reason,
           paymentMethod: returnRequestData.paymentMethod,
           ...(returnForm.paymentMethod === 'upi' ? { 
-            upiId: returnRequestData.upiId 
+            upiId: returnForm.upiId 
           } : {
-            accountNumber: returnRequestData.accountNumber,
-            ifscCode: returnRequestData.ifscCode,
-            accountHolderName: returnRequestData.accountHolderName
+            accountNumber: returnForm.accountNumber,
+            ifscCode: returnForm.ifscCode,
+            accountHolderName: returnForm.accountHolderName
           }),
           requestedAt: new Date(),
           status: 'pending'

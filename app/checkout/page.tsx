@@ -218,7 +218,7 @@ export default function CheckoutPage() {
           name: item.product.name,
           price: item.product.price,
           quantity: item.quantity,
-          image: item.product.images?.[0] || item.product.image,
+          image: item.product.images?.[0] || (item.product as any).image || '',
           color: item.selectedColor,
           size: item.selectedSize,
         })),
