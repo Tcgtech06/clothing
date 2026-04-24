@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ThumbsUp, ThumbsDown, Meh } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, Meh, Lock } from 'lucide-react';
 import { db } from '@/lib/firebase';
-import { doc, updateDoc, increment, onSnapshot } from 'firebase/firestore';
+import { doc, updateDoc, increment, onSnapshot, collection, query, where, getDocs, setDoc } from 'firebase/firestore';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
 
@@ -26,6 +26,55 @@ export default function ProductPoll({ productId, firestoreId, initialPoll, onVot
   const [userVote, setUserVote] = useState<string | null>(null);
   const [showThankYou, setShowThankYou] = useState(false);
   const [isVoting, setIsVoting] = useState(false);
+  const [canVote, setCanVote] = useState(false);
+  const [checkingEligibility, setCheckingEligibility] = useState(true);
+
+  // Check if user has received this product
+  useEffect(() => {
+    const checkVotingEligibility = async () => {
+      if (!user || !firestoreId) {
+        setCheckingEligibility(false);
+        return;
+      }
+
+      try {
+        // Query orders where user has received this product
+        const ordersRef = collection(db, 'orders');
+        const q = query(
+          ordersRef,
+          where('customerEmail', '==', user.email),
+          where('status', '==', 'delivered')
+        );
+
+        const querySnapshot = await getDocs(q);
+        let hasProduct = false;
+
+        // Check if any delivered order contains this product
+        querySnapshot.forEach((doc) => {
+          const orderData = doc.data();
+          const productDetails = orderData.productDetails || [];
+          
+          // Check if this product is in the order
+          const hasThisProduct = productDetails.some((item: any) => 
+            item.firestoreId === firestoreId || item.id === productId
+          );
+
+          if (hasThisProduct) {
+            hasProduct = true;
+          }
+        });
+
+        setCanVote(hasProduct);
+      } catch (error) {
+        console.error('Error checking voting eligibility:', error);
+        setCanVote(false);
+      } finally {
+        setCheckingEligibility(false);
+      }
+    };
+
+    checkVotingEligibility();
+  }, [user, firestoreId, productId]);
 
   // Real-time listener for poll updates
   useEffect(() => {
@@ -44,6 +93,32 @@ export default function ProductPoll({ productId, firestoreId, initialPoll, onVot
     return () => unsubscribe();
   }, [firestoreId]);
 
+  // Check if user already voted
+  useEffect(() => {
+    const checkExistingVote = async () => {
+      if (!user || !firestoreId) return;
+
+      try {
+        const userVotesRef = collection(db, 'userVotes');
+        const voteQuery = query(
+          userVotesRef,
+          where('userId', '==', user.uid),
+          where('productId', '==', firestoreId)
+        );
+        
+        const voteSnapshot = await getDocs(voteQuery);
+        if (!voteSnapshot.empty) {
+          const voteData = voteSnapshot.docs[0].data();
+          setUserVote(voteData.vote);
+        }
+      } catch (error) {
+        console.error('Error checking existing vote:', error);
+      }
+    };
+
+    checkExistingVote();
+  }, [user, firestoreId]);
+
   const totalVotes = poll.best + poll.good + poll.average + poll.worst;
 
   const getPercentage = (votes: number) => {
@@ -55,11 +130,14 @@ export default function ProductPoll({ productId, firestoreId, initialPoll, onVot
       router.push('/signup');
       return;
     }
+
+    if (!canVote) {
+      alert('You can only vote for products you have received!');
+      return;
+    }
     
-    // Check if user already voted (stored in localStorage)
-    const votedProducts = JSON.parse(localStorage.getItem('votedProducts') || '{}');
-    
-    if (votedProducts[productId]) {
+    // Check if user already voted
+    if (userVote) {
       alert('You have already voted for this product!');
       return;
     }
@@ -80,9 +158,14 @@ export default function ProductPoll({ productId, firestoreId, initialPoll, onVot
       
       console.log('Vote saved to Firestore:', voteType);
 
-      // Save vote to localStorage
-      votedProducts[productId] = voteType;
-      localStorage.setItem('votedProducts', JSON.stringify(votedProducts));
+      // Save vote record to prevent duplicate voting
+      await setDoc(doc(db, 'userVotes', `${user.uid}_${firestoreId}`), {
+        userId: user.uid,
+        userEmail: user.email,
+        productId: firestoreId,
+        vote: voteType,
+        votedAt: new Date().toISOString()
+      });
 
       setUserVote(voteType);
 
@@ -101,12 +184,6 @@ export default function ProductPoll({ productId, firestoreId, initialPoll, onVot
       setIsVoting(false);
     }
   };
-
-  // Check if user already voted
-  const votedProducts = typeof window !== 'undefined' 
-    ? JSON.parse(localStorage.getItem('votedProducts') || '{}')
-    : {};
-  const hasVoted = votedProducts[productId];
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6">
@@ -178,7 +255,39 @@ export default function ProductPoll({ productId, firestoreId, initialPoll, onVot
       </div>
 
       {/* Voting Buttons */}
-      {!hasVoted ? (
+      {checkingEligibility ? (
+        <div className="p-4 bg-gray-50 rounded-lg text-center">
+          <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+          <p className="text-sm text-gray-600">Checking eligibility...</p>
+        </div>
+      ) : !user ? (
+        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-center">
+          <Lock className="w-6 h-6 text-blue-600 mx-auto mb-2" />
+          <p className="text-sm text-blue-800 font-medium mb-2">Login to vote</p>
+          <button
+            onClick={() => router.push('/login')}
+            className="text-sm text-blue-600 hover:text-blue-700 font-semibold"
+          >
+            Click here to login
+          </button>
+        </div>
+      ) : !canVote ? (
+        <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg text-center">
+          <Lock className="w-6 h-6 text-orange-600 mx-auto mb-2" />
+          <p className="text-sm text-orange-800 font-medium">
+            Only customers who have received this product can vote
+          </p>
+          <p className="text-xs text-orange-600 mt-1">
+            Purchase and receive this product to share your opinion!
+          </p>
+        </div>
+      ) : userVote ? (
+        <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg text-center">
+          <p className="text-sm text-gray-600">
+            You voted: <span className="font-bold capitalize">{userVote}</span>
+          </p>
+        </div>
+      ) : (
         <div>
           <p className="text-sm text-gray-600 mb-3">Rate this product:</p>
           <div className="grid grid-cols-2 gap-2">
@@ -218,12 +327,6 @@ export default function ProductPoll({ productId, firestoreId, initialPoll, onVot
           {isVoting && (
             <p className="text-sm text-gray-500 mt-2 text-center">Saving your vote...</p>
           )}
-        </div>
-      ) : (
-        <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg text-center">
-          <p className="text-sm text-gray-600">
-            You voted: <span className="font-bold capitalize">{hasVoted}</span>
-          </p>
         </div>
       )}
 

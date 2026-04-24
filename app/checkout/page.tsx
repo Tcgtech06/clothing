@@ -76,22 +76,149 @@ export default function CheckoutPage() {
     setIsProcessing(true);
 
     try {
+      // If online payment is selected, initiate Razorpay
+      if (paymentMethod === 'online') {
+        await handleOnlinePayment();
+      } else {
+        // Cash on Delivery - create order directly
+        await createOrder('Cash on Delivery', null);
+      }
+    } catch (error: any) {
+      console.error('Error in checkout:', error);
+      alert(error.message || 'Failed to process checkout. Please try again.');
+      setIsProcessing(false);
+    }
+  };
+
+  const handleOnlinePayment = async () => {
+    try {
+      // Step 1: Create Razorpay order
+      const response = await fetch('/api/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: getCartTotal(),
+          currency: 'INR',
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to create payment order');
+      }
+
+      // Step 2: Load Razorpay script
+      const scriptLoaded = await loadRazorpayScript();
+      if (!scriptLoaded) {
+        throw new Error('Failed to load Razorpay SDK. Please check your internet connection.');
+      }
+
+      // Step 3: Open Razorpay payment modal
+      const razorpayOptions = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: data.amount,
+        currency: data.currency,
+        name: 'E-Shop',
+        description: 'Purchase from E-Shop',
+        order_id: data.orderId,
+        prefill: {
+          name: formData.name,
+          email: formData.email,
+          contact: formData.phone,
+        },
+        theme: {
+          color: '#8B5CF6',
+        },
+        handler: async function (response: any) {
+          // Payment successful - verify and create order
+          await verifyAndCreateOrder(response);
+        },
+        modal: {
+          ondismiss: function () {
+            setIsProcessing(false);
+            alert('Payment cancelled. Please try again.');
+          },
+        },
+      };
+
+      const razorpay = new (window as any).Razorpay(razorpayOptions);
+      
+      razorpay.on('payment.failed', function (response: any) {
+        setIsProcessing(false);
+        alert(`Payment failed: ${response.error.description}`);
+      });
+
+      razorpay.open();
+    } catch (error: any) {
+      throw error;
+    }
+  };
+
+  const loadRazorpayScript = (): Promise<boolean> => {
+    return new Promise((resolve) => {
+      if (typeof window !== 'undefined' && (window as any).Razorpay) {
+        resolve(true);
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  const verifyAndCreateOrder = async (paymentResponse: any) => {
+    try {
+      // Verify payment signature
+      const verifyResponse = await fetch('/api/verify-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          razorpay_order_id: paymentResponse.razorpay_order_id,
+          razorpay_payment_id: paymentResponse.razorpay_payment_id,
+          razorpay_signature: paymentResponse.razorpay_signature,
+        }),
+      });
+
+      const verifyData = await verifyResponse.json();
+
+      if (!verifyResponse.ok || !verifyData.success) {
+        throw new Error('Payment verification failed');
+      }
+
+      // Payment verified - create order
+      await createOrder('Online Payment', paymentResponse.razorpay_payment_id);
+    } catch (error: any) {
+      setIsProcessing(false);
+      alert(error.message || 'Payment verification failed. Please contact support.');
+    }
+  };
+
+  const createOrder = async (paymentMethodText: string, paymentId: string | null) => {
+    try {
       // Create order object
       const orderData = {
         customerName: formData.name,
         customerEmail: formData.email,
         customerPhone: formData.phone,
         shippingAddress: `${formData.address}, ${formData.city}, ${formData.state} - ${formData.pincode}`,
-        paymentMethod: paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment',
+        paymentMethod: paymentMethodText,
+        paymentId: paymentId,
+        paymentStatus: paymentId ? 'paid' : 'pending',
         status: 'new',
         total: getCartTotal(),
         items: cart.length,
         products: cart.map(item => `${item.product.name} (x${item.quantity})`),
         productDetails: cart.map(item => ({
           id: item.product.id,
+          firestoreId: (item.product as any).firestoreId,
           name: item.product.name,
           price: item.product.price,
           quantity: item.quantity,
+          image: item.product.images?.[0] || item.product.image,
           color: item.selectedColor,
           size: item.selectedSize,
         })),
@@ -101,7 +228,9 @@ export default function CheckoutPage() {
           {
             status: 'Order Placed',
             date: new Date().toISOString(),
-            description: 'Your order has been placed successfully',
+            description: paymentId 
+              ? 'Your order has been placed and payment received successfully'
+              : 'Your order has been placed successfully',
           }
         ],
       };
@@ -121,15 +250,14 @@ export default function CheckoutPage() {
       console.log('Redirecting to order success page...');
       window.location.href = `/order-success?orderId=${docRef.id}`;
     } catch (error: any) {
-      console.error('Error placing order:', error);
+      console.error('Error creating order:', error);
       
-      // Provide specific error messages
       if (error.code === 'permission-denied') {
         alert('Firebase permission error. Please contact support or check Firebase setup.\n\nError: Missing or insufficient permissions.\n\nFor developers: Update Firestore security rules in Firebase Console.');
       } else if (error.message) {
-        alert(`Failed to place order: ${error.message}`);
+        alert(`Failed to create order: ${error.message}`);
       } else {
-        alert('Failed to place order. Please try again.');
+        alert('Failed to create order. Please try again.');
       }
       
       setIsProcessing(false);
