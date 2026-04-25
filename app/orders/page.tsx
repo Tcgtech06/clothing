@@ -144,6 +144,9 @@ export default function OrdersPage() {
   const [showPollPrompt, setShowPollPrompt] = useState(false);
   const [pollProducts, setPollProducts] = useState<any[]>([]);
   const router = useRouter();
+  
+  // Track truck positions for animation
+  const [truckPositions, setTruckPositions] = useState<{ [key: string]: number }>({});
 
   useEffect(() => {
     // Fetch all orders (no email filter since we don't have auth yet)
@@ -165,6 +168,9 @@ export default function OrdersPage() {
 
       // Check for newly delivered products to prompt for poll voting
       checkForPollPrompt(ordersData);
+      
+      // Animate trucks to their current positions
+      animateTrucks(ordersData);
     }, (error) => {
       console.error('Error fetching orders:', error);
       setLoading(false);
@@ -172,6 +178,33 @@ export default function OrdersPage() {
 
     return () => unsubscribe();
   }, []);
+
+  const animateTrucks = (ordersData: Order[]) => {
+    // Animate each truck from 0 to current position
+    ordersData.forEach((order) => {
+      const orderId = order.id;
+      
+      // Calculate target position
+      let targetPosition = 0;
+      if (order.returnRequest) {
+        const returnSteps = getReturnTrackingSteps(order.returnRequest.returnStatus || 'pending');
+        const currentIndex = returnSteps.findIndex(s => s.status === 'current');
+        targetPosition = (currentIndex / (returnSteps.length - 1)) * 100;
+      } else {
+        const orderSteps = getTrackingSteps(order.status);
+        const currentIndex = orderSteps.findIndex(s => s.status === 'current');
+        targetPosition = (currentIndex / (orderSteps.length - 1)) * 100;
+      }
+      
+      // Start from 0 and animate to target
+      setTimeout(() => {
+        setTruckPositions(prev => ({
+          ...prev,
+          [orderId]: targetPosition
+        }));
+      }, 100);
+    });
+  };
 
   const checkForPollPrompt = (ordersData: Order[]) => {
     if (!user) return;
@@ -457,9 +490,10 @@ export default function OrdersPage() {
                       <div 
                         className="absolute top-1 md:top-2 truck-container"
                         style={{ 
-                          left: `${(getTrackingSteps(order.status).findIndex(s => s.status === 'current') / (getTrackingSteps(order.status).length - 1)) * 100}%`,
+                          left: `${truckPositions[order.id] !== undefined ? truckPositions[order.id] : 0}%`,
                           transform: 'translateX(-50%)',
-                          zIndex: 3
+                          zIndex: 3,
+                          transition: 'left 2s cubic-bezier(0.4, 0, 0.2, 1)'
                         }}
                       >
                         <div className="relative truck-animate">
@@ -521,9 +555,10 @@ export default function OrdersPage() {
                       <div 
                         className="absolute top-1 md:top-2 truck-container"
                         style={{ 
-                          left: `${(getReturnTrackingSteps(order.returnRequest.returnStatus || 'pending').findIndex(s => s.status === 'current') / (getReturnTrackingSteps(order.returnRequest.returnStatus || 'pending').length - 1)) * 100}%`,
+                          left: `${truckPositions[order.id] !== undefined ? truckPositions[order.id] : 0}%`,
                           transform: 'translateX(-50%)',
-                          zIndex: 3
+                          zIndex: 3,
+                          transition: 'left 2s cubic-bezier(0.4, 0, 0.2, 1)'
                         }}
                       >
                         {/* Show truck for all steps except refund-completed */}
