@@ -1,58 +1,83 @@
-# MCP Quick Start - 3 Steps
+P# MCP Quick Start - 2 Steps (Updated)
 
-## Step 1: Install uv (Python Package Manager)
+## ✅ Prerequisites Already Met
 
-Choose one method:
+You already have Node.js and npm installed (required for your Next.js project), so you're ready to go!
 
-```bash
-# Option A: Using pip
-pip install uv
+## Step 1: Reconnect MCP Servers
 
-# Option B: Using official installer
-# Visit: https://docs.astral.sh/uv/getting-started/installation/
-```
+The configuration has been updated to use `npx` (comes with Node.js).
 
-Verify:
-```bash
-uvx --version
-```
+**Open Command Palette** (Ctrl+Shift+P) → Type "MCP" → Select **"MCP: Reconnect Servers"**
 
-## Step 2: Restart Kiro or Reconnect MCP Servers
-
-- **Option A**: Restart Kiro completely
-- **Option B**: Open Command Palette (Ctrl+Shift+P) → Type "MCP" → Select "MCP: Reconnect Servers"
-
-## Step 3: Verify Connection
+## Step 2: Verify Connection
 
 1. Open Kiro Feature Panel (sidebar)
 2. Look for "MCP Server" section
-3. You should see 3 servers:
+3. You should see:
    - ✅ filesystem (connected)
-   - ✅ fetch (connected)
-   - ✅ git (connected)
 
 ## That's It! 🎉
 
-Your MCP servers are now active. Kiro will automatically use them when needed.
+Your MCP filesystem server is now active.
 
 ## Quick Test
 
 Ask Kiro:
-- "Show me the git commit history using MCP"
-- "Use MCP to fetch data from https://api.github.com"
-- "List all TypeScript files using the filesystem MCP server"
+- "Use MCP to list all TypeScript files"
+- "Read the package.json file using the filesystem MCP server"
 
 ## Configuration File
 
 Location: `.kiro/settings/mcp.json`
 
-Edit this file to:
-- Add more servers
-- Disable servers
-- Configure auto-approve tools
+Current configuration:
+```json
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "D:\\TCG TECHNOLOGY CLIENTS\\cloth"],
+      "disabled": false
+    }
+  }
+}
+```
+
+## What Changed?
+
+- **Before**: Used `uvx` (Python) - packages didn't exist
+- **Now**: Uses `npx` (Node.js) - official MCP packages work correctly
 
 ## Need Help?
 
-- Read full guide: `.kiro/MCP_SETUP_GUIDE.md`
-- Command Palette → "Help: MCP Documentation"
-- Check MCP Server view for error messages
+- **Troubleshooting**: Read `.kiro/MCP_TROUBLESHOOTING.md`
+- **Full Guide**: Read `.kiro/MCP_SETUP_GUIDE.md`
+- **Check Logs**: View "MCP Logs" output panel in Kiro
+
+## Optional: Add More Servers
+
+Edit `.kiro/settings/mcp.json` to add:
+
+### Memory Server (persistent context)
+```json
+"memory": {
+  "command": "npx",
+  "args": ["-y", "@modelcontextprotocol/server-memory"],
+  "disabled": false
+}
+```
+
+### GitHub Server (requires token)
+```json
+"github": {
+  "command": "npx",
+  "args": ["-y", "@modelcontextprotocol/server-github"],
+  "env": {
+    "GITHUB_PERSONAL_ACCESS_TOKEN": "your-token"
+  },
+  "disabled": false
+}
+```
+
+After adding, reconnect servers using Command Palette.

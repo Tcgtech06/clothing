@@ -89,32 +89,32 @@ Set `"disabled": true` to temporarily disable a server:
 
 ## Additional MCP Servers You Can Add
 
-### For Firebase/Firestore Projects:
+### For Memory/Context Management:
 ```json
-"firebase": {
+"memory": {
   "command": "uvx",
-  "args": ["mcp-server-firebase"],
+  "args": ["@modelcontextprotocol/server-memory"],
+  "disabled": false
+}
+```
+
+### For PostgreSQL Database:
+```json
+"postgres": {
+  "command": "uvx",
+  "args": ["@modelcontextprotocol/server-postgres", "postgresql://user:password@localhost/dbname"],
+  "disabled": false
+}
+```
+
+### For Brave Search:
+```json
+"brave-search": {
+  "command": "uvx",
+  "args": ["@modelcontextprotocol/server-brave-search"],
   "env": {
-    "FIREBASE_PROJECT_ID": "your-project-id"
+    "BRAVE_API_KEY": "your-api-key"
   },
-  "disabled": false
-}
-```
-
-### For Database Operations:
-```json
-"sqlite": {
-  "command": "uvx",
-  "args": ["mcp-server-sqlite", "--db-path", "./database.db"],
-  "disabled": false
-}
-```
-
-### For AWS Documentation:
-```json
-"aws-docs": {
-  "command": "uvx",
-  "args": ["awslabs.aws-documentation-mcp-server@latest"],
   "disabled": false
 }
 ```
