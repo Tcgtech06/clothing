@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Grid, Award, Package, User, ShoppingCart, Heart } from 'lucide-react';
+import { Home, Grid, Package, User, ShoppingCart, Heart, Headphones } from 'lucide-react';
 import { useState } from 'react';
 import ProfileMenu from './ProfileMenu';
 import { useCart } from '@/lib/cart-context';
@@ -11,9 +11,9 @@ import { useAuth } from '@/lib/auth-context';
 
 const navItems = [
   { name: 'Home', href: '/', icon: Home },
-  { name: 'Category', href: '/category', icon: Grid },
-  { name: 'Loyalty Points', href: '/loyalty', icon: Award },
+  { name: 'Explore', href: '/category', icon: Grid },
   { name: 'My Orders', href: '/orders', icon: Package },
+  { name: 'Support', href: '/support', icon: Headphones },
 ];
 
 export default function Navigation() {
