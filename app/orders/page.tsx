@@ -605,6 +605,10 @@ export default function OrdersPage() {
                         <RotateCcw className="w-3 h-3 md:w-4 md:h-4" />
                         Return Request Active - Tracking Return Process
                       </p>
+                      {/* Debug: Show actual return status */}
+                      <p className="text-xs text-gray-600 mt-1">
+                        Debug: returnStatus = "{order.returnRequest?.returnStatus || 'undefined'}"
+                      </p>
                     </div>
                     <div className="relative overflow-x-auto pb-2">
                       {/* Progress Line */}
@@ -627,9 +631,16 @@ export default function OrdersPage() {
                           transition: isAnimating[order.id] ? 'left 3s linear' : 'none'
                         }}
                       >
-                        {/* Show truck for all steps, money icon ONLY at the very last stage (refund-completed) */}
-                        {order.returnRequest.returnStatus === 'refund-completed' ? (
-                          /* Money handover animation for refund completed - ONLY at final stage */
+                        {/* Determine which icon to show based on return status */}
+                        {/* TRUCK: Show for pending, approved, pickup-scheduled, picked-up, or undefined */}
+                        {/* MONEY: Show ONLY for refund-completed */}
+                        {(() => {
+                          const returnStatus = order.returnRequest?.returnStatus;
+                          const showMoney = returnStatus === 'refund-completed';
+                          
+                          if (showMoney) {
+                            // MONEY ANIMATION - Only at final stage
+                            return (
                           <div className="relative">
                             <div className="money-handover-animation">
                               {/* Person receiving money */}
@@ -667,8 +678,10 @@ export default function OrdersPage() {
                               </div>
                             </div>
                           </div>
-                        ) : (
-                          /* Show truck for ALL other stages (pending, approved, pickup-scheduled, picked-up) */
+                            );
+                          } else {
+                            // TRUCK ANIMATION - All other stages
+                            return (
                           <div className="relative">
                             {/* Glow effect behind truck */}
                             <div className="absolute inset-0 bg-orange-400 rounded-full blur-lg opacity-30 scale-150 animate-pulse"></div>
@@ -713,7 +726,9 @@ export default function OrdersPage() {
                               </div>
                             )}
                           </div>
-                        )}
+                            );
+                          }
+                        })()}
                       </div>
                       
                       {/* Steps - Reduced Gap */}
