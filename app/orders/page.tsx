@@ -518,9 +518,9 @@ export default function OrdersPage() {
                         }}
                       ></div>
                       
-                      {/* Animated Truck - Enhanced Visibility and Realistic Movement */}
+                      {/* Animated Truck Video */}
                       <div 
-                        className="absolute top-0 md:top-1 truck-container"
+                        className="absolute top-[-8px] md:top-[-6px] truck-container"
                         style={{ 
                           left: `${truckPositions[order.id] !== undefined ? truckPositions[order.id] : 0}%`,
                           transform: 'translateX(-50%)',
@@ -528,13 +528,22 @@ export default function OrdersPage() {
                           transition: isAnimating[order.id] ? 'left 1.5s ease-in-out' : 'none'
                         }}
                       >
-                        <div className="relative truck-animate-realistic">
+                        <div className="relative">
                           {/* Glow effect behind truck */}
                           <div className="absolute inset-0 bg-blue-400 rounded-full blur-lg opacity-30 scale-150 animate-pulse"></div>
                           
-                          {/* Truck icon - larger and more visible */}
-                          <Truck className="relative w-8 h-8 md:w-10 md:h-10 text-blue-600 drop-shadow-2xl filter drop-shadow-[0_4px_16px_rgba(37,99,235,0.7)]" 
-                                 strokeWidth={2.5} />
+                          {/* Truck Video Animation */}
+                          <video 
+                            className="relative w-12 h-12 md:w-14 md:h-14 object-contain drop-shadow-2xl filter drop-shadow-[0_4px_16px_rgba(37,99,235,0.7)]"
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                          >
+                            <source src="/truck.webm" type="video/webm" />
+                            {/* Fallback to icon if video doesn't load */}
+                            <Truck className="w-12 h-12 md:w-14 md:h-14 text-blue-600" strokeWidth={2.5} />
+                          </video>
                           
                           {/* Enhanced shadow with movement */}
                           <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1.5 bg-gradient-to-r from-transparent via-blue-500 to-transparent blur-md opacity-50 animate-pulse"></div>
@@ -562,17 +571,13 @@ export default function OrdersPage() {
                               <div className="w-1 h-1 bg-gray-200 rounded-full animate-dust-cloud" style={{ animationDelay: '0.4s' }}></div>
                             </div>
                           )}
-                          
-                          {/* Wheels animation effect */}
-                          <div className="absolute bottom-0 left-2 w-1.5 h-1.5 bg-gray-800 rounded-full"></div>
-                          <div className="absolute bottom-0 right-2 w-1.5 h-1.5 bg-gray-800 rounded-full"></div>
                         </div>
                       </div>
                       
-                      {/* Steps */}
-                      <div className="relative flex justify-between min-w-[480px] md:min-w-0" style={{ zIndex: 2 }}>
+                      {/* Steps - Reduced Gap */}
+                      <div className="relative flex justify-between min-w-[400px] md:min-w-0 gap-2" style={{ zIndex: 2 }}>
                         {getTrackingSteps(order.status).map((step, index) => (
-                          <div key={index} className="flex flex-col items-center" style={{ flex: 1 }}>
+                          <div key={index} className="flex flex-col items-center flex-1">
                             <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center mb-1 md:mb-2 text-xs md:text-base font-bold transition-all duration-300 ${
                               step.status === 'completed' ? 'bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg scale-110' :
                               step.status === 'current' ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg scale-110 animate-pulse animate-pulse-ring' :
@@ -580,7 +585,7 @@ export default function OrdersPage() {
                             }`}>
                               {step.status === 'completed' ? '✓' : index + 1}
                             </div>
-                            <p className={`text-[10px] md:text-xs text-center max-w-[60px] md:max-w-[80px] transition-all leading-tight ${
+                            <p className={`text-[10px] md:text-xs text-center max-w-[60px] md:max-w-[70px] transition-all leading-tight ${
                               step.status === 'completed' || step.status === 'current' ? 'text-gray-800 font-semibold' : 'text-gray-400'
                             }`}>
                               {step.label}
@@ -614,7 +619,7 @@ export default function OrdersPage() {
                       
                       {/* Animated Return Truck - Enhanced Visibility and Realistic Movement */}
                       <div 
-                        className="absolute top-0 md:top-1 truck-container"
+                        className="absolute top-[-8px] md:top-[-6px] truck-container"
                         style={{ 
                           left: `${truckPositions[order.id] !== undefined ? truckPositions[order.id] : 0}%`,
                           transform: 'translateX(-50%)',
@@ -624,13 +629,22 @@ export default function OrdersPage() {
                       >
                         {/* Show truck for all steps except refund-completed */}
                         {order.returnRequest.returnStatus !== 'refund-completed' ? (
-                          <div className="relative truck-animate-realistic">
+                          <div className="relative">
                             {/* Glow effect behind truck */}
                             <div className="absolute inset-0 bg-orange-400 rounded-full blur-lg opacity-30 scale-150 animate-pulse"></div>
                             
-                            {/* Truck icon - larger and more visible */}
-                            <Truck className="relative w-8 h-8 md:w-10 md:h-10 text-orange-600 drop-shadow-2xl filter drop-shadow-[0_4px_16px_rgba(234,88,12,0.7)]" 
-                                   strokeWidth={2.5} />
+                            {/* Truck Video Animation */}
+                            <video 
+                              className="relative w-12 h-12 md:w-14 md:h-14 object-contain drop-shadow-2xl filter drop-shadow-[0_4px_16px_rgba(234,88,12,0.7)]"
+                              autoPlay
+                              loop
+                              muted
+                              playsInline
+                            >
+                              <source src="/truck.webm" type="video/webm" />
+                              {/* Fallback to icon if video doesn't load */}
+                              <Truck className="w-12 h-12 md:w-14 md:h-14 text-orange-600" strokeWidth={2.5} />
+                            </video>
                             
                             {/* Enhanced shadow with movement */}
                             <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1.5 bg-gradient-to-r from-transparent via-orange-500 to-transparent blur-md opacity-50 animate-pulse"></div>
@@ -658,10 +672,6 @@ export default function OrdersPage() {
                                 <div className="w-1 h-1 bg-gray-200 rounded-full animate-dust-cloud" style={{ animationDelay: '0.4s' }}></div>
                               </div>
                             )}
-                            
-                            {/* Wheels animation effect */}
-                            <div className="absolute bottom-0 left-2 w-1.5 h-1.5 bg-gray-800 rounded-full"></div>
-                            <div className="absolute bottom-0 right-2 w-1.5 h-1.5 bg-gray-800 rounded-full"></div>
                           </div>
                         ) : (
                           /* Money handover animation for refund completed */
@@ -705,10 +715,10 @@ export default function OrdersPage() {
                         )}
                       </div>
                       
-                      {/* Steps */}
-                      <div className="relative flex justify-between min-w-[560px] md:min-w-0" style={{ zIndex: 2 }}>
+                      {/* Steps - Reduced Gap */}
+                      <div className="relative flex justify-between min-w-[350px] md:min-w-0 gap-2" style={{ zIndex: 2 }}>
                         {getReturnTrackingSteps(order.returnRequest.returnStatus || 'pending').map((step, index) => (
-                          <div key={index} className="flex flex-col items-center" style={{ flex: 1 }}>
+                          <div key={index} className="flex flex-col items-center flex-1">
                             <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center mb-1 md:mb-2 text-xs md:text-base font-bold transition-all duration-300 ${
                               step.status === 'completed' ? 'bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-lg scale-110' :
                               step.status === 'current' ? 'bg-gradient-to-br from-red-500 to-red-600 text-white shadow-lg scale-110 animate-pulse animate-pulse-ring' :
@@ -716,7 +726,7 @@ export default function OrdersPage() {
                             }`}>
                               {step.status === 'completed' ? '✓' : index + 1}
                             </div>
-                            <p className={`text-[10px] md:text-xs text-center max-w-[60px] md:max-w-[80px] transition-all leading-tight ${
+                            <p className={`text-[10px] md:text-xs text-center max-w-[60px] md:max-w-[70px] transition-all leading-tight ${
                               step.status === 'completed' || step.status === 'current' ? 'text-gray-800 font-semibold' : 'text-gray-400'
                             }`}>
                               {step.label}
