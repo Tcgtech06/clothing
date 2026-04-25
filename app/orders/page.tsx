@@ -607,7 +607,7 @@ export default function OrdersPage() {
                       </p>
                       {/* Debug: Show actual return status */}
                       <p className="text-xs text-gray-600 mt-1">
-                        Debug: returnStatus = "{order.returnRequest?.returnStatus || 'undefined'}"
+                        Debug: returnStatus = &quot;{order.returnRequest?.returnStatus || 'undefined'}&quot;
                       </p>
                     </div>
                     <div className="relative overflow-x-auto pb-2">

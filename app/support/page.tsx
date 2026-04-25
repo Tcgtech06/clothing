@@ -41,7 +41,7 @@ export default function SupportPage() {
               <Headphones className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-3xl font-bold text-gray-800 mb-2">Customer Support</h1>
-            <p className="text-gray-600">We're here to help! Reach out to us anytime.</p>
+            <p className="text-gray-600">We&apos;re here to help! Reach out to us anytime.</p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6 mb-8">
@@ -92,7 +92,7 @@ export default function SupportPage() {
               <div className="space-y-3">
                 <div className="border-l-4 border-primary pl-4 py-2">
                   <h3 className="font-semibold text-gray-800 text-sm">Order Tracking</h3>
-                  <p className="text-xs text-gray-600">Track your orders in the "My Orders" section</p>
+                  <p className="text-xs text-gray-600">Track your orders in the &quot;My Orders&quot; section</p>
                 </div>
 
                 <div className="border-l-4 border-blue-500 pl-4 py-2">
@@ -123,7 +123,7 @@ export default function SupportPage() {
                   <Send className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-lg font-semibold text-green-800 mb-2">Message Sent!</h3>
-                <p className="text-green-600">We'll get back to you within 24 hours.</p>
+                <p className="text-green-600">We&apos;ll get back to you within 24 hours.</p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -214,7 +214,7 @@ export default function SupportPage() {
                   How do I track my order?
                 </summary>
                 <p className="text-sm text-gray-600 mt-2 pl-4">
-                  Go to "My Orders" section and click on any order to see detailed tracking information with real-time updates.
+                  Go to &quot;My Orders&quot; section and click on any order to see detailed tracking information with real-time updates.
                 </p>
               </details>
 
