@@ -517,25 +517,63 @@ export default function OrdersPage() {
                         }}
                       ></div>
                       
-                      {/* Animated Return Truck (reversed direction) */}
+                      {/* Animated Return Truck (same direction as order truck - left to right) */}
                       <div 
                         className="absolute top-1 md:top-2 truck-container"
                         style={{ 
                           left: `${(getReturnTrackingSteps(order.returnRequest.returnStatus || 'pending').findIndex(s => s.status === 'current') / (getReturnTrackingSteps(order.returnRequest.returnStatus || 'pending').length - 1)) * 100}%`,
-                          transform: 'translateX(-50%) scaleX(-1)',
+                          transform: 'translateX(-50%)',
                           zIndex: 3
                         }}
                       >
-                        <div className="relative truck-animate">
-                          <Truck className="w-5 h-5 md:w-6 md:h-6 text-orange-600 drop-shadow-lg filter drop-shadow-[0_2px_8px_rgba(234,88,12,0.4)]" />
-                          {/* Truck shadow */}
-                          <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-orange-400 blur-sm opacity-50 animate-pulse"></div>
-                          {/* Speed lines (reversed) */}
-                          <div className="absolute top-1/2 -left-3 transform -translate-y-1/2 flex gap-0.5 opacity-60">
-                            <div className="w-1 h-0.5 bg-orange-400 animate-pulse"></div>
-                            <div className="w-0.5 h-0.5 bg-orange-300 animate-pulse" style={{ animationDelay: '0.1s' }}></div>
+                        {/* Show truck for all steps except refund-completed */}
+                        {order.returnRequest.returnStatus !== 'refund-completed' ? (
+                          <div className="relative truck-animate">
+                            <Truck className="w-5 h-5 md:w-6 md:h-6 text-orange-600 drop-shadow-lg filter drop-shadow-[0_2px_8px_rgba(234,88,12,0.4)]" />
+                            {/* Truck shadow */}
+                            <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-orange-400 blur-sm opacity-50 animate-pulse"></div>
+                            {/* Speed lines */}
+                            <div className="absolute top-1/2 -left-3 transform -translate-y-1/2 flex gap-0.5 opacity-60">
+                              <div className="w-1 h-0.5 bg-orange-400 animate-pulse"></div>
+                              <div className="w-0.5 h-0.5 bg-orange-300 animate-pulse" style={{ animationDelay: '0.1s' }}></div>
+                            </div>
                           </div>
-                        </div>
+                        ) : (
+                          /* Money handover animation for refund completed */
+                          <div className="relative">
+                            <div className="money-handover-animation">
+                              {/* Person receiving money */}
+                              <div className="flex items-center gap-1">
+                                <div className="relative">
+                                  {/* Person icon */}
+                                  <svg className="w-6 h-6 md:w-8 md:h-8 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                  </svg>
+                                  {/* Money bills flying to person */}
+                                  <div className="absolute -top-2 -right-2 animate-money-fly">
+                                    <svg className="w-4 h-4 md:w-5 md:h-5 text-green-500" fill="currentColor" viewBox="0 0 24 24">
+                                      <path d="M2 6h20v12H2V6zm2 2v8h16V8H4zm7 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/>
+                                    </svg>
+                                  </div>
+                                  <div className="absolute -top-1 -right-3 animate-money-fly" style={{ animationDelay: '0.2s' }}>
+                                    <svg className="w-3 h-3 md:w-4 md:h-4 text-green-400" fill="currentColor" viewBox="0 0 24 24">
+                                      <path d="M2 6h20v12H2V6zm2 2v8h16V8H4zm7 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/>
+                                    </svg>
+                                  </div>
+                                  <div className="absolute top-0 -right-4 animate-money-fly" style={{ animationDelay: '0.4s' }}>
+                                    <svg className="w-3 h-3 md:w-4 md:h-4 text-green-300" fill="currentColor" viewBox="0 0 24 24">
+                                      <path d="M2 6h20v12H2V6zm2 2v8h16V8H4zm7 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/>
+                                    </svg>
+                                  </div>
+                                </div>
+                              </div>
+                              {/* Success checkmark */}
+                              <div className="absolute -top-1 -right-1 bg-green-500 rounded-full p-0.5 animate-scale-in">
+                                <CheckCircle className="w-3 h-3 text-white" />
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                       
                       {/* Steps */}

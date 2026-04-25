@@ -27,6 +27,14 @@ export default function ProductCard({ product }: { product: Product }) {
   // Use firestoreId if available, otherwise use numeric id
   const productLink = product.firestoreId ? `/product/${product.firestoreId}` : `/product/${product.id}`;
   
+  // Debug log
+  console.log('ProductCard:', {
+    name: product.name,
+    id: product.id,
+    firestoreId: product.firestoreId,
+    link: productLink
+  });
+  
   // Prefetch on hover for instant navigation
   const handleMouseEnter = () => {
     router.prefetch(productLink);
@@ -141,7 +149,12 @@ export default function ProductCard({ product }: { product: Product }) {
           <div>
             <p className="text-2xl font-bold text-primary">₹{product.price.toLocaleString('en-IN')}</p>
           </div>
-          <CheckoutButton productName={product.name} productPrice={product.price} productId={product.id} />
+          <CheckoutButton 
+            productName={product.name} 
+            productPrice={product.price} 
+            productId={product.id}
+            firestoreId={product.firestoreId}
+          />
         </div>
       </div>
     </div>
