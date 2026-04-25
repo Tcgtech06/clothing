@@ -53,3 +53,48 @@ body {
   animation: fade-in-delay 0.8s ease-out 0.2s forwards;
   opacity: 0;
 }
+
+/* Truck animation for order tracking */
+@keyframes truck-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes truck-wheels {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.truck-animate {
+  animation: truck-bounce 1s ease-in-out infinite;
+}
+
+/* Smooth truck movement transition */
+.truck-container {
+  transition: left 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Pulse animation for current step */
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

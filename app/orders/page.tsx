@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Package, Truck, CheckCircle, Clock, X, MapPin, RotateCcw } from 'lucide-react';
+import { Package, Truck, CheckCircle, Clock, X, MapPin, RotateCcw, TruckIcon } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { collection, query, orderBy, where, onSnapshot, doc, updateDoc, addDoc, serverTimestamp } from 'firebase/firestore';
 import Link from 'next/link';
@@ -439,32 +439,53 @@ export default function OrdersPage() {
                   </div>
                 </div>
 
-                {/* Tracking Progress - Horizontal Flow */}
+                {/* Tracking Progress - Horizontal Flow - Mobile Optimized with Truck Animation */}
                 {!order.returnRequest && (
-                  <div className="mb-6 px-4">
-                    <div className="relative">
+                  <div className="mb-6 px-2 md:px-4">
+                    <div className="relative overflow-x-auto pb-2">
                       {/* Progress Line */}
-                      <div className="absolute top-5 left-0 right-0 h-1 bg-gray-200" style={{ zIndex: 0 }}></div>
+                      <div className="absolute top-4 md:top-5 left-0 right-0 h-0.5 md:h-1 bg-gray-200" style={{ zIndex: 0 }}></div>
                       <div 
-                        className="absolute top-5 left-0 h-1 bg-gradient-to-r from-green-500 to-blue-500 transition-all duration-500" 
+                        className="absolute top-4 md:top-5 left-0 h-0.5 md:h-1 bg-gradient-to-r from-green-500 to-blue-500 transition-all duration-500" 
                         style={{ 
                           width: `${(getTrackingSteps(order.status).filter(s => s.status === 'completed').length / (getTrackingSteps(order.status).length - 1)) * 100}%`,
                           zIndex: 1
                         }}
                       ></div>
                       
+                      {/* Animated Truck */}
+                      <div 
+                        className="absolute top-1 md:top-2 truck-container"
+                        style={{ 
+                          left: `${(getTrackingSteps(order.status).findIndex(s => s.status === 'current') / (getTrackingSteps(order.status).length - 1)) * 100}%`,
+                          transform: 'translateX(-50%)',
+                          zIndex: 3
+                        }}
+                      >
+                        <div className="relative truck-animate">
+                          <Truck className="w-5 h-5 md:w-6 md:h-6 text-blue-600 drop-shadow-lg filter drop-shadow-[0_2px_8px_rgba(37,99,235,0.4)]" />
+                          {/* Truck shadow */}
+                          <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-blue-400 blur-sm opacity-50 animate-pulse"></div>
+                          {/* Speed lines */}
+                          <div className="absolute top-1/2 -left-3 transform -translate-y-1/2 flex gap-0.5 opacity-60">
+                            <div className="w-1 h-0.5 bg-blue-400 animate-pulse"></div>
+                            <div className="w-0.5 h-0.5 bg-blue-300 animate-pulse" style={{ animationDelay: '0.1s' }}></div>
+                          </div>
+                        </div>
+                      </div>
+                      
                       {/* Steps */}
-                      <div className="relative flex justify-between" style={{ zIndex: 2 }}>
+                      <div className="relative flex justify-between min-w-[480px] md:min-w-0" style={{ zIndex: 2 }}>
                         {getTrackingSteps(order.status).map((step, index) => (
                           <div key={index} className="flex flex-col items-center" style={{ flex: 1 }}>
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 font-bold transition-all duration-300 ${
+                            <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center mb-1 md:mb-2 text-xs md:text-base font-bold transition-all duration-300 ${
                               step.status === 'completed' ? 'bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg scale-110' :
-                              step.status === 'current' ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg scale-110 animate-pulse' :
+                              step.status === 'current' ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg scale-110 animate-pulse animate-pulse-ring' :
                               'bg-gray-200 text-gray-400'
                             }`}>
                               {step.status === 'completed' ? '✓' : index + 1}
                             </div>
-                            <p className={`text-xs text-center max-w-[80px] transition-all ${
+                            <p className={`text-[10px] md:text-xs text-center max-w-[60px] md:max-w-[80px] transition-all leading-tight ${
                               step.status === 'completed' || step.status === 'current' ? 'text-gray-800 font-semibold' : 'text-gray-400'
                             }`}>
                               {step.label}
@@ -476,38 +497,59 @@ export default function OrdersPage() {
                   </div>
                 )}
 
-                {/* Return Tracking Progress */}
+                {/* Return Tracking Progress - Mobile Optimized with Truck Animation */}
                 {order.returnRequest && (
-                  <div className="mb-6 px-4">
-                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-4">
-                      <p className="text-sm font-semibold text-orange-800 flex items-center gap-2">
-                        <RotateCcw className="w-4 h-4" />
+                  <div className="mb-6 px-2 md:px-4">
+                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-2 md:p-3 mb-4">
+                      <p className="text-xs md:text-sm font-semibold text-orange-800 flex items-center gap-2">
+                        <RotateCcw className="w-3 h-3 md:w-4 md:h-4" />
                         Return Request Active - Tracking Return Process
                       </p>
                     </div>
-                    <div className="relative">
+                    <div className="relative overflow-x-auto pb-2">
                       {/* Progress Line */}
-                      <div className="absolute top-5 left-0 right-0 h-1 bg-gray-200" style={{ zIndex: 0 }}></div>
+                      <div className="absolute top-4 md:top-5 left-0 right-0 h-0.5 md:h-1 bg-gray-200" style={{ zIndex: 0 }}></div>
                       <div 
-                        className="absolute top-5 left-0 h-1 bg-gradient-to-r from-orange-500 to-red-500 transition-all duration-500" 
+                        className="absolute top-4 md:top-5 left-0 h-0.5 md:h-1 bg-gradient-to-r from-orange-500 to-red-500 transition-all duration-500" 
                         style={{ 
                           width: `${(getReturnTrackingSteps(order.returnRequest.returnStatus || 'pending').filter(s => s.status === 'completed').length / (getReturnTrackingSteps(order.returnRequest.returnStatus || 'pending').length - 1)) * 100}%`,
                           zIndex: 1
                         }}
                       ></div>
                       
+                      {/* Animated Return Truck (reversed direction) */}
+                      <div 
+                        className="absolute top-1 md:top-2 truck-container"
+                        style={{ 
+                          left: `${(getReturnTrackingSteps(order.returnRequest.returnStatus || 'pending').findIndex(s => s.status === 'current') / (getReturnTrackingSteps(order.returnRequest.returnStatus || 'pending').length - 1)) * 100}%`,
+                          transform: 'translateX(-50%) scaleX(-1)',
+                          zIndex: 3
+                        }}
+                      >
+                        <div className="relative truck-animate">
+                          <Truck className="w-5 h-5 md:w-6 md:h-6 text-orange-600 drop-shadow-lg filter drop-shadow-[0_2px_8px_rgba(234,88,12,0.4)]" />
+                          {/* Truck shadow */}
+                          <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-orange-400 blur-sm opacity-50 animate-pulse"></div>
+                          {/* Speed lines (reversed) */}
+                          <div className="absolute top-1/2 -left-3 transform -translate-y-1/2 flex gap-0.5 opacity-60">
+                            <div className="w-1 h-0.5 bg-orange-400 animate-pulse"></div>
+                            <div className="w-0.5 h-0.5 bg-orange-300 animate-pulse" style={{ animationDelay: '0.1s' }}></div>
+                          </div>
+                        </div>
+                      </div>
+                      
                       {/* Steps */}
-                      <div className="relative flex justify-between" style={{ zIndex: 2 }}>
+                      <div className="relative flex justify-between min-w-[560px] md:min-w-0" style={{ zIndex: 2 }}>
                         {getReturnTrackingSteps(order.returnRequest.returnStatus || 'pending').map((step, index) => (
                           <div key={index} className="flex flex-col items-center" style={{ flex: 1 }}>
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 font-bold transition-all duration-300 ${
+                            <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center mb-1 md:mb-2 text-xs md:text-base font-bold transition-all duration-300 ${
                               step.status === 'completed' ? 'bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-lg scale-110' :
-                              step.status === 'current' ? 'bg-gradient-to-br from-red-500 to-red-600 text-white shadow-lg scale-110 animate-pulse' :
+                              step.status === 'current' ? 'bg-gradient-to-br from-red-500 to-red-600 text-white shadow-lg scale-110 animate-pulse animate-pulse-ring' :
                               'bg-gray-200 text-gray-400'
                             }`}>
                               {step.status === 'completed' ? '✓' : index + 1}
                             </div>
-                            <p className={`text-xs text-center max-w-[80px] transition-all ${
+                            <p className={`text-[10px] md:text-xs text-center max-w-[60px] md:max-w-[80px] transition-all leading-tight ${
                               step.status === 'completed' || step.status === 'current' ? 'text-gray-800 font-semibold' : 'text-gray-400'
                             }`}>
                               {step.label}
@@ -519,10 +561,10 @@ export default function OrdersPage() {
                   </div>
                 )}
 
-                {/* Order Details */}
+                {/* Order Details - Mobile Optimized */}
                 <div className="border-t pt-4">
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                    <div className="mb-4 md:mb-0">
+                  <div className="flex flex-col gap-4">
+                    <div>
                       <p className="text-sm text-gray-600 mb-2">
                         {order.items} {order.items === 1 ? 'item' : 'items'}
                       </p>
@@ -546,8 +588,8 @@ export default function OrdersPage() {
                       {order.status === 'delivered' && (
                         <div className="mt-3">
                           <div className="flex items-center gap-2 text-green-600 font-semibold mb-1">
-                            <CheckCircle className="w-5 h-5" />
-                            <span>Successfully Delivered</span>
+                            <CheckCircle className="w-4 h-4 md:w-5 md:h-5" />
+                            <span className="text-sm md:text-base">Successfully Delivered</span>
                           </div>
                           {(order.deliveredAt || order.createdAt) && (
                             <p className="text-xs text-gray-500">
@@ -578,9 +620,9 @@ export default function OrdersPage() {
                                   setSelectedOrder(order);
                                   setShowReturnModal(true);
                                 }}
-                                className="text-sm text-primary hover:text-primary/80 font-semibold flex items-center gap-1"
+                                className="text-xs md:text-sm text-primary hover:text-primary/80 font-semibold flex items-center gap-1"
                               >
-                                <RotateCcw className="w-4 h-4" />
+                                <RotateCcw className="w-3 h-3 md:w-4 md:h-4" />
                                 Return Product
                               </button>
                             </div>
@@ -588,16 +630,16 @@ export default function OrdersPage() {
                         </div>
                       )}
                     </div>
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+                      <div className="flex-1">
                         <p className="text-sm text-gray-600">Total</p>
-                        <p className="text-xl font-bold text-primary">
+                        <p className="text-xl md:text-2xl font-bold text-primary">
                           ₹{order.total.toLocaleString('en-IN')}
                         </p>
                       </div>
                       <button
                         onClick={() => setSelectedOrder(order)}
-                        className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 transition font-semibold"
+                        className="w-full sm:w-auto bg-primary text-white px-4 md:px-6 py-2 md:py-2.5 rounded-lg hover:bg-primary/90 transition font-semibold text-sm md:text-base"
                       >
                         Track Order
                       </button>
@@ -611,38 +653,38 @@ export default function OrdersPage() {
         </div>
       </div>
 
-      {/* Order Tracking Modal */}
+      {/* Order Tracking Modal - Mobile Optimized */}
       {selectedOrder && !showReturnModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 md:p-4">
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-bold text-gray-800">
+            <div className="p-4 md:p-6">
+              <div className="flex items-center justify-between mb-4 md:mb-6">
+                <h3 className="text-lg md:text-2xl font-bold text-gray-800">
                   {selectedOrder.returnRequest ? 'Return Tracking' : 'Order Tracking'}
                 </h3>
                 <button
                   onClick={() => setSelectedOrder(null)}
                   className="text-gray-500 hover:text-gray-700"
                 >
-                  <X className="w-6 h-6" />
+                  <X className="w-5 h-5 md:w-6 md:h-6" />
                 </button>
               </div>
 
-              <div className="space-y-6">
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <p className="text-sm text-gray-600 mb-1">Order ID</p>
-                  <p className="font-mono font-semibold text-gray-800">
+              <div className="space-y-4 md:space-y-6">
+                <div className="bg-gray-50 p-3 md:p-4 rounded-lg">
+                  <p className="text-xs md:text-sm text-gray-600 mb-1">Order ID</p>
+                  <p className="font-mono text-sm md:text-base font-semibold text-gray-800 break-all">
                     #{selectedOrder.id.substring(0, 12).toUpperCase()}
                   </p>
                 </div>
 
                 {selectedOrder.returnRequest && (
-                  <div className="bg-orange-50 border-2 border-orange-300 p-4 rounded-lg">
+                  <div className="bg-orange-50 border-2 border-orange-300 p-3 md:p-4 rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
-                      <RotateCcw className="w-5 h-5 text-orange-600" />
-                      <p className="font-semibold text-orange-800">Return Request Active</p>
+                      <RotateCcw className="w-4 h-4 md:w-5 md:h-5 text-orange-600" />
+                      <p className="text-sm md:text-base font-semibold text-orange-800">Return Request Active</p>
                     </div>
-                    <p className="text-sm text-orange-700">
+                    <p className="text-xs md:text-sm text-orange-700">
                       Current Status: <span className="font-semibold capitalize">
                         {(selectedOrder.returnRequest.returnStatus || 'pending').replace(/-/g, ' ')}
                       </span>
@@ -652,33 +694,33 @@ export default function OrdersPage() {
 
                 {selectedOrder.shippingAddress && (
                   <div>
-                    <p className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                      <MapPin className="w-4 h-4" />
+                    <p className="text-xs md:text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                      <MapPin className="w-3 h-3 md:w-4 md:h-4" />
                       {selectedOrder.returnRequest ? 'Pickup Address' : 'Delivery Address'}
                     </p>
-                    <p className="text-gray-600">{selectedOrder.shippingAddress}</p>
+                    <p className="text-sm md:text-base text-gray-600">{selectedOrder.shippingAddress}</p>
                   </div>
                 )}
 
                 <div>
-                  <p className="text-sm font-medium text-gray-700 mb-4">
+                  <p className="text-xs md:text-sm font-medium text-gray-700 mb-3 md:mb-4">
                     {selectedOrder.returnRequest ? 'Return Tracking History' : 'Tracking History'}
                   </p>
-                  <div className="space-y-4">
+                  <div className="space-y-3 md:space-y-4">
                     {selectedOrder.returnRequest && selectedOrder.returnRequest.returnTrackingHistory ? (
                       // Show return tracking history
                       selectedOrder.returnRequest.returnTrackingHistory.map((track, index) => (
-                        <div key={index} className="flex gap-4">
+                        <div key={index} className="flex gap-3 md:gap-4">
                           <div className="flex flex-col items-center">
-                            <div className="w-3 h-3 rounded-full bg-orange-500"></div>
+                            <div className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-orange-500"></div>
                             {index < (selectedOrder.returnRequest?.returnTrackingHistory?.length || 0) - 1 && (
                               <div className="w-0.5 h-full bg-gray-300 my-1"></div>
                             )}
                           </div>
-                          <div className="flex-1 pb-4">
-                            <p className="font-semibold text-gray-800">{track.status}</p>
-                            <p className="text-sm text-gray-600">{track.description}</p>
-                            <p className="text-xs text-gray-500 mt-1">
+                          <div className="flex-1 pb-3 md:pb-4">
+                            <p className="text-sm md:text-base font-semibold text-gray-800">{track.status}</p>
+                            <p className="text-xs md:text-sm text-gray-600">{track.description}</p>
+                            <p className="text-[10px] md:text-xs text-gray-500 mt-1">
                               {new Date(track.date).toLocaleString('en-IN')}
                             </p>
                           </div>
@@ -687,24 +729,24 @@ export default function OrdersPage() {
                     ) : selectedOrder.trackingStatus ? (
                       // Show order tracking history
                       selectedOrder.trackingStatus.map((track, index) => (
-                        <div key={index} className="flex gap-4">
+                        <div key={index} className="flex gap-3 md:gap-4">
                           <div className="flex flex-col items-center">
-                            <div className="w-3 h-3 rounded-full bg-primary"></div>
+                            <div className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-primary"></div>
                             {index < (selectedOrder.trackingStatus?.length || 0) - 1 && (
                               <div className="w-0.5 h-full bg-gray-300 my-1"></div>
                             )}
                           </div>
-                          <div className="flex-1 pb-4">
-                            <p className="font-semibold text-gray-800">{track.status}</p>
-                            <p className="text-sm text-gray-600">{track.description}</p>
-                            <p className="text-xs text-gray-500 mt-1">
+                          <div className="flex-1 pb-3 md:pb-4">
+                            <p className="text-sm md:text-base font-semibold text-gray-800">{track.status}</p>
+                            <p className="text-xs md:text-sm text-gray-600">{track.description}</p>
+                            <p className="text-[10px] md:text-xs text-gray-500 mt-1">
                               {new Date(track.date).toLocaleString('en-IN')}
                             </p>
                           </div>
                         </div>
                       ))
                     ) : (
-                      <p className="text-sm text-gray-500 text-center py-4">
+                      <p className="text-xs md:text-sm text-gray-500 text-center py-4">
                         No tracking history available yet
                       </p>
                     )}
@@ -712,10 +754,10 @@ export default function OrdersPage() {
                 </div>
 
                 <div>
-                  <p className="text-sm font-medium text-gray-700 mb-2">Order Items</p>
+                  <p className="text-xs md:text-sm font-medium text-gray-700 mb-2">Order Items</p>
                   <div className="space-y-2">
                     {selectedOrder.productDetails?.map((item, index) => (
-                      <div key={index} className="flex justify-between text-sm border-b pb-2">
+                      <div key={index} className="flex justify-between text-xs md:text-sm border-b pb-2">
                         <span className="text-gray-700">
                           {item.name} x {item.quantity}
                         </span>
@@ -725,19 +767,19 @@ export default function OrdersPage() {
                       </div>
                     ))}
                   </div>
-                  <div className="flex justify-between font-bold text-lg mt-4 pt-4 border-t">
+                  <div className="flex justify-between font-bold text-base md:text-lg mt-3 md:mt-4 pt-3 md:pt-4 border-t">
                     <span>Total</span>
                     <span className="text-primary">₹{selectedOrder.total.toLocaleString('en-IN')}</span>
                   </div>
                 </div>
 
                 {selectedOrder.returnRequest && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <p className="text-sm font-medium text-blue-800 mb-2">Return Information</p>
-                    <p className="text-sm text-blue-700">
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 md:p-4">
+                    <p className="text-xs md:text-sm font-medium text-blue-800 mb-2">Return Information</p>
+                    <p className="text-xs md:text-sm text-blue-700">
                       <strong>Reason:</strong> {selectedOrder.returnRequest.reason}
                     </p>
-                    <p className="text-sm text-blue-700 mt-1">
+                    <p className="text-xs md:text-sm text-blue-700 mt-1">
                       <strong>Refund Method:</strong> {selectedOrder.returnRequest.paymentMethod.toUpperCase()}
                       {selectedOrder.returnRequest.paymentMethod === 'upi' 
                         ? ` - ${selectedOrder.returnRequest.upiId}`
