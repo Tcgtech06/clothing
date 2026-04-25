@@ -46,7 +46,7 @@ interface ReturnRequest {
   accountHolderName?: string;
   requestedAt: any;
   status: 'pending' | 'approved' | 'rejected' | 'refunded';
-  returnStatus?: 'pending' | 'approved' | 'pickup-scheduled' | 'picked-up' | 'return-successful' | 'refund-initiated' | 'refund-completed';
+  returnStatus?: 'pending' | 'approved' | 'pickup-scheduled' | 'picked-up' | 'refund-completed';
   adminNotes?: string;
   total: number;
   products: string[];
@@ -293,8 +293,6 @@ export default function AdminDashboard() {
         'approved': 'Return request has been approved',
         'pickup-scheduled': 'Pickup has been scheduled for your product',
         'picked-up': 'Product has been picked up from your location',
-        'return-successful': 'Product successfully received at our warehouse',
-        'refund-initiated': 'Refund process has been initiated',
         'refund-completed': 'Refund has been completed and credited to your account'
       };
 
@@ -965,13 +963,6 @@ export default function AdminDashboard() {
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <button
-                      onClick={() => updateReturnTrackingStatus(selectedReturn.id, 'pending')}
-                      className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 text-sm font-medium"
-                      disabled={selectedReturn.returnStatus === 'pending'}
-                    >
-                      Return Requested
-                    </button>
-                    <button
                       onClick={() => updateReturnTrackingStatus(selectedReturn.id, 'approved')}
                       className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-sm font-medium"
                       disabled={selectedReturn.returnStatus === 'approved'}
@@ -993,22 +984,8 @@ export default function AdminDashboard() {
                       Product Picked Up
                     </button>
                     <button
-                      onClick={() => updateReturnTrackingStatus(selectedReturn.id, 'return-successful')}
-                      className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 text-sm font-medium"
-                      disabled={selectedReturn.returnStatus === 'return-successful'}
-                    >
-                      Return Successful
-                    </button>
-                    <button
-                      onClick={() => updateReturnTrackingStatus(selectedReturn.id, 'refund-initiated')}
-                      className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 text-sm font-medium"
-                      disabled={selectedReturn.returnStatus === 'refund-initiated'}
-                    >
-                      Refund Initiated
-                    </button>
-                    <button
                       onClick={() => updateReturnTrackingStatus(selectedReturn.id, 'refund-completed')}
-                      className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm font-medium col-span-2"
+                      className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm font-medium"
                       disabled={selectedReturn.returnStatus === 'refund-completed'}
                     >
                       Refund Completed

@@ -38,7 +38,7 @@ interface Order {
     accountHolderName?: string;
     requestedAt: any;
     status: 'pending' | 'approved' | 'rejected' | 'refunded';
-    returnStatus?: 'pending' | 'approved' | 'pickup-scheduled' | 'picked-up' | 'return-successful' | 'refund-initiated' | 'refund-completed';
+    returnStatus?: 'pending' | 'approved' | 'pickup-scheduled' | 'picked-up' | 'refund-completed';
     returnTrackingHistory?: Array<{
       status: string;
       date: string;
@@ -75,7 +75,6 @@ const getStatusColor = (status: string) => {
 
 const getTrackingSteps = (status: string) => {
   const allSteps = [
-    { key: 'placed', label: 'Order Placed' },
     { key: 'accepted', label: 'Order Accepted' },
     { key: 'shipped', label: 'Shipped' },
     { key: 'nearby', label: 'Nearby Delivery' },
@@ -85,13 +84,12 @@ const getTrackingSteps = (status: string) => {
 
   // Map status to step index
   let currentStepIndex = 0;
-  if (status === 'new' || status === 'placed') currentStepIndex = 0;
-  else if (status === 'accepted') currentStepIndex = 1;
-  else if (status === 'processing') currentStepIndex = 1;
-  else if (status === 'shipped') currentStepIndex = 2;
-  else if (status === 'nearby') currentStepIndex = 3;
-  else if (status === 'out-for-delivery') currentStepIndex = 4;
-  else if (status === 'delivered') currentStepIndex = 5;
+  if (status === 'new' || status === 'placed' || status === 'accepted') currentStepIndex = 0;
+  else if (status === 'processing') currentStepIndex = 0;
+  else if (status === 'shipped') currentStepIndex = 1;
+  else if (status === 'nearby') currentStepIndex = 2;
+  else if (status === 'out-for-delivery') currentStepIndex = 3;
+  else if (status === 'delivered') currentStepIndex = 4;
 
   return allSteps.map((step, index) => ({
     ...step,
@@ -101,24 +99,20 @@ const getTrackingSteps = (status: string) => {
 
 const getReturnTrackingSteps = (returnStatus: string) => {
   const allSteps = [
-    { key: 'pending', label: 'Return Requested' },
     { key: 'approved', label: 'Return Approved' },
     { key: 'pickup-scheduled', label: 'Pickup Scheduled' },
     { key: 'picked-up', label: 'Product Picked Up' },
-    { key: 'return-successful', label: 'Return Successful' },
-    { key: 'refund-initiated', label: 'Refund Initiated' },
     { key: 'refund-completed', label: 'Refund Completed' },
   ];
 
   // Map return status to step index
   let currentStepIndex = 0;
-  if (returnStatus === 'pending') currentStepIndex = 0;
-  else if (returnStatus === 'approved') currentStepIndex = 1;
-  else if (returnStatus === 'pickup-scheduled') currentStepIndex = 2;
-  else if (returnStatus === 'picked-up') currentStepIndex = 3;
-  else if (returnStatus === 'return-successful') currentStepIndex = 4;
-  else if (returnStatus === 'refund-initiated') currentStepIndex = 5;
-  else if (returnStatus === 'refund-completed') currentStepIndex = 6;
+  if (returnStatus === 'pending' || returnStatus === 'approved') currentStepIndex = 0;
+  else if (returnStatus === 'pickup-scheduled') currentStepIndex = 1;
+  else if (returnStatus === 'picked-up') currentStepIndex = 2;
+  else if (returnStatus === 'return-successful') currentStepIndex = 2;
+  else if (returnStatus === 'refund-initiated') currentStepIndex = 2;
+  else if (returnStatus === 'refund-completed') currentStepIndex = 3;
 
   return allSteps.map((step, index) => ({
     ...step,
@@ -147,6 +141,7 @@ export default function OrdersPage() {
   
   // Track truck positions for animation
   const [truckPositions, setTruckPositions] = useState<{ [key: string]: number }>({});
+  const [isAnimating, setIsAnimating] = useState<{ [key: string]: boolean }>({});
 
   useEffect(() => {
     // Fetch all orders (no email filter since we don't have auth yet)
@@ -180,29 +175,66 @@ export default function OrdersPage() {
   }, []);
 
   const animateTrucks = (ordersData: Order[]) => {
-    // Animate each truck from 0 to current position
+    // Reset all truck positions to 0 first
+    const resetPositions: { [key: string]: number } = {};
+    const animatingStates: { [key: string]: boolean } = {};
+    
+    ordersData.forEach((order) => {
+      resetPositions[order.id] = 0;
+      animatingStates[order.id] = true;
+    });
+    
+    setTruckPositions(resetPositions);
+    setIsAnimating(animatingStates);
+    
+    // Animate each truck step by step with pauses
     ordersData.forEach((order) => {
       const orderId = order.id;
       
-      // Calculate target position
-      let targetPosition = 0;
+      // Get all steps
+      let steps;
+      let currentStepIndex;
+      
       if (order.returnRequest) {
-        const returnSteps = getReturnTrackingSteps(order.returnRequest.returnStatus || 'pending');
-        const currentIndex = returnSteps.findIndex(s => s.status === 'current');
-        targetPosition = (currentIndex / (returnSteps.length - 1)) * 100;
+        steps = getReturnTrackingSteps(order.returnRequest.returnStatus || 'pending');
+        currentStepIndex = steps.findIndex(s => s.status === 'current');
       } else {
-        const orderSteps = getTrackingSteps(order.status);
-        const currentIndex = orderSteps.findIndex(s => s.status === 'current');
-        targetPosition = (currentIndex / (orderSteps.length - 1)) * 100;
+        steps = getTrackingSteps(order.status);
+        currentStepIndex = steps.findIndex(s => s.status === 'current');
       }
       
-      // Start from 0 and animate to target
+      // Animate through each step
+      let currentStep = 0;
+      const animateToNextStep = () => {
+        if (currentStep <= currentStepIndex) {
+          const position = (currentStep / (steps.length - 1)) * 100;
+          
+          // Move to this step
+          setTruckPositions(prev => ({
+            ...prev,
+            [orderId]: position
+          }));
+          
+          // Pause at this step for 500ms, then move to next
+          setTimeout(() => {
+            currentStep++;
+            if (currentStep <= currentStepIndex) {
+              animateToNextStep();
+            } else {
+              // Animation complete
+              setIsAnimating(prev => ({
+                ...prev,
+                [orderId]: false
+              }));
+            }
+          }, 500); // Pause for 500ms at each step
+        }
+      };
+      
+      // Start animation after initial delay
       setTimeout(() => {
-        setTruckPositions(prev => ({
-          ...prev,
-          [orderId]: targetPosition
-        }));
-      }, 100);
+        animateToNextStep();
+      }, 300);
     });
   };
 
@@ -486,25 +518,54 @@ export default function OrdersPage() {
                         }}
                       ></div>
                       
-                      {/* Animated Truck */}
+                      {/* Animated Truck - Enhanced Visibility and Realistic Movement */}
                       <div 
-                        className="absolute top-1 md:top-2 truck-container"
+                        className="absolute top-0 md:top-1 truck-container"
                         style={{ 
                           left: `${truckPositions[order.id] !== undefined ? truckPositions[order.id] : 0}%`,
                           transform: 'translateX(-50%)',
                           zIndex: 3,
-                          transition: 'left 2s cubic-bezier(0.4, 0, 0.2, 1)'
+                          transition: isAnimating[order.id] ? 'left 1.5s ease-in-out' : 'none'
                         }}
                       >
-                        <div className="relative truck-animate">
-                          <Truck className="w-5 h-5 md:w-6 md:h-6 text-blue-600 drop-shadow-lg filter drop-shadow-[0_2px_8px_rgba(37,99,235,0.4)]" />
-                          {/* Truck shadow */}
-                          <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-blue-400 blur-sm opacity-50 animate-pulse"></div>
-                          {/* Speed lines */}
-                          <div className="absolute top-1/2 -left-3 transform -translate-y-1/2 flex gap-0.5 opacity-60">
-                            <div className="w-1 h-0.5 bg-blue-400 animate-pulse"></div>
-                            <div className="w-0.5 h-0.5 bg-blue-300 animate-pulse" style={{ animationDelay: '0.1s' }}></div>
-                          </div>
+                        <div className="relative truck-animate-realistic">
+                          {/* Glow effect behind truck */}
+                          <div className="absolute inset-0 bg-blue-400 rounded-full blur-lg opacity-30 scale-150 animate-pulse"></div>
+                          
+                          {/* Truck icon - larger and more visible */}
+                          <Truck className="relative w-8 h-8 md:w-10 md:h-10 text-blue-600 drop-shadow-2xl filter drop-shadow-[0_4px_16px_rgba(37,99,235,0.7)]" 
+                                 strokeWidth={2.5} />
+                          
+                          {/* Enhanced shadow with movement */}
+                          <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1.5 bg-gradient-to-r from-transparent via-blue-500 to-transparent blur-md opacity-50 animate-pulse"></div>
+                          
+                          {/* Animated speed lines - only show when moving */}
+                          {isAnimating[order.id] && (
+                            <div className="absolute top-1/2 -left-5 transform -translate-y-1/2 flex flex-col gap-1 opacity-80">
+                              <div className="flex gap-1 animate-speed-line">
+                                <div className="w-3 h-0.5 bg-blue-500 rounded-full"></div>
+                                <div className="w-2 h-0.5 bg-blue-400 rounded-full"></div>
+                                <div className="w-1.5 h-0.5 bg-blue-300 rounded-full"></div>
+                              </div>
+                              <div className="flex gap-1 animate-speed-line" style={{ animationDelay: '0.15s' }}>
+                                <div className="w-2.5 h-0.5 bg-blue-400 rounded-full"></div>
+                                <div className="w-1.5 h-0.5 bg-blue-300 rounded-full"></div>
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Dust cloud effect - only when moving */}
+                          {isAnimating[order.id] && (
+                            <div className="absolute -bottom-1 -left-3 flex gap-1.5 opacity-40">
+                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-dust-cloud"></div>
+                              <div className="w-1.5 h-1.5 bg-gray-300 rounded-full animate-dust-cloud" style={{ animationDelay: '0.2s' }}></div>
+                              <div className="w-1 h-1 bg-gray-200 rounded-full animate-dust-cloud" style={{ animationDelay: '0.4s' }}></div>
+                            </div>
+                          )}
+                          
+                          {/* Wheels animation effect */}
+                          <div className="absolute bottom-0 left-2 w-1.5 h-1.5 bg-gray-800 rounded-full"></div>
+                          <div className="absolute bottom-0 right-2 w-1.5 h-1.5 bg-gray-800 rounded-full"></div>
                         </div>
                       </div>
                       
@@ -551,27 +612,56 @@ export default function OrdersPage() {
                         }}
                       ></div>
                       
-                      {/* Animated Return Truck (same direction as order truck - left to right) */}
+                      {/* Animated Return Truck - Enhanced Visibility and Realistic Movement */}
                       <div 
-                        className="absolute top-1 md:top-2 truck-container"
+                        className="absolute top-0 md:top-1 truck-container"
                         style={{ 
                           left: `${truckPositions[order.id] !== undefined ? truckPositions[order.id] : 0}%`,
                           transform: 'translateX(-50%)',
                           zIndex: 3,
-                          transition: 'left 2s cubic-bezier(0.4, 0, 0.2, 1)'
+                          transition: isAnimating[order.id] ? 'left 1.5s ease-in-out' : 'none'
                         }}
                       >
                         {/* Show truck for all steps except refund-completed */}
                         {order.returnRequest.returnStatus !== 'refund-completed' ? (
-                          <div className="relative truck-animate">
-                            <Truck className="w-5 h-5 md:w-6 md:h-6 text-orange-600 drop-shadow-lg filter drop-shadow-[0_2px_8px_rgba(234,88,12,0.4)]" />
-                            {/* Truck shadow */}
-                            <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-orange-400 blur-sm opacity-50 animate-pulse"></div>
-                            {/* Speed lines */}
-                            <div className="absolute top-1/2 -left-3 transform -translate-y-1/2 flex gap-0.5 opacity-60">
-                              <div className="w-1 h-0.5 bg-orange-400 animate-pulse"></div>
-                              <div className="w-0.5 h-0.5 bg-orange-300 animate-pulse" style={{ animationDelay: '0.1s' }}></div>
-                            </div>
+                          <div className="relative truck-animate-realistic">
+                            {/* Glow effect behind truck */}
+                            <div className="absolute inset-0 bg-orange-400 rounded-full blur-lg opacity-30 scale-150 animate-pulse"></div>
+                            
+                            {/* Truck icon - larger and more visible */}
+                            <Truck className="relative w-8 h-8 md:w-10 md:h-10 text-orange-600 drop-shadow-2xl filter drop-shadow-[0_4px_16px_rgba(234,88,12,0.7)]" 
+                                   strokeWidth={2.5} />
+                            
+                            {/* Enhanced shadow with movement */}
+                            <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1.5 bg-gradient-to-r from-transparent via-orange-500 to-transparent blur-md opacity-50 animate-pulse"></div>
+                            
+                            {/* Animated speed lines - only show when moving */}
+                            {isAnimating[order.id] && (
+                              <div className="absolute top-1/2 -left-5 transform -translate-y-1/2 flex flex-col gap-1 opacity-80">
+                                <div className="flex gap-1 animate-speed-line">
+                                  <div className="w-3 h-0.5 bg-orange-500 rounded-full"></div>
+                                  <div className="w-2 h-0.5 bg-orange-400 rounded-full"></div>
+                                  <div className="w-1.5 h-0.5 bg-orange-300 rounded-full"></div>
+                                </div>
+                                <div className="flex gap-1 animate-speed-line" style={{ animationDelay: '0.15s' }}>
+                                  <div className="w-2.5 h-0.5 bg-orange-400 rounded-full"></div>
+                                  <div className="w-1.5 h-0.5 bg-orange-300 rounded-full"></div>
+                                </div>
+                              </div>
+                            )}
+                            
+                            {/* Dust cloud effect - only when moving */}
+                            {isAnimating[order.id] && (
+                              <div className="absolute -bottom-1 -left-3 flex gap-1.5 opacity-40">
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-dust-cloud"></div>
+                                <div className="w-1.5 h-1.5 bg-gray-300 rounded-full animate-dust-cloud" style={{ animationDelay: '0.2s' }}></div>
+                                <div className="w-1 h-1 bg-gray-200 rounded-full animate-dust-cloud" style={{ animationDelay: '0.4s' }}></div>
+                              </div>
+                            )}
+                            
+                            {/* Wheels animation effect */}
+                            <div className="absolute bottom-0 left-2 w-1.5 h-1.5 bg-gray-800 rounded-full"></div>
+                            <div className="absolute bottom-0 right-2 w-1.5 h-1.5 bg-gray-800 rounded-full"></div>
                           </div>
                         ) : (
                           /* Money handover animation for refund completed */
@@ -580,31 +670,35 @@ export default function OrdersPage() {
                               {/* Person receiving money */}
                               <div className="flex items-center gap-1">
                                 <div className="relative">
-                                  {/* Person icon */}
-                                  <svg className="w-6 h-6 md:w-8 md:h-8 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                                  {/* Glow effect */}
+                                  <div className="absolute inset-0 bg-green-400 rounded-full blur-lg opacity-30 scale-150"></div>
+                                  
+                                  {/* Person icon - larger */}
+                                  <svg className="relative w-8 h-8 md:w-10 md:h-10 text-green-600 drop-shadow-xl" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                                   </svg>
-                                  {/* Money bills flying to person */}
-                                  <div className="absolute -top-2 -right-2 animate-money-fly">
-                                    <svg className="w-4 h-4 md:w-5 md:h-5 text-green-500" fill="currentColor" viewBox="0 0 24 24">
+                                  
+                                  {/* Money bills flying to person - larger */}
+                                  <div className="absolute -top-3 -right-3 animate-money-fly">
+                                    <svg className="w-5 h-5 md:w-6 md:h-6 text-green-500 drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
                                       <path d="M2 6h20v12H2V6zm2 2v8h16V8H4zm7 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/>
                                     </svg>
                                   </div>
-                                  <div className="absolute -top-1 -right-3 animate-money-fly" style={{ animationDelay: '0.2s' }}>
-                                    <svg className="w-3 h-3 md:w-4 md:h-4 text-green-400" fill="currentColor" viewBox="0 0 24 24">
+                                  <div className="absolute -top-2 -right-4 animate-money-fly" style={{ animationDelay: '0.2s' }}>
+                                    <svg className="w-4 h-4 md:w-5 md:h-5 text-green-400 drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
                                       <path d="M2 6h20v12H2V6zm2 2v8h16V8H4zm7 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/>
                                     </svg>
                                   </div>
-                                  <div className="absolute top-0 -right-4 animate-money-fly" style={{ animationDelay: '0.4s' }}>
-                                    <svg className="w-3 h-3 md:w-4 md:h-4 text-green-300" fill="currentColor" viewBox="0 0 24 24">
+                                  <div className="absolute -top-1 -right-5 animate-money-fly" style={{ animationDelay: '0.4s' }}>
+                                    <svg className="w-4 h-4 md:w-5 md:h-5 text-green-300 drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
                                       <path d="M2 6h20v12H2V6zm2 2v8h16V8H4zm7 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/>
                                     </svg>
                                   </div>
                                 </div>
                               </div>
-                              {/* Success checkmark */}
-                              <div className="absolute -top-1 -right-1 bg-green-500 rounded-full p-0.5 animate-scale-in">
-                                <CheckCircle className="w-3 h-3 text-white" />
+                              {/* Success checkmark - larger */}
+                              <div className="absolute -top-2 -right-2 bg-green-500 rounded-full p-1 animate-scale-in shadow-lg">
+                                <CheckCircle className="w-4 h-4 text-white" />
                               </div>
                             </div>
                           </div>

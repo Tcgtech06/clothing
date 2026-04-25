@@ -60,7 +60,7 @@ body {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-4px);
+    transform: translateY(-6px);
   }
 }
 
@@ -74,7 +74,62 @@ body {
 }
 
 .truck-animate {
-  animation: truck-bounce 1s ease-in-out infinite;
+  animation: truck-bounce 0.8s ease-in-out infinite;
+}
+
+/* More realistic truck animation with subtle movement */
+.truck-animate-realistic {
+  animation: truck-bounce-realistic 0.6s ease-in-out infinite;
+}
+
+@keyframes truck-bounce-realistic {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-2px) rotate(-1deg);
+  }
+  50% {
+    transform: translateY(-4px) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-2px) rotate(1deg);
+  }
+}
+
+/* Speed lines animation */
+@keyframes speed-line {
+  0% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+}
+
+.animate-speed-line {
+  animation: speed-line 0.8s ease-out infinite;
+}
+
+/* Dust cloud animation */
+@keyframes dust-cloud {
+  0% {
+    opacity: 0.6;
+    transform: scale(0.5) translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5) translateX(-15px);
+  }
+}
+
+.animate-dust-cloud {
+  animation: dust-cloud 1s ease-out infinite;
 }
 
 /* Pulse animation for current step */
