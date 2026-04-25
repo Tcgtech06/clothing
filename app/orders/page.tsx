@@ -187,7 +187,7 @@ export default function OrdersPage() {
     setTruckPositions(resetPositions);
     setIsAnimating(animatingStates);
     
-    // Animate each truck step by step with pauses
+    // Animate each truck step by step with very slow speed (like 1km/h)
     ordersData.forEach((order) => {
       const orderId = order.id;
       
@@ -203,7 +203,7 @@ export default function OrdersPage() {
         currentStepIndex = steps.findIndex(s => s.status === 'current');
       }
       
-      // Animate through each step
+      // Animate through each step very slowly
       let currentStep = 0;
       const animateToNextStep = () => {
         if (currentStep <= currentStepIndex) {
@@ -215,26 +215,26 @@ export default function OrdersPage() {
             [orderId]: position
           }));
           
-          // Pause at this step for 500ms, then move to next
+          // Pause at this step for 800ms, then move to next very slowly
           setTimeout(() => {
             currentStep++;
             if (currentStep <= currentStepIndex) {
               animateToNextStep();
             } else {
-              // Animation complete
+              // Animation complete - truck stays at current position
               setIsAnimating(prev => ({
                 ...prev,
                 [orderId]: false
               }));
             }
-          }, 500); // Pause for 500ms at each step
+          }, 800); // Longer pause at each checkpoint
         }
       };
       
       // Start animation after initial delay
       setTimeout(() => {
         animateToNextStep();
-      }, 300);
+      }, 500);
     });
   };
 
@@ -525,7 +525,7 @@ export default function OrdersPage() {
                           left: `${truckPositions[order.id] !== undefined ? truckPositions[order.id] : 0}%`,
                           transform: 'translateX(-50%)',
                           zIndex: 3,
-                          transition: isAnimating[order.id] ? 'left 1.5s ease-in-out' : 'none'
+                          transition: isAnimating[order.id] ? 'left 3s linear' : 'none'
                         }}
                       >
                         <div className="relative">
@@ -617,18 +617,58 @@ export default function OrdersPage() {
                         }}
                       ></div>
                       
-                      {/* Animated Return Truck - Enhanced Visibility and Realistic Movement */}
+                      {/* Animated Return Truck Video */}
                       <div 
                         className="absolute top-[-8px] md:top-[-6px] truck-container"
                         style={{ 
                           left: `${truckPositions[order.id] !== undefined ? truckPositions[order.id] : 0}%`,
                           transform: 'translateX(-50%)',
                           zIndex: 3,
-                          transition: isAnimating[order.id] ? 'left 1.5s ease-in-out' : 'none'
+                          transition: isAnimating[order.id] ? 'left 3s linear' : 'none'
                         }}
                       >
-                        {/* Show truck for all steps except refund-completed */}
-                        {order.returnRequest.returnStatus !== 'refund-completed' ? (
+                        {/* Show truck for all steps, money icon ONLY at the very last stage (refund-completed) */}
+                        {order.returnRequest.returnStatus === 'refund-completed' ? (
+                          /* Money handover animation for refund completed - ONLY at final stage */
+                          <div className="relative">
+                            <div className="money-handover-animation">
+                              {/* Person receiving money */}
+                              <div className="flex items-center gap-1">
+                                <div className="relative">
+                                  {/* Glow effect */}
+                                  <div className="absolute inset-0 bg-green-400 rounded-full blur-lg opacity-30 scale-150"></div>
+                                  
+                                  {/* Person icon - larger */}
+                                  <svg className="relative w-8 h-8 md:w-10 md:h-10 text-green-600 drop-shadow-xl" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                  </svg>
+                                  
+                                  {/* Money bills flying to person - larger */}
+                                  <div className="absolute -top-3 -right-3 animate-money-fly">
+                                    <svg className="w-5 h-5 md:w-6 md:h-6 text-green-500 drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
+                                      <path d="M2 6h20v12H2V6zm2 2v8h16V8H4zm7 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/>
+                                    </svg>
+                                  </div>
+                                  <div className="absolute -top-2 -right-4 animate-money-fly" style={{ animationDelay: '0.2s' }}>
+                                    <svg className="w-4 h-4 md:w-5 md:h-5 text-green-400 drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
+                                      <path d="M2 6h20v12H2V6zm2 2v8h16V8H4zm7 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/>
+                                    </svg>
+                                  </div>
+                                  <div className="absolute -top-1 -right-5 animate-money-fly" style={{ animationDelay: '0.4s' }}>
+                                    <svg className="w-4 h-4 md:w-5 md:h-5 text-green-300 drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
+                                      <path d="M2 6h20v12H2V6zm2 2v8h16V8H4zm7 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/>
+                                    </svg>
+                                  </div>
+                                </div>
+                              </div>
+                              {/* Success checkmark - larger */}
+                              <div className="absolute -top-2 -right-2 bg-green-500 rounded-full p-1 animate-scale-in shadow-lg">
+                                <CheckCircle className="w-4 h-4 text-white" />
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          /* Show truck for ALL other stages (pending, approved, pickup-scheduled, picked-up) */
                           <div className="relative">
                             {/* Glow effect behind truck */}
                             <div className="absolute inset-0 bg-orange-400 rounded-full blur-lg opacity-30 scale-150 animate-pulse"></div>
@@ -672,45 +712,6 @@ export default function OrdersPage() {
                                 <div className="w-1 h-1 bg-gray-200 rounded-full animate-dust-cloud" style={{ animationDelay: '0.4s' }}></div>
                               </div>
                             )}
-                          </div>
-                        ) : (
-                          /* Money handover animation for refund completed */
-                          <div className="relative">
-                            <div className="money-handover-animation">
-                              {/* Person receiving money */}
-                              <div className="flex items-center gap-1">
-                                <div className="relative">
-                                  {/* Glow effect */}
-                                  <div className="absolute inset-0 bg-green-400 rounded-full blur-lg opacity-30 scale-150"></div>
-                                  
-                                  {/* Person icon - larger */}
-                                  <svg className="relative w-8 h-8 md:w-10 md:h-10 text-green-600 drop-shadow-xl" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                                  </svg>
-                                  
-                                  {/* Money bills flying to person - larger */}
-                                  <div className="absolute -top-3 -right-3 animate-money-fly">
-                                    <svg className="w-5 h-5 md:w-6 md:h-6 text-green-500 drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
-                                      <path d="M2 6h20v12H2V6zm2 2v8h16V8H4zm7 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/>
-                                    </svg>
-                                  </div>
-                                  <div className="absolute -top-2 -right-4 animate-money-fly" style={{ animationDelay: '0.2s' }}>
-                                    <svg className="w-4 h-4 md:w-5 md:h-5 text-green-400 drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
-                                      <path d="M2 6h20v12H2V6zm2 2v8h16V8H4zm7 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/>
-                                    </svg>
-                                  </div>
-                                  <div className="absolute -top-1 -right-5 animate-money-fly" style={{ animationDelay: '0.4s' }}>
-                                    <svg className="w-4 h-4 md:w-5 md:h-5 text-green-300 drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
-                                      <path d="M2 6h20v12H2V6zm2 2v8h16V8H4zm7 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/>
-                                    </svg>
-                                  </div>
-                                </div>
-                              </div>
-                              {/* Success checkmark - larger */}
-                              <div className="absolute -top-2 -right-2 bg-green-500 rounded-full p-1 animate-scale-in shadow-lg">
-                                <CheckCircle className="w-4 h-4 text-white" />
-                              </div>
-                            </div>
                           </div>
                         )}
                       </div>
@@ -814,12 +815,6 @@ export default function OrdersPage() {
                           ₹{order.total.toLocaleString('en-IN')}
                         </p>
                       </div>
-                      <button
-                        onClick={() => setSelectedOrder(order)}
-                        className="w-full sm:w-auto bg-primary text-white px-4 md:px-6 py-2 md:py-2.5 rounded-lg hover:bg-primary/90 transition font-semibold text-sm md:text-base"
-                      >
-                        Track Order
-                      </button>
                     </div>
                   </div>
                 </div>
