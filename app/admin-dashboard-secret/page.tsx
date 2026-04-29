@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import {
   Package, TrendingUp, DollarSign, Users, Bell, X, Trash2,
   Plus, Edit, Image as ImageIcon, Upload, CheckCircle, Clock,
-  Truck, MapPin, PackageCheck, Search, RotateCcw, AlertCircle
+  Truck, MapPin, PackageCheck, Search, RotateCcw, AlertCircle, LogOut
 } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import {
@@ -13,8 +13,11 @@ import {
 } from 'firebase/firestore';
 import InventoryTab from '@/components/InventoryTab';
 import AnalyticsTab from '@/components/AnalyticsTab';
+import ProtectedAdminRoute from '@/components/ProtectedAdminRoute';
+import { useAdminAuth } from '@/lib/admin-auth-context';
 import { initializePollsForAllProducts } from '@/lib/init-polls';
 import { CATEGORIES } from '@/data/categories';
+import { useRouter } from 'next/navigation';
 
 const IMGBB_KEY = 'c609e2ff4c762257899c035c382f6503';
 
@@ -77,7 +80,7 @@ const emptyForm: ProductForm = {
   sizes: [''], loyaltyPoints: 0, stock: 0,
 };
 
-export default function AdminDashboard() {
+function AdminDashboard() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [stats, setStats] = useState({ totalOrders: 0, totalRevenue: 0, newOrders: 0, totalCustomers: 0 });
   const [notifications, setNotifications] = useState<string[]>([]);
@@ -94,6 +97,15 @@ export default function AdminDashboard() {
   const [returnRequests, setReturnRequests] = useState<ReturnRequest[]>([]);
   const [selectedReturn, setSelectedReturn] = useState<ReturnRequest | null>(null);
   const [adminNotes, setAdminNotes] = useState('');
+  const { adminLogout } = useAdminAuth();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    if (confirm('Are you sure you want to logout?')) {
+      adminLogout();
+      router.push('/admin-login');
+    }
+  };
 
   useEffect(() => {
     const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
@@ -374,6 +386,13 @@ export default function AdminDashboard() {
                 )}
               </div>
               <span className="text-sm text-red-500 font-medium">Live Updates</span>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-semibold"
+              >
+                <LogOut className="w-4 h-4" />
+                Logout
+              </button>
             </div>
           </div>
           <div className="flex gap-4 mt-4 border-b">
@@ -1071,3 +1090,14 @@ export default function AdminDashboard() {
     </div>
   );
 }
+
+// Wrap with ProtectedAdminRoute
+function AdminDashboardPage() {
+  return (
+    <ProtectedAdminRoute>
+      <AdminDashboard />
+    </ProtectedAdminRoute>
+  );
+}
+
+export default AdminDashboardPage;

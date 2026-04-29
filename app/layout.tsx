@@ -5,6 +5,7 @@ import Navigation from '@/components/Navigation';
 import { CartProvider } from '@/lib/cart-context';
 import { FavouritesProvider } from '@/lib/favourites-context';
 import { AuthProvider } from '@/lib/auth-context';
+import { AdminAuthProvider } from '@/lib/admin-auth-context';
 
 export default function RootLayout({
   children,
@@ -22,14 +23,16 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
       </head>
       <body className="bg-gray-50">
-        <AuthProvider>
-          <CartProvider>
-            <FavouritesProvider>
-              <Navigation />
-              <main className="pt-14 pb-20 md:pt-0 md:pb-0">{children}</main>
-            </FavouritesProvider>
-          </CartProvider>
-        </AuthProvider>
+        <AdminAuthProvider>
+          <AuthProvider>
+            <CartProvider>
+              <FavouritesProvider>
+                <Navigation />
+                <main className="pt-14 pb-20 md:pt-0 md:pb-0">{children}</main>
+              </FavouritesProvider>
+            </CartProvider>
+          </AuthProvider>
+        </AdminAuthProvider>
       </body>
     </html>
   );

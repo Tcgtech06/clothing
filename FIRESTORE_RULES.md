@@ -13,6 +13,12 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // Admins - allow read for authentication, no write from client
+    match /admins/{adminId} {
+      allow read: if true;  // Allow reading for admin login authentication
+      allow write: if false; // Prevent any write operations from client
+    }
+
     // Users - allow list for phone login lookup
     match /users/{userId} {
       allow read: if request.auth != null;
