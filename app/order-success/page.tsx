@@ -48,8 +48,6 @@ function OrderSuccessContent() {
     const countdownInterval = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
-          clearInterval(countdownInterval);
-          router.push('/orders');
           return 0;
         }
         return prev - 1;
@@ -62,7 +60,14 @@ function OrderSuccessContent() {
       audio.pause();
       audio.currentTime = 0;
     };
-  }, [router]);
+  }, []);
+
+  // Separate effect for navigation to avoid router.push in cleanup
+  useEffect(() => {
+    if (countdown === 0) {
+      router.push('/orders');
+    }
+  }, [countdown, router]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center px-4">
