@@ -238,28 +238,25 @@ export default function OrdersPage() {
     });
   };
 
-  const checkForPollPrompt = (ordersData: Order[]) => {
-    if (!user) return;
+  const checkForPollPrompt = async (ordersData: Order[]) => {
+    if (!user?.uid) return;
 
-    // Get list of products user has already been prompted to vote for
-    const promptedProducts = JSON.parse(localStorage.getItem('pollPrompted') || '{}');
+    // Get list of orders user has already been prompted to vote for
+    const promptedOrders = JSON.parse(localStorage.getItem('pollPromptedOrders') || '{}');
     
-    // Find delivered orders with products that haven't been prompted yet
+    // Find delivered orders that haven't been prompted yet
     const productsToVote: any[] = [];
     
     ordersData.forEach(order => {
-      if (order.status === 'delivered' && order.productDetails) {
+      if (order.status === 'delivered' && order.productDetails && !promptedOrders[order.id]) {
         order.productDetails.forEach((product: any) => {
-          const productKey = product.firestoreId || product.id;
-          if (!promptedProducts[productKey]) {
-            productsToVote.push({
-              ...product,
-              orderId: order.id
-            });
-            // Mark as prompted
-            promptedProducts[productKey] = true;
-          }
+          productsToVote.push({
+            ...product,
+            orderId: order.id
+          });
         });
+        // Mark this order as prompted
+        promptedOrders[order.id] = true;
       }
     });
 
@@ -267,7 +264,7 @@ export default function OrdersPage() {
       setPollProducts(productsToVote);
       setShowPollPrompt(true);
       // Save to localStorage
-      localStorage.setItem('pollPrompted', JSON.stringify(promptedProducts));
+      localStorage.setItem('pollPromptedOrders', JSON.stringify(promptedOrders));
     }
   };
 

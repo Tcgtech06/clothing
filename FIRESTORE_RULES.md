@@ -30,6 +30,25 @@ service cloud.firestore {
     match /userAddresses/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
+    
+    // User Notifications - users can only access their own notifications
+    match /userNotifications/{notificationId} {
+      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+    
+    // Admin Notifications - any authenticated user can access (for admin dashboard)
+    match /adminNotifications/{notificationId} {
+      allow read, create, update, delete: if request.auth != null;
+    }
+    
+    // User Poll Votes - users can only create/read their own votes
+    match /userPollVotes/{voteId} {
+      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
 
     // Products - public read, allow write for admin dashboard
     match /products/{productId} {

@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { db } from './firebase';
-import { collection, query, where, onSnapshot, Timestamp } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, Timestamp, addDoc, deleteDoc, doc, updateDoc, orderBy, limit } from 'firebase/firestore';
 import { useAuth } from './auth-context';
 import { usePushNotifications } from './push-notification-context';
 
@@ -15,6 +15,7 @@ interface Notification {
   status?: string;
   createdAt: Timestamp;
   read: boolean;
+  userId?: string;
 }
 
 interface NotificationContextType {
@@ -41,15 +42,42 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!user?.email) return;
 
+    // Listen to user's notifications from Firestore
+    // Removed orderBy to avoid composite index requirement - will sort client-side
+    const notificationsQuery = query(
+      collection(db, 'userNotifications'),
+      where('userId', '==', user.uid),
+      limit(50)
+    );
+
+    const unsubscribeNotifications = onSnapshot(notificationsQuery, (snapshot) => {
+      const notifs: Notification[] = [];
+      
+      snapshot.forEach((doc) => {
+        notifs.push({
+          id: doc.id,
+          ...doc.data(),
+        } as Notification);
+      });
+      
+      // Sort client-side by createdAt descending (newest first)
+      notifs.sort((a, b) => {
+        const aTime = a.createdAt?.toMillis() || 0;
+        const bTime = b.createdAt?.toMillis() || 0;
+        return bTime - aTime;
+      });
+      
+      setNotifications(notifs);
+    });
+
     // Listen to user's orders for status updates
-    // Simplified query to avoid composite index requirement
     const ordersQuery = query(
       collection(db, 'orders'),
       where('customerEmail', '==', user.email)
     );
 
-    const unsubscribe = onSnapshot(ordersQuery, (snapshot) => {
-      snapshot.docChanges().forEach((change) => {
+    const unsubscribeOrders = onSnapshot(ordersQuery, (snapshot) => {
+      snapshot.docChanges().forEach(async (change) => {
         const doc = change.doc;
         const data = doc.data();
         
@@ -91,24 +119,13 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
           const statusInfo = statusMessages[data.status];
           
           if (statusInfo) {
-            // Play notification sound
-            playNotificationSound();
+            console.log('🔔 Order status changed:', data.status);
+            console.log('📧 Sending notification:', statusInfo.title);
             
-            // Send push notification if permission granted
-            if (permission === 'granted') {
-              sendPushNotification(statusInfo.title, {
-                body: statusInfo.message,
-                icon: '/icon-192x192.png',
-                badge: '/icon-192x192.png',
-                tag: 'order-update',
-                requireInteraction: false,
-              });
-            }
-            
-            // Add notification
-            setNotifications(prev => {
-              const newNotification: Notification = {
-                id: `${doc.id}-${data.status}-${Date.now()}`,
+            // Save notification to Firestore
+            try {
+              await addDoc(collection(db, 'userNotifications'), {
+                userId: user.uid,
                 orderId: doc.id,
                 title: statusInfo.title,
                 message: statusInfo.message,
@@ -116,20 +133,39 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
                 status: data.status,
                 createdAt: Timestamp.now(),
                 read: false,
-              };
-              
-              // Add to beginning and keep last 20
-              const updated = [newNotification, ...prev].slice(0, 20);
-              // Sort by timestamp (newest first)
-              return updated.sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
-            });
+              });
+              console.log('💾 Notification saved to Firestore');
+            } catch (error) {
+              console.error('❌ Error saving notification to Firestore:', error);
+            }
+            
+            // Play notification sound
+            playNotificationSound();
+            
+            // Send push notification if permission granted
+            console.log('🔐 Permission status:', permission);
+            if (permission === 'granted') {
+              console.log('✅ Calling sendPushNotification...');
+              sendPushNotification(statusInfo.title, {
+                body: statusInfo.message,
+                icon: '/icon-192x192.png',
+                badge: '/icon-192x192.png',
+                tag: 'order-update',
+                requireInteraction: false,
+              });
+            } else {
+              console.warn('⚠️ Cannot send push notification - permission not granted');
+            }
           }
         }
       });
     });
 
-    return () => unsubscribe();
-  }, [user?.email, permission, sendPushNotification]);
+    return () => {
+      unsubscribeNotifications();
+      unsubscribeOrders();
+    };
+  }, [user?.email, user?.uid, permission, sendPushNotification]);
 
   const playNotificationSound = () => {
     const audio = new Audio('/Notification.mp3');
@@ -139,16 +175,29 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const markAsRead = (id: string) => {
-    setNotifications(prev =>
-      prev.map(notif =>
-        notif.id === id ? { ...notif, read: true } : notif
-      )
-    );
+  const markAsRead = async (id: string) => {
+    try {
+      // Update in Firestore
+      await updateDoc(doc(db, 'userNotifications', id), {
+        read: true,
+      });
+      console.log('✅ Notification marked as read:', id);
+    } catch (error) {
+      console.error('❌ Error marking notification as read:', error);
+    }
   };
 
-  const clearAll = () => {
-    setNotifications([]);
+  const clearAll = async () => {
+    try {
+      // Delete all notifications for this user from Firestore
+      const deletePromises = notifications.map(notif => 
+        deleteDoc(doc(db, 'userNotifications', notif.id))
+      );
+      await Promise.all(deletePromises);
+      console.log('✅ All notifications cleared from Firestore');
+    } catch (error) {
+      console.error('❌ Error clearing notifications:', error);
+    }
   };
 
   const unreadCount = notifications.filter(n => !n.read).length;

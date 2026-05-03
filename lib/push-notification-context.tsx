@@ -28,9 +28,14 @@ export function PushNotificationProvider({ children }: { children: ReactNode }) 
     if (typeof window !== 'undefined' && 'Notification' in window && 'serviceWorker' in navigator) {
       setIsSupported(true);
       setPermission(Notification.permission);
+      console.log('🔔 Push Notification System Initialized');
+      console.log('📱 Browser supports notifications:', true);
+      console.log('🔐 Current permission:', Notification.permission);
       
       // Register service worker
       registerServiceWorker();
+    } else {
+      console.warn('⚠️ Push notifications not supported in this browser');
     }
   }, []);
 
@@ -80,13 +85,17 @@ export function PushNotificationProvider({ children }: { children: ReactNode }) 
   };
 
   const sendNotification = (title: string, options?: NotificationOptions) => {
+    console.log('🔔 sendNotification called:', title);
+    console.log('📊 isSupported:', isSupported, 'permission:', permission);
+    console.log('👁️ Page visible:', !document.hidden);
+    
     if (!isSupported) {
-      console.log('Push notifications not supported');
+      console.warn('⚠️ Push notifications not supported');
       return;
     }
 
     if (permission !== 'granted') {
-      console.log('Push notification permission not granted');
+      console.warn('⚠️ Push notification permission not granted. Current:', permission);
       return;
     }
 
@@ -94,10 +103,10 @@ export function PushNotificationProvider({ children }: { children: ReactNode }) 
       // Play notification sound
       const audio = new Audio('/Notification.mp3');
       audio.volume = 0.6;
-      audio.play().catch(err => console.log('Audio play failed:', err));
+      audio.play().catch(err => console.log('🔇 Audio play failed:', err));
 
-      // If service worker is registered and page is not visible, use service worker
-      if (registration && document.hidden) {
+      // ONLY send push notification if page is hidden (user closed the webapp)
+      if (document.hidden && registration) {
         // Send notification through service worker for background notifications
         registration.showNotification(title, {
           icon: '/icon-192x192.png',
@@ -105,38 +114,14 @@ export function PushNotificationProvider({ children }: { children: ReactNode }) 
           requireInteraction: false,
           ...options,
         });
-        console.log('Background push notification sent via Service Worker:', title);
+        console.log('✅ Background push notification sent via Service Worker (page hidden):', title);
       } else {
-        // Create notification directly for foreground
-        const notification = new Notification(title, {
-          icon: '/icon-192x192.png',
-          badge: '/icon-192x192.png',
-          requireInteraction: false,
-          ...options,
-        });
-
-        // Auto close after 10 seconds
-        setTimeout(() => {
-          notification.close();
-        }, 10000);
-
-        // Handle notification click
-        notification.onclick = () => {
-          window.focus();
-          notification.close();
-          
-          // Navigate to orders page if notification has tag
-          if (options?.tag === 'order-update') {
-            window.location.href = '/orders';
-          } else if (options?.tag === 'admin-order') {
-            window.location.href = '/admin-dashboard-secret';
-          }
-        };
-
-        console.log('Foreground push notification sent:', title);
+        // Page is visible - notification will show in-app only (notification bell)
+        console.log('📱 In-app notification only (page visible):', title);
+        // Don't create browser notification when page is visible
       }
     } catch (error) {
-      console.error('Error sending notification:', error);
+      console.error('❌ Error sending notification:', error);
     }
   };
 

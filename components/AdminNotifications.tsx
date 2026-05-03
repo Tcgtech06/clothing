@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Bell, X, Package, RotateCcw } from 'lucide-react';
 import { db } from '@/lib/firebase';
-import { collection, query, orderBy, limit, onSnapshot, Timestamp } from 'firebase/firestore';
+import { collection, query, orderBy, limit, onSnapshot, Timestamp, addDoc, deleteDoc, doc, updateDoc, where } from 'firebase/firestore';
 import { usePushNotifications } from '@/lib/push-notification-context';
 
 interface AdminNotification {
@@ -13,6 +13,7 @@ interface AdminNotification {
   type: 'order' | 'return';
   createdAt: Timestamp;
   read: boolean;
+  adminId?: string;
 }
 
 export default function AdminNotifications() {
@@ -23,6 +24,32 @@ export default function AdminNotifications() {
   const { sendNotification: sendPushNotification, permission } = usePushNotifications();
 
   useEffect(() => {
+    // Listen to admin notifications from Firestore
+    // Removed orderBy to avoid composite index requirement - will sort client-side
+    const adminNotificationsQuery = query(
+      collection(db, 'adminNotifications'),
+      limit(50)
+    );
+
+    const unsubscribeAdminNotifications = onSnapshot(adminNotificationsQuery, (snapshot) => {
+      const notifs: AdminNotification[] = [];
+      
+      snapshot.forEach((doc) => {
+        notifs.push({
+          id: doc.id,
+          ...doc.data(),
+        } as AdminNotification);
+      });
+      
+      // Sort client-side by createdAt descending (newest first)
+      notifs.sort((a, b) => {
+        const aTime = a.createdAt?.toMillis() || 0;
+        const bTime = b.createdAt?.toMillis() || 0;
+        return bTime - aTime;
+      });
+      
+      setNotifications(notifs);
+    });
     // Listen to new orders ONLY (not status updates)
     const ordersQuery = query(
       collection(db, 'orders'),
@@ -31,9 +58,7 @@ export default function AdminNotifications() {
     );
 
     const unsubscribeOrders = onSnapshot(ordersQuery, (snapshot) => {
-      const orderNotifications: AdminNotification[] = [];
-      
-      snapshot.docChanges().forEach((change) => {
+      snapshot.docChanges().forEach(async (change) => {
         const doc = change.doc;
         const data = doc.data();
         const orderDate = data.createdAt?.toDate();
@@ -43,7 +68,6 @@ export default function AdminNotifications() {
         // Show notifications ONLY for NEW orders (not status updates)
         if (diffMinutes < 60 && change.type === 'added') {
           const notificationData = {
-            id: `order-new-${doc.id}`,
             title: '🛍️ New Order Received',
             message: `Order #${doc.id.substring(0, 8).toUpperCase()} - ₹${data.total} from ${data.customerName}`,
             type: 'order' as const,
@@ -51,10 +75,24 @@ export default function AdminNotifications() {
             read: false,
           };
           
-          orderNotifications.push(notificationData);
+          console.log('🔔 New order detected:', doc.id);
+          console.log('📧 Sending admin notification:', notificationData.title);
+          
+          // Save notification to Firestore
+          try {
+            await addDoc(collection(db, 'adminNotifications'), notificationData);
+            console.log('💾 Admin notification saved to Firestore');
+          } catch (error) {
+            console.error('❌ Error saving admin notification:', error);
+          }
+          
+          // Play notification sound
+          playNotificationSound();
           
           // Send push notification for new order
+          console.log('🔐 Admin permission status:', permission);
           if (permission === 'granted') {
+            console.log('✅ Calling sendPushNotification for admin...');
             sendPushNotification(notificationData.title, {
               body: notificationData.message,
               icon: '/icon-192x192.png',
@@ -62,24 +100,10 @@ export default function AdminNotifications() {
               tag: 'admin-order',
               requireInteraction: true,
             });
+          } else {
+            console.warn('⚠️ Cannot send admin push notification - permission not granted');
           }
         }
-      });
-
-      // Play notification sound if there are new orders
-      if (orderNotifications.length > 0) {
-        playNotificationSound();
-      }
-      
-      // Merge with existing notifications
-      setNotifications(prev => {
-        const returnNotifs = prev.filter(n => n.type === 'return');
-        const allNotifs = [...orderNotifications, ...returnNotifs];
-        // Remove duplicates and sort
-        const uniqueNotifs = Array.from(new Map(allNotifs.map(n => [n.id, n])).values());
-        return uniqueNotifs.sort((a, b) => 
-          b.createdAt?.toMillis() - a.createdAt?.toMillis()
-        );
       });
     });
 
@@ -91,10 +115,8 @@ export default function AdminNotifications() {
     );
 
     const unsubscribeReturns = onSnapshot(returnsQuery, (snapshot) => {
-      const returnNotifications: AdminNotification[] = [];
-      
-      snapshot.forEach((doc) => {
-        const data = doc.data();
+      snapshot.forEach(async (docSnapshot) => {
+        const data = docSnapshot.data();
         const returnDate = data.requestedAt?.toDate();
         const now = new Date();
         const diffMinutes = (now.getTime() - returnDate?.getTime()) / (1000 * 60);
@@ -102,7 +124,6 @@ export default function AdminNotifications() {
         // Show notifications for returns requested in the last 60 minutes
         if (diffMinutes < 60 && data.status === 'pending') {
           const notificationData = {
-            id: `return-${doc.id}`,
             title: '🔄 Return Request',
             message: `Return for Order #${data.orderId?.substring(0, 8).toUpperCase()} - ₹${data.total}`,
             type: 'return' as const,
@@ -110,43 +131,44 @@ export default function AdminNotifications() {
             read: false,
           };
           
-          returnNotifications.push(notificationData);
+          // Check if notification already exists
+          const existingNotif = notifications.find(n => 
+            n.type === 'return' && n.message.includes(data.orderId?.substring(0, 8).toUpperCase())
+          );
+          
+          if (!existingNotif) {
+            // Save notification to Firestore
+            try {
+              await addDoc(collection(db, 'adminNotifications'), notificationData);
+              console.log('💾 Return notification saved to Firestore');
+              
+              // Play notification sound
+              playNotificationSound();
+              
+              // Send push notification
+              if (permission === 'granted') {
+                sendPushNotification(notificationData.title, {
+                  body: notificationData.message,
+                  icon: '/icon-192x192.png',
+                  badge: '/icon-192x192.png',
+                  tag: 'admin-order',
+                  requireInteraction: true,
+                });
+              }
+            } catch (error) {
+              console.error('❌ Error saving return notification:', error);
+            }
+          }
         }
-      });
-
-      // Play notification sound if there are new returns
-      if (returnNotifications.length > lastReturnCount && lastReturnCount > 0) {
-        playNotificationSound();
-        
-        // Send push notification for new return
-        if (permission === 'granted' && returnNotifications.length > 0) {
-          const latestReturn = returnNotifications[0];
-          sendPushNotification(latestReturn.title, {
-            body: latestReturn.message,
-            icon: '/icon-192x192.png',
-            badge: '/icon-192x192.png',
-            tag: 'admin-order',
-            requireInteraction: true,
-          });
-        }
-      }
-      
-      setLastReturnCount(returnNotifications.length);
-      
-      // Merge with existing notifications
-      setNotifications(prev => {
-        const orderNotifs = prev.filter(n => n.type === 'order');
-        return [...orderNotifs, ...returnNotifications].sort((a, b) => 
-          b.createdAt?.toMillis() - a.createdAt?.toMillis()
-        );
       });
     });
 
     return () => {
+      unsubscribeAdminNotifications();
       unsubscribeOrders();
       unsubscribeReturns();
     };
-  }, [lastOrderCount, lastReturnCount, permission, sendPushNotification]);
+  }, [lastOrderCount, lastReturnCount, permission, sendPushNotification, notifications]);
 
   const playNotificationSound = () => {
     const audio = new Audio('/Notification.mp3');
@@ -156,16 +178,27 @@ export default function AdminNotifications() {
     });
   };
 
-  const markAsRead = (id: string) => {
-    setNotifications(prev =>
-      prev.map(notif =>
-        notif.id === id ? { ...notif, read: true } : notif
-      )
-    );
+  const markAsRead = async (id: string) => {
+    try {
+      await updateDoc(doc(db, 'adminNotifications', id), {
+        read: true,
+      });
+      console.log('✅ Admin notification marked as read:', id);
+    } catch (error) {
+      console.error('❌ Error marking admin notification as read:', error);
+    }
   };
 
-  const clearAll = () => {
-    setNotifications([]);
+  const clearAll = async () => {
+    try {
+      const deletePromises = notifications.map(notif => 
+        deleteDoc(doc(db, 'adminNotifications', notif.id))
+      );
+      await Promise.all(deletePromises);
+      console.log('✅ All admin notifications cleared');
+    } catch (error) {
+      console.error('❌ Error clearing admin notifications:', error);
+    }
   };
 
   const formatTime = (timestamp: any) => {

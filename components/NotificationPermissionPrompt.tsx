@@ -9,30 +9,51 @@ export default function NotificationPermissionPrompt() {
   const { permission, requestPermission, isSupported } = usePushNotifications();
 
   useEffect(() => {
-    // Show prompt after 3 seconds if permission is default and notifications are supported
-    if (isSupported && permission === 'default') {
+    // Check if user has already been prompted
+    const hasBeenPrompted = localStorage.getItem('notificationPromptShown');
+    const dismissedUntil = localStorage.getItem('notificationPromptDismissed');
+    
+    // Don't show if already dismissed recently
+    if (dismissedUntil && Date.now() < parseInt(dismissedUntil)) {
+      console.log('🔕 Notification prompt dismissed until:', new Date(parseInt(dismissedUntil)));
+      return;
+    }
+    
+    // Show prompt immediately if permission is default and notifications are supported
+    if (isSupported && permission === 'default' && !hasBeenPrompted) {
+      console.log('🔔 Showing notification permission prompt');
+      // Show after 2 seconds (reduced from 3)
       const timer = setTimeout(() => {
         setShowPrompt(true);
-      }, 3000);
+      }, 2000);
 
       return () => clearTimeout(timer);
+    } else {
+      console.log('🔕 Not showing prompt - isSupported:', isSupported, 'permission:', permission, 'hasBeenPrompted:', hasBeenPrompted);
     }
   }, [permission, isSupported]);
 
   const handleAllow = async () => {
+    console.log('🔔 User clicked Allow Notifications');
     const granted = await requestPermission();
+    console.log('🔐 Permission result:', granted);
     if (granted) {
       setShowPrompt(false);
       // Save preference
       localStorage.setItem('notificationPromptShown', 'true');
+      console.log('✅ Notification permission granted and saved');
+    } else {
+      console.warn('⚠️ Notification permission denied');
     }
   };
 
   const handleDismiss = () => {
+    console.log('🔕 User dismissed notification prompt');
     setShowPrompt(false);
     // Save that user dismissed (don't show again for 7 days)
     const dismissedUntil = Date.now() + (7 * 24 * 60 * 60 * 1000);
     localStorage.setItem('notificationPromptDismissed', dismissedUntil.toString());
+    console.log('📅 Prompt dismissed until:', new Date(dismissedUntil));
   };
 
   // Don't show if already dismissed recently
