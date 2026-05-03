@@ -13,6 +13,14 @@ function OrderSuccessContent() {
   const [showAnimation, setShowAnimation] = useState(true);
 
   useEffect(() => {
+    // Play success audio
+    const audio = new Audio('/sucess.mp3');
+    audio.volume = 0.5; // Set volume to 50%
+    audio.play().catch(error => {
+      console.log('Audio playback failed:', error);
+      // Browsers may block autoplay, but we try anyway
+    });
+
     // Countdown timer
     const countdownInterval = setInterval(() => {
       setCountdown((prev) => {
@@ -25,7 +33,12 @@ function OrderSuccessContent() {
       });
     }, 1000);
 
-    return () => clearInterval(countdownInterval);
+    return () => {
+      clearInterval(countdownInterval);
+      // Stop audio when component unmounts
+      audio.pause();
+      audio.currentTime = 0;
+    };
   }, [router]);
 
   return (
@@ -33,8 +46,16 @@ function OrderSuccessContent() {
       <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8 text-center">
         {/* Animated Success Icon */}
         <div className="relative mb-6">
-          <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto">
+          <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto animate-pulse">
             <CheckCircle className="w-16 h-16 text-white animate-bounce" />
+          </div>
+          {/* Sound waves animation */}
+          <div className="absolute -right-2 top-1/2 transform -translate-y-1/2">
+            <div className="flex gap-1 items-end">
+              <div className="w-1 bg-green-500 rounded-full animate-sound-wave" style={{ height: '12px', animationDelay: '0ms' }}></div>
+              <div className="w-1 bg-green-500 rounded-full animate-sound-wave" style={{ height: '20px', animationDelay: '150ms' }}></div>
+              <div className="w-1 bg-green-500 rounded-full animate-sound-wave" style={{ height: '16px', animationDelay: '300ms' }}></div>
+            </div>
           </div>
           {/* Confetti effect */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -102,6 +123,21 @@ function OrderSuccessContent() {
             100% {
               stroke-dashoffset: 0;
             }
+          }
+          
+          @keyframes sound-wave {
+            0%, 100% {
+              transform: scaleY(0.5);
+              opacity: 0.5;
+            }
+            50% {
+              transform: scaleY(1.5);
+              opacity: 1;
+            }
+          }
+          
+          .animate-sound-wave {
+            animation: sound-wave 0.6s ease-in-out infinite;
           }
         `}</style>
       </div>
