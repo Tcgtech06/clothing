@@ -5,7 +5,7 @@ import { useCart } from '@/lib/cart-context';
 import { useRouter } from 'next/navigation';
 import { CreditCard, Wallet, MapPin, User, Phone, Mail, Edit2, Plus, Check } from 'lucide-react';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, doc, setDoc, getDoc } from 'firebase/firestore';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useAuth } from '@/lib/auth-context';
 
@@ -22,6 +22,7 @@ interface SavedAddress {
 export default function CheckoutPage() {
   const { cart, getCartTotal, clearCart } = useCart();
   const router = useRouter();
+  const { user } = useAuth();
   const [paymentMethod, setPaymentMethod] = useState<'cod' | 'online'>('cod');
   const [isProcessing, setIsProcessing] = useState(false);
   const [savedAddress, setSavedAddress] = useState<SavedAddress | null>(null);
@@ -39,17 +40,28 @@ export default function CheckoutPage() {
     pincode: '',
   });
 
-  // Load saved address from localStorage
+  // Load saved address from Firebase
   useEffect(() => {
-    const saved = localStorage.getItem('shippingAddress');
-    if (saved) {
-      const parsedAddress = JSON.parse(saved);
-      setSavedAddress(parsedAddress);
-      setFormData(parsedAddress);
-    } else {
-      setIsEditingAddress(true);
-    }
-  }, []);
+    const loadSavedAddress = async () => {
+      if (!user?.uid) return;
+      
+      try {
+        const addressDoc = await getDoc(doc(db, 'userAddresses', user.uid));
+        if (addressDoc.exists()) {
+          const addressData = addressDoc.data() as SavedAddress;
+          setSavedAddress(addressData);
+          setFormData(addressData);
+        } else {
+          setIsEditingAddress(true);
+        }
+      } catch (error) {
+        console.error('Error loading address:', error);
+        setIsEditingAddress(true);
+      }
+    };
+    
+    loadSavedAddress();
+  }, [user]);
 
   // Redirect if cart is empty (but not if order was just placed)
   useEffect(() => {
@@ -58,11 +70,20 @@ export default function CheckoutPage() {
     }
   }, [cart.length, router, orderPlaced]);
 
-  const handleSaveAddress = () => {
-    localStorage.setItem('shippingAddress', JSON.stringify(formData));
-    setSavedAddress(formData);
-    setIsEditingAddress(false);
-    setSaveAddress(false);
+  const handleSaveAddress = async () => {
+    if (!user?.uid) return;
+    
+    try {
+      // Save to Firebase
+      await setDoc(doc(db, 'userAddresses', user.uid), formData);
+      setSavedAddress(formData);
+      setIsEditingAddress(false);
+      setSaveAddress(false);
+      console.log('Address saved to Firebase');
+    } catch (error) {
+      console.error('Error saving address:', error);
+      alert('Failed to save address. Please try again.');
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -70,7 +91,7 @@ export default function CheckoutPage() {
 
     // Save address if checkbox is checked
     if (saveAddress && !savedAddress) {
-      handleSaveAddress();
+      await handleSaveAddress();
     }
 
     setIsProcessing(true);

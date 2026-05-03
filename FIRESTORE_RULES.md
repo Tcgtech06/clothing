@@ -26,6 +26,11 @@ service cloud.firestore {
       allow write: if request.auth != null && request.auth.uid == userId;
     }
 
+    // User Addresses - users can only access their own address
+    match /userAddresses/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
     // Products - public read, allow write for admin dashboard
     match /products/{productId} {
       allow read: if true;
