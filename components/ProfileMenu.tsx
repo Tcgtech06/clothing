@@ -17,8 +17,70 @@ export default function ProfileMenu({ isOpen, onClose }: ProfileMenuProps) {
     onClose();
   };
 
+  // If user is not logged in, show login/signup options
+  if (!user) {
+    return (
+      <>
+        {/* Overlay */}
+        {isOpen && (
+          <div
+            className="fixed inset-0 bg-black/50 z-50"
+            onClick={onClose}
+          />
+        )}
+
+        {/* Slide-in Menu */}
+        <div
+          className={`fixed top-0 left-0 h-full w-72 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${
+            isOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
+        >
+          <div className="flex flex-col h-full">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-primary to-secondary p-4 text-white flex-shrink-0">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-lg font-bold">Welcome!</h2>
+                <button
+                  onClick={onClose}
+                  className="p-2 hover:bg-white/20 rounded-full transition"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <p className="text-sm text-white/90">Please login to access your account</p>
+            </div>
+
+            {/* Login/Signup Buttons */}
+            <div className="flex-1 p-4 flex flex-col gap-3">
+              <Link
+                href="/login"
+                onClick={onClose}
+                className="w-full bg-primary text-white py-3 px-4 rounded-lg hover:bg-primary/90 transition font-semibold text-center"
+              >
+                Login
+              </Link>
+              
+              <Link
+                href="/signup"
+                onClick={onClose}
+                className="w-full border-2 border-primary text-primary py-3 px-4 rounded-lg hover:bg-primary/5 transition font-semibold text-center"
+              >
+                Sign Up
+              </Link>
+
+              <p className="text-xs text-gray-500 text-center mt-4">
+                Login to track orders, save favorites, and get exclusive offers
+              </p>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   const displayName = userData?.displayName || user?.displayName || 'User';
-  const displayEmail = userData?.email || user?.email || 'user@example.com';
+  const displayEmail = userData?.email || user?.email || '';
   const initial = displayName.charAt(0).toUpperCase();
 
   return (

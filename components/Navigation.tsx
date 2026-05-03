@@ -142,31 +142,58 @@ export default function Navigation() {
                       onClick={() => setShowProfileMenu(false)}
                     />
                     
-                    <div className="absolute top-12 right-0 bg-white rounded-lg shadow-xl border border-gray-200 py-2 w-64 z-50">
-                      {/* User Info */}
-                      <div className="px-4 py-3 border-b border-gray-200">
-                        <p className="font-semibold text-gray-800">{displayName}</p>
-                        <p className="text-sm text-gray-500">{displayEmail}</p>
+                    {user ? (
+                      // Logged in user dropdown
+                      <div className="absolute top-12 right-0 bg-white rounded-lg shadow-xl border border-gray-200 py-2 w-64 z-50">
+                        {/* User Info */}
+                        <div className="px-4 py-3 border-b border-gray-200">
+                          <p className="font-semibold text-gray-800">{displayName}</p>
+                          <p className="text-sm text-gray-500">{displayEmail}</p>
+                        </div>
+                        
+                        {/* Menu Items */}
+                        <Link
+                          href="/profile"
+                          className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                          onClick={() => setShowProfileMenu(false)}
+                        >
+                          My Profile
+                        </Link>
+                        
+                        <hr className="my-2" />
+                        
+                        <button 
+                          onClick={handleLogout}
+                          className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 font-medium"
+                        >
+                          Logout
+                        </button>
                       </div>
-                      
-                      {/* Menu Items */}
-                      <Link
-                        href="/profile"
-                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                        onClick={() => setShowProfileMenu(false)}
-                      >
-                        My Profile
-                      </Link>
-                      
-                      <hr className="my-2" />
-                      
-                      <button 
-                        onClick={handleLogout}
-                        className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 font-medium"
-                      >
-                        Logout
-                      </button>
-                    </div>
+                    ) : (
+                      // Not logged in dropdown
+                      <div className="absolute top-12 right-0 bg-white rounded-lg shadow-xl border border-gray-200 py-2 w-64 z-50">
+                        <div className="px-4 py-3 border-b border-gray-200">
+                          <p className="font-semibold text-gray-800">Welcome!</p>
+                          <p className="text-sm text-gray-500">Please login to continue</p>
+                        </div>
+                        
+                        <Link
+                          href="/login"
+                          className="block px-4 py-2 text-primary hover:bg-primary/5 font-medium"
+                          onClick={() => setShowProfileMenu(false)}
+                        >
+                          Login
+                        </Link>
+                        
+                        <Link
+                          href="/signup"
+                          className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                          onClick={() => setShowProfileMenu(false)}
+                        >
+                          Sign Up
+                        </Link>
+                      </div>
+                    )}
                   </>
                 )}
               </div>
