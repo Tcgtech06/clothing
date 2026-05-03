@@ -102,7 +102,6 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
                 badge: '/icon-192x192.png',
                 tag: 'order-update',
                 requireInteraction: false,
-                vibrate: [200, 100, 200],
               });
             }
             

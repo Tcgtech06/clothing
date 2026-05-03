@@ -80,7 +80,6 @@ export function PushNotificationProvider({ children }: { children: ReactNode }) 
       const notification = new Notification(title, {
         icon: '/icon-192x192.png',
         badge: '/icon-192x192.png',
-        vibrate: [200, 100, 200],
         requireInteraction: false,
         ...options,
       });

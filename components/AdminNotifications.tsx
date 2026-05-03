@@ -61,7 +61,6 @@ export default function AdminNotifications() {
               badge: '/icon-192x192.png',
               tag: 'admin-order',
               requireInteraction: true,
-              vibrate: [200, 100, 200, 100, 200],
             });
           }
         }
@@ -128,7 +127,6 @@ export default function AdminNotifications() {
             badge: '/icon-192x192.png',
             tag: 'admin-order',
             requireInteraction: true,
-            vibrate: [200, 100, 200],
           });
         }
       }

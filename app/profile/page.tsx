@@ -13,7 +13,7 @@ function ProfilePageContent() {
     name: userData?.displayName || user?.displayName || '',
     email: userData?.email || user?.email || '',
     phone: userData?.phone || '',
-    address: userData?.address || '',
+    address: '',
   });
 
   const [editedProfile, setEditedProfile] = useState(profile);
