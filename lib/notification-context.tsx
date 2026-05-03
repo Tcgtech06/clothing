@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { db } from './firebase';
-import { collection, query, where, orderBy, onSnapshot, Timestamp } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, Timestamp } from 'firebase/firestore';
 import { useAuth } from './auth-context';
 
 interface Notification {
@@ -40,10 +40,10 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     if (!user?.email) return;
 
     // Listen to user's orders for status updates
+    // Simplified query to avoid composite index requirement
     const ordersQuery = query(
       collection(db, 'orders'),
-      where('customerEmail', '==', user.email),
-      orderBy('createdAt', 'desc')
+      where('customerEmail', '==', user.email)
     );
 
     const unsubscribe = onSnapshot(ordersQuery, (snapshot) => {
@@ -100,7 +100,9 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
               };
               
               // Add to beginning and keep last 20
-              return [newNotification, ...prev].slice(0, 20);
+              const updated = [newNotification, ...prev].slice(0, 20);
+              // Sort by timestamp (newest first)
+              return updated.sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
             });
           }
         }

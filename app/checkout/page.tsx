@@ -197,6 +197,43 @@ export default function CheckoutPage() {
     }
   };
 
+  const sendWhatsAppNotification = (orderId: string, orderData: any) => {
+    try {
+      // Format order details for WhatsApp
+      const productList = cart.map((item, index) => 
+        `${index + 1}. ${item.product.name} x ${item.quantity} - ₹${(item.product.price * item.quantity).toLocaleString('en-IN')}`
+      ).join('\n');
+
+      const message = `🛍️ *NEW ORDER RECEIVED*\n\n` +
+        `📦 *Order ID:* #${orderId.substring(0, 12).toUpperCase()}\n\n` +
+        `👤 *Customer Details:*\n` +
+        `Name: ${orderData.customerName}\n` +
+        `Phone: ${orderData.customerPhone}\n` +
+        `Email: ${orderData.customerEmail}\n\n` +
+        `📍 *Shipping Address:*\n${orderData.shippingAddress}\n\n` +
+        `🛒 *Order Items:*\n${productList}\n\n` +
+        `💰 *Total Amount:* ₹${orderData.total.toLocaleString('en-IN')}\n` +
+        `💳 *Payment Method:* ${orderData.paymentMethod}\n` +
+        `✅ *Payment Status:* ${orderData.paymentStatus === 'paid' ? 'Paid' : 'Pending (COD)'}\n\n` +
+        `⏰ *Order Time:* ${new Date().toLocaleString('en-IN')}`;
+
+      // WhatsApp number (without + or spaces)
+      const whatsappNumber = '919791962802';
+      
+      // Encode message for URL
+      const encodedMessage = encodeURIComponent(message);
+      
+      // Open WhatsApp in new tab
+      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+      window.open(whatsappUrl, '_blank');
+      
+      console.log('WhatsApp notification sent successfully');
+    } catch (error) {
+      console.error('Error sending WhatsApp notification:', error);
+      // Don't block order creation if WhatsApp fails
+    }
+  };
+
   const createOrder = async (paymentMethodText: string, paymentId: string | null) => {
     try {
       // Create order object
@@ -246,9 +283,14 @@ export default function CheckoutPage() {
       // Clear cart
       clearCart();
 
-      // Redirect to success page
+      // Redirect to success page first
       console.log('Redirecting to order success page...');
-      window.location.href = `/order-success?orderId=${docRef.id}`;
+      router.push(`/order-success?orderId=${docRef.id}`);
+      
+      // Send WhatsApp notification after a short delay (so redirect happens first)
+      setTimeout(() => {
+        sendWhatsAppNotification(docRef.id, orderData);
+      }, 1000);
     } catch (error: any) {
       console.error('Error creating order:', error);
       

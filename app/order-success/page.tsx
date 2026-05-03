@@ -16,17 +16,25 @@ function OrderSuccessContent() {
     // Play success audio
     const audio = new Audio('/sucess.mp3');
     audio.volume = 0.5; // Set volume to 50%
-    audio.play().catch(error => {
-      console.log('Audio playback failed:', error);
-      // Browsers may block autoplay, but we try anyway
-    });
+    
+    const playAudio = async () => {
+      try {
+        await audio.play();
+        console.log('Success audio playing');
+      } catch (error) {
+        console.log('Audio playback failed:', error);
+        // Browsers may block autoplay, but we try anyway
+      }
+    };
+    
+    playAudio();
 
     // Countdown timer
     const countdownInterval = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
           clearInterval(countdownInterval);
-          window.location.href = '/orders';
+          router.push('/orders');
           return 0;
         }
         return prev - 1;
