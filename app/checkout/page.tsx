@@ -197,37 +197,36 @@ export default function CheckoutPage() {
     }
   };
 
-  const sendWhatsAppNotification = (orderId: string, orderData: any) => {
+  const sendWhatsAppNotification = async (orderId: string, orderData: any) => {
     try {
-      // Format order details for WhatsApp
-      const productList = cart.map((item, index) => 
-        `${index + 1}. ${item.product.name} x ${item.quantity} - ₹${(item.product.price * item.quantity).toLocaleString('en-IN')}`
-      ).join('\n');
+      // Send WhatsApp notification via API
+      const response = await fetch('/api/send-whatsapp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          orderId,
+          orderData: {
+            customerName: orderData.customerName,
+            customerPhone: orderData.customerPhone,
+            customerEmail: orderData.customerEmail,
+            shippingAddress: orderData.shippingAddress,
+            products: orderData.products,
+            total: orderData.total,
+            paymentMethod: orderData.paymentMethod,
+            paymentStatus: orderData.paymentStatus,
+          },
+        }),
+      });
 
-      const message = `🛍️ *NEW ORDER RECEIVED*\n\n` +
-        `📦 *Order ID:* #${orderId.substring(0, 12).toUpperCase()}\n\n` +
-        `👤 *Customer Details:*\n` +
-        `Name: ${orderData.customerName}\n` +
-        `Phone: ${orderData.customerPhone}\n` +
-        `Email: ${orderData.customerEmail}\n\n` +
-        `📍 *Shipping Address:*\n${orderData.shippingAddress}\n\n` +
-        `🛒 *Order Items:*\n${productList}\n\n` +
-        `💰 *Total Amount:* ₹${orderData.total.toLocaleString('en-IN')}\n` +
-        `💳 *Payment Method:* ${orderData.paymentMethod}\n` +
-        `✅ *Payment Status:* ${orderData.paymentStatus === 'paid' ? 'Paid' : 'Pending (COD)'}\n\n` +
-        `⏰ *Order Time:* ${new Date().toLocaleString('en-IN')}`;
-
-      // WhatsApp number (without + or spaces)
-      const whatsappNumber = '919791962802';
+      const result = await response.json();
       
-      // Encode message for URL
-      const encodedMessage = encodeURIComponent(message);
-      
-      // Open WhatsApp in new tab
-      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
-      window.open(whatsappUrl, '_blank');
-      
-      console.log('WhatsApp notification sent successfully');
+      if (result.success) {
+        console.log('WhatsApp notification sent successfully:', result);
+      } else {
+        console.error('Failed to send WhatsApp notification:', result.error);
+      }
     } catch (error) {
       console.error('Error sending WhatsApp notification:', error);
       // Don't block order creation if WhatsApp fails
@@ -277,20 +276,18 @@ export default function CheckoutPage() {
       
       console.log('Order created successfully:', docRef.id);
       
+      // Send WhatsApp notification in background (non-blocking)
+      sendWhatsAppNotification(docRef.id, orderData);
+      
       // Mark order as placed to prevent cart redirect
       setOrderPlaced(true);
 
       // Clear cart
       clearCart();
 
-      // Redirect to success page first
+      // Redirect to success page
       console.log('Redirecting to order success page...');
       router.push(`/order-success?orderId=${docRef.id}`);
-      
-      // Send WhatsApp notification after a short delay (so redirect happens first)
-      setTimeout(() => {
-        sendWhatsAppNotification(docRef.id, orderData);
-      }, 1000);
     } catch (error: any) {
       console.error('Error creating order:', error);
       
