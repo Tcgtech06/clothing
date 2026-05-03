@@ -68,7 +68,7 @@ export default function NotificationBell() {
           />
 
           {/* Notification Panel */}
-          <div className="absolute top-12 right-0 md:right-0 bg-white rounded-lg shadow-2xl border border-gray-200 w-[calc(100vw-2rem)] max-w-[320px] md:w-96 z-50 max-h-[500px] overflow-hidden flex flex-col">
+          <div className="fixed md:absolute top-16 md:top-12 left-1/2 md:left-auto md:right-0 -translate-x-1/2 md:translate-x-0 bg-white rounded-lg shadow-2xl border border-gray-200 w-[calc(100vw-2rem)] max-w-[320px] md:w-96 z-50 max-h-[500px] overflow-hidden flex flex-col">
             {/* Header */}
             <div className="p-4 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r from-primary/5 to-secondary/5">
               <div>

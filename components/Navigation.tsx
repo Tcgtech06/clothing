@@ -44,7 +44,7 @@ export default function Navigation() {
       {/* Mobile Navigation - Top Bar with Profile */}
       <nav className="md:hidden fixed top-0 left-0 right-0 bg-white shadow-md z-40">
         <div className="flex items-center justify-between px-4 h-14">
-          {/* Left Side - Profile and Notification */}
+          {/* Left Side - Profile */}
           <div className="flex items-center gap-2">
             {/* Profile Icon */}
             <button
@@ -53,9 +53,6 @@ export default function Navigation() {
             >
               <User className="w-6 h-6" />
             </button>
-            
-            {/* Notification Bell */}
-            <NotificationBell />
           </div>
 
           {/* Logo - Center */}
@@ -65,6 +62,9 @@ export default function Navigation() {
 
           {/* Right Side Icons */}
           <div className="flex items-center gap-3">
+            {/* Notification Bell */}
+            <NotificationBell />
+            
             {/* Favourites Icon */}
             <Link href="/favourites" className="relative">
               <Heart className={`w-6 h-6 ${pathname === '/favourites' ? 'fill-red-500 text-red-500' : 'text-gray-700'}`} />
