@@ -6,7 +6,9 @@ import { CartProvider } from '@/lib/cart-context';
 import { FavouritesProvider } from '@/lib/favourites-context';
 import { AuthProvider } from '@/lib/auth-context';
 import { AdminAuthProvider } from '@/lib/admin-auth-context';
+import { PushNotificationProvider } from '@/lib/push-notification-context';
 import { NotificationProvider } from '@/lib/notification-context';
+import NotificationPermissionPrompt from '@/components/NotificationPermissionPrompt';
 
 export default function RootLayout({
   children,
@@ -26,14 +28,17 @@ export default function RootLayout({
       <body className="bg-gray-50">
         <AdminAuthProvider>
           <AuthProvider>
-            <NotificationProvider>
-              <CartProvider>
-                <FavouritesProvider>
-                  <Navigation />
-                  <main className="pt-14 pb-20 md:pt-0 md:pb-0">{children}</main>
-                </FavouritesProvider>
-              </CartProvider>
-            </NotificationProvider>
+            <PushNotificationProvider>
+              <NotificationProvider>
+                <CartProvider>
+                  <FavouritesProvider>
+                    <Navigation />
+                    <NotificationPermissionPrompt />
+                    <main className="pt-14 pb-20 md:pt-0 md:pb-0">{children}</main>
+                  </FavouritesProvider>
+                </CartProvider>
+              </NotificationProvider>
+            </PushNotificationProvider>
           </AuthProvider>
         </AdminAuthProvider>
       </body>

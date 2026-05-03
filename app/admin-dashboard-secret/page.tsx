@@ -15,6 +15,7 @@ import InventoryTab from '@/components/InventoryTab';
 import AnalyticsTab from '@/components/AnalyticsTab';
 import ProtectedAdminRoute from '@/components/ProtectedAdminRoute';
 import AdminNotifications from '@/components/AdminNotifications';
+import AdminNotificationPermission from '@/components/AdminNotificationPermission';
 import { useAdminAuth } from '@/lib/admin-auth-context';
 import { initializePollsForAllProducts } from '@/lib/init-polls';
 import { CATEGORIES } from '@/data/categories';
@@ -378,6 +379,9 @@ function AdminDashboard() {
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-gray-800">Admin Dashboard</h1>
             <div className="flex items-center gap-4">
+              {/* Admin Notification Permission */}
+              <AdminNotificationPermission />
+              
               {/* Admin Notifications */}
               <AdminNotifications />
               

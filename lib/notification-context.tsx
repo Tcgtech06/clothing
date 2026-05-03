@@ -4,6 +4,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { db } from './firebase';
 import { collection, query, where, onSnapshot, Timestamp } from 'firebase/firestore';
 import { useAuth } from './auth-context';
+import { usePushNotifications } from './push-notification-context';
 
 interface Notification {
   id: string;
@@ -35,6 +36,7 @@ export const useNotifications = () => useContext(NotificationContext);
 export function NotificationProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const { user } = useAuth();
+  const { sendNotification: sendPushNotification, permission } = usePushNotifications();
 
   useEffect(() => {
     if (!user?.email) return;
@@ -53,30 +55,36 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
         
         // Only show notifications for status updates (not new orders)
         if (change.type === 'modified') {
-          const statusMessages: { [key: string]: { title: string; message: string } } = {
+          const statusMessages: { [key: string]: { title: string; message: string; emoji: string } } = {
             'accepted': {
               title: '✅ Order Accepted by Admin',
-              message: `Your order #${doc.id.substring(0, 8).toUpperCase()} has been accepted and is being prepared`
+              message: `Your order #${doc.id.substring(0, 8).toUpperCase()} has been accepted and is being prepared`,
+              emoji: '✅'
             },
             'processing': {
               title: '⚙️ Order Processing',
-              message: `Your order #${doc.id.substring(0, 8).toUpperCase()} is being processed`
+              message: `Your order #${doc.id.substring(0, 8).toUpperCase()} is being processed`,
+              emoji: '⚙️'
             },
             'shipped': {
               title: '🚚 Order Shipped',
-              message: `Your order #${doc.id.substring(0, 8).toUpperCase()} has been shipped and is on the way`
+              message: `Your order #${doc.id.substring(0, 8).toUpperCase()} has been shipped and is on the way`,
+              emoji: '🚚'
             },
             'nearby': {
               title: '📍 Order Nearby',
-              message: `Your order #${doc.id.substring(0, 8).toUpperCase()} is nearby for delivery`
+              message: `Your order #${doc.id.substring(0, 8).toUpperCase()} is nearby for delivery`,
+              emoji: '📍'
             },
             'out-for-delivery': {
               title: '🚛 Out for Delivery',
-              message: `Your order #${doc.id.substring(0, 8).toUpperCase()} is out for delivery`
+              message: `Your order #${doc.id.substring(0, 8).toUpperCase()} is out for delivery`,
+              emoji: '🚛'
             },
             'delivered': {
               title: '✅ Order Delivered',
-              message: `Your order #${doc.id.substring(0, 8).toUpperCase()} has been delivered successfully`
+              message: `Your order #${doc.id.substring(0, 8).toUpperCase()} has been delivered successfully`,
+              emoji: '🎉'
             },
           };
           
@@ -85,6 +93,18 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
           if (statusInfo) {
             // Play notification sound
             playNotificationSound();
+            
+            // Send push notification if permission granted
+            if (permission === 'granted') {
+              sendPushNotification(statusInfo.title, {
+                body: statusInfo.message,
+                icon: '/icon-192x192.png',
+                badge: '/icon-192x192.png',
+                tag: 'order-update',
+                requireInteraction: false,
+                vibrate: [200, 100, 200],
+              });
+            }
             
             // Add notification
             setNotifications(prev => {
@@ -110,7 +130,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     });
 
     return () => unsubscribe();
-  }, [user?.email]);
+  }, [user?.email, permission, sendPushNotification]);
 
   const playNotificationSound = () => {
     const audio = new Audio('/Notification.mp3');

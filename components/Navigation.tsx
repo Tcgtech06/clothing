@@ -6,6 +6,7 @@ import { Home, Grid, Package, User, ShoppingCart, Heart, Headphones } from 'luci
 import { useState } from 'react';
 import ProfileMenu from './ProfileMenu';
 import NotificationBell from './NotificationBell';
+import NotificationSettingsButton from './NotificationSettingsButton';
 import { useCart } from '@/lib/cart-context';
 import { useFavourites } from '@/lib/favourites-context';
 import { useAuth } from '@/lib/auth-context';
@@ -56,6 +57,9 @@ export default function Navigation() {
             
             {/* Notification Bell */}
             <NotificationBell />
+            
+            {/* Notification Settings */}
+            <NotificationSettingsButton />
           </div>
 
           {/* Logo - Center */}
@@ -123,6 +127,9 @@ export default function Navigation() {
             <div className="flex items-center gap-4">
               {/* Notification Bell */}
               <NotificationBell />
+              
+              {/* Notification Settings */}
+              <NotificationSettingsButton />
 
               {/* Profile Icon */}
               <div className="relative">

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Bell, X, Package, RotateCcw } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { collection, query, orderBy, limit, onSnapshot, Timestamp } from 'firebase/firestore';
+import { usePushNotifications } from '@/lib/push-notification-context';
 
 interface AdminNotification {
   id: string;
@@ -19,6 +20,7 @@ export default function AdminNotifications() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [lastOrderCount, setLastOrderCount] = useState(0);
   const [lastReturnCount, setLastReturnCount] = useState(0);
+  const { sendNotification: sendPushNotification, permission } = usePushNotifications();
 
   useEffect(() => {
     // Listen to new orders ONLY (not status updates)
@@ -40,14 +42,28 @@ export default function AdminNotifications() {
         
         // Show notifications ONLY for NEW orders (not status updates)
         if (diffMinutes < 60 && change.type === 'added') {
-          orderNotifications.push({
+          const notificationData = {
             id: `order-new-${doc.id}`,
             title: '🛍️ New Order Received',
             message: `Order #${doc.id.substring(0, 8).toUpperCase()} - ₹${data.total} from ${data.customerName}`,
-            type: 'order',
+            type: 'order' as const,
             createdAt: data.createdAt,
             read: false,
-          });
+          };
+          
+          orderNotifications.push(notificationData);
+          
+          // Send push notification for new order
+          if (permission === 'granted') {
+            sendPushNotification(notificationData.title, {
+              body: notificationData.message,
+              icon: '/icon-192x192.png',
+              badge: '/icon-192x192.png',
+              tag: 'admin-order',
+              requireInteraction: true,
+              vibrate: [200, 100, 200, 100, 200],
+            });
+          }
         }
       });
 
@@ -86,20 +102,35 @@ export default function AdminNotifications() {
         
         // Show notifications for returns requested in the last 60 minutes
         if (diffMinutes < 60 && data.status === 'pending') {
-          returnNotifications.push({
+          const notificationData = {
             id: `return-${doc.id}`,
             title: '🔄 Return Request',
             message: `Return for Order #${data.orderId?.substring(0, 8).toUpperCase()} - ₹${data.total}`,
-            type: 'return',
+            type: 'return' as const,
             createdAt: data.requestedAt,
             read: false,
-          });
+          };
+          
+          returnNotifications.push(notificationData);
         }
       });
 
       // Play notification sound if there are new returns
       if (returnNotifications.length > lastReturnCount && lastReturnCount > 0) {
         playNotificationSound();
+        
+        // Send push notification for new return
+        if (permission === 'granted' && returnNotifications.length > 0) {
+          const latestReturn = returnNotifications[0];
+          sendPushNotification(latestReturn.title, {
+            body: latestReturn.message,
+            icon: '/icon-192x192.png',
+            badge: '/icon-192x192.png',
+            tag: 'admin-order',
+            requireInteraction: true,
+            vibrate: [200, 100, 200],
+          });
+        }
       }
       
       setLastReturnCount(returnNotifications.length);
@@ -117,7 +148,7 @@ export default function AdminNotifications() {
       unsubscribeOrders();
       unsubscribeReturns();
     };
-  }, [lastOrderCount, lastReturnCount]);
+  }, [lastOrderCount, lastReturnCount, permission, sendPushNotification]);
 
   const playNotificationSound = () => {
     const audio = new Audio('/Notification.mp3');
