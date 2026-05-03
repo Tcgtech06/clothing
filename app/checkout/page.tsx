@@ -218,42 +218,6 @@ export default function CheckoutPage() {
     }
   };
 
-  const sendWhatsAppNotification = async (orderId: string, orderData: any) => {
-    try {
-      // Send WhatsApp notification via API
-      const response = await fetch('/api/send-whatsapp', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          orderId,
-          orderData: {
-            customerName: orderData.customerName,
-            customerPhone: orderData.customerPhone,
-            customerEmail: orderData.customerEmail,
-            shippingAddress: orderData.shippingAddress,
-            products: orderData.products,
-            total: orderData.total,
-            paymentMethod: orderData.paymentMethod,
-            paymentStatus: orderData.paymentStatus,
-          },
-        }),
-      });
-
-      const result = await response.json();
-      
-      if (result.success) {
-        console.log('WhatsApp notification sent successfully:', result);
-      } else {
-        console.error('Failed to send WhatsApp notification:', result.error);
-      }
-    } catch (error) {
-      console.error('Error sending WhatsApp notification:', error);
-      // Don't block order creation if WhatsApp fails
-    }
-  };
-
   const createOrder = async (paymentMethodText: string, paymentId: string | null) => {
     try {
       // Create order object
@@ -297,18 +261,14 @@ export default function CheckoutPage() {
       
       console.log('Order created successfully:', docRef.id);
       
-      // Send WhatsApp notification in background (non-blocking)
-      sendWhatsAppNotification(docRef.id, orderData);
-      
       // Mark order as placed to prevent cart redirect
       setOrderPlaced(true);
 
       // Clear cart
       clearCart();
 
-      // Redirect to success page
-      console.log('Redirecting to order success page...');
-      router.push(`/order-success?orderId=${docRef.id}`);
+      // Immediate redirect to success page
+      window.location.href = `/order-success?orderId=${docRef.id}`;
     } catch (error: any) {
       console.error('Error creating order:', error);
       
