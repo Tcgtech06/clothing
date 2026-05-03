@@ -21,7 +21,7 @@ export default function AdminNotifications() {
   const [lastReturnCount, setLastReturnCount] = useState(0);
 
   useEffect(() => {
-    // Listen to new orders and status changes
+    // Listen to new orders ONLY (not status updates)
     const ordersQuery = query(
       collection(db, 'orders'),
       orderBy('createdAt', 'desc'),
@@ -38,46 +38,20 @@ export default function AdminNotifications() {
         const now = new Date();
         const diffMinutes = orderDate ? (now.getTime() - orderDate.getTime()) / (1000 * 60) : 999;
         
-        // Show notifications for orders placed in the last 60 minutes
-        if (diffMinutes < 60) {
-          // New order notification
-          if (change.type === 'added') {
-            orderNotifications.push({
-              id: `order-new-${doc.id}`,
-              title: '🛍️ New Order Received',
-              message: `Order #${doc.id.substring(0, 8).toUpperCase()} - ₹${data.total} from ${data.customerName}`,
-              type: 'order',
-              createdAt: data.createdAt,
-              read: false,
-            });
-          }
-          
-          // Order status update notification
-          if (change.type === 'modified') {
-            const statusMessages: { [key: string]: string } = {
-              'accepted': '✅ Order Accepted',
-              'processing': '⚙️ Order Processing',
-              'shipped': '🚚 Order Shipped',
-              'nearby': '📍 Order Nearby',
-              'out-for-delivery': '🚛 Out for Delivery',
-              'delivered': '✅ Order Delivered',
-            };
-            
-            const statusMessage = statusMessages[data.status] || `📦 Order ${data.status}`;
-            
-            orderNotifications.push({
-              id: `order-update-${doc.id}-${data.status}`,
-              title: statusMessage,
-              message: `Order #${doc.id.substring(0, 8).toUpperCase()} status updated`,
-              type: 'order',
-              createdAt: data.createdAt,
-              read: false,
-            });
-          }
+        // Show notifications ONLY for NEW orders (not status updates)
+        if (diffMinutes < 60 && change.type === 'added') {
+          orderNotifications.push({
+            id: `order-new-${doc.id}`,
+            title: '🛍️ New Order Received',
+            message: `Order #${doc.id.substring(0, 8).toUpperCase()} - ₹${data.total} from ${data.customerName}`,
+            type: 'order',
+            createdAt: data.createdAt,
+            read: false,
+          });
         }
       });
 
-      // Play notification sound if there are new notifications
+      // Play notification sound if there are new orders
       if (orderNotifications.length > 0) {
         playNotificationSound();
       }

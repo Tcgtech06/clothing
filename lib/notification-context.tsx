@@ -2,13 +2,16 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { db } from './firebase';
-import { collection, query, orderBy, limit, onSnapshot, Timestamp } from 'firebase/firestore';
+import { collection, query, where, orderBy, onSnapshot, Timestamp } from 'firebase/firestore';
+import { useAuth } from './auth-context';
 
 interface Notification {
   id: string;
+  orderId: string;
   title: string;
   message: string;
   type: 'order' | 'return' | 'product' | 'info';
+  status?: string;
   createdAt: Timestamp;
   read: boolean;
 }
@@ -31,49 +34,81 @@ export const useNotifications = () => useContext(NotificationContext);
 
 export function NotificationProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [lastNotificationCount, setLastNotificationCount] = useState(0);
+  const { user } = useAuth();
 
   useEffect(() => {
-    // Listen to new orders for notifications
+    if (!user?.email) return;
+
+    // Listen to user's orders for status updates
     const ordersQuery = query(
       collection(db, 'orders'),
-      orderBy('createdAt', 'desc'),
-      limit(10)
+      where('customerEmail', '==', user.email),
+      orderBy('createdAt', 'desc')
     );
 
     const unsubscribe = onSnapshot(ordersQuery, (snapshot) => {
-      const newNotifications: Notification[] = [];
-      
-      snapshot.forEach((doc) => {
+      snapshot.docChanges().forEach((change) => {
+        const doc = change.doc;
         const data = doc.data();
-        const orderDate = data.createdAt?.toDate();
-        const now = new Date();
-        const diffMinutes = (now.getTime() - orderDate?.getTime()) / (1000 * 60);
         
-        // Only show notifications for orders placed in the last 30 minutes
-        if (diffMinutes < 30) {
-          newNotifications.push({
-            id: doc.id,
-            title: 'New Order Received',
-            message: `Order #${doc.id.substring(0, 8).toUpperCase()} - ₹${data.total}`,
-            type: 'order',
-            createdAt: data.createdAt,
-            read: false,
-          });
+        // Only show notifications for status updates (not new orders)
+        if (change.type === 'modified') {
+          const statusMessages: { [key: string]: { title: string; message: string } } = {
+            'accepted': {
+              title: '✅ Order Accepted by Admin',
+              message: `Your order #${doc.id.substring(0, 8).toUpperCase()} has been accepted and is being prepared`
+            },
+            'processing': {
+              title: '⚙️ Order Processing',
+              message: `Your order #${doc.id.substring(0, 8).toUpperCase()} is being processed`
+            },
+            'shipped': {
+              title: '🚚 Order Shipped',
+              message: `Your order #${doc.id.substring(0, 8).toUpperCase()} has been shipped and is on the way`
+            },
+            'nearby': {
+              title: '📍 Order Nearby',
+              message: `Your order #${doc.id.substring(0, 8).toUpperCase()} is nearby for delivery`
+            },
+            'out-for-delivery': {
+              title: '🚛 Out for Delivery',
+              message: `Your order #${doc.id.substring(0, 8).toUpperCase()} is out for delivery`
+            },
+            'delivered': {
+              title: '✅ Order Delivered',
+              message: `Your order #${doc.id.substring(0, 8).toUpperCase()} has been delivered successfully`
+            },
+          };
+          
+          const statusInfo = statusMessages[data.status];
+          
+          if (statusInfo) {
+            // Play notification sound
+            playNotificationSound();
+            
+            // Add notification
+            setNotifications(prev => {
+              const newNotification: Notification = {
+                id: `${doc.id}-${data.status}-${Date.now()}`,
+                orderId: doc.id,
+                title: statusInfo.title,
+                message: statusInfo.message,
+                type: 'order',
+                status: data.status,
+                createdAt: Timestamp.now(),
+                read: false,
+              };
+              
+              // Add to beginning and keep last 20
+              return [newNotification, ...prev].slice(0, 20);
+            });
+          }
         }
       });
-
-      // Play notification sound if there are new notifications
-      if (newNotifications.length > lastNotificationCount && lastNotificationCount > 0) {
-        playNotificationSound();
-      }
-      
-      setLastNotificationCount(newNotifications.length);
-      setNotifications(newNotifications);
     });
 
     return () => unsubscribe();
-  }, [lastNotificationCount]);
+  }, [user?.email]);
 
   const playNotificationSound = () => {
     const audio = new Audio('/Notification.mp3');

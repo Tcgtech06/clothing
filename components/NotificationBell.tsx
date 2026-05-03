@@ -3,10 +3,12 @@
 import { useState } from 'react';
 import { Bell, X, Package, RotateCcw, Info, ShoppingBag } from 'lucide-react';
 import { useNotifications } from '@/lib/notification-context';
+import { useRouter } from 'next/navigation';
 
 export default function NotificationBell() {
   const [showNotifications, setShowNotifications] = useState(false);
   const { notifications, unreadCount, markAsRead, clearAll } = useNotifications();
+  const router = useRouter();
 
   const getIcon = (type: string) => {
     switch (type) {
@@ -32,6 +34,13 @@ export default function NotificationBell() {
     const diffHours = Math.floor(diffMinutes / 60);
     if (diffHours < 24) return `${diffHours}h ago`;
     return date.toLocaleDateString();
+  };
+
+  const handleNotificationClick = (notification: any) => {
+    markAsRead(notification.id);
+    setShowNotifications(false);
+    // Redirect to orders page
+    router.push('/orders');
   };
 
   return (
@@ -88,7 +97,7 @@ export default function NotificationBell() {
                   {notifications.map((notification) => (
                     <div
                       key={notification.id}
-                      onClick={() => markAsRead(notification.id)}
+                      onClick={() => handleNotificationClick(notification)}
                       className={`p-4 hover:bg-gray-50 cursor-pointer transition ${
                         !notification.read ? 'bg-blue-50/50' : ''
                       }`}
