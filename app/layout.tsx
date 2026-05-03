@@ -6,6 +6,7 @@ import { CartProvider } from '@/lib/cart-context';
 import { FavouritesProvider } from '@/lib/favourites-context';
 import { AuthProvider } from '@/lib/auth-context';
 import { AdminAuthProvider } from '@/lib/admin-auth-context';
+import { NotificationProvider } from '@/lib/notification-context';
 
 export default function RootLayout({
   children,
@@ -25,12 +26,14 @@ export default function RootLayout({
       <body className="bg-gray-50">
         <AdminAuthProvider>
           <AuthProvider>
-            <CartProvider>
-              <FavouritesProvider>
-                <Navigation />
-                <main className="pt-14 pb-20 md:pt-0 md:pb-0">{children}</main>
-              </FavouritesProvider>
-            </CartProvider>
+            <NotificationProvider>
+              <CartProvider>
+                <FavouritesProvider>
+                  <Navigation />
+                  <main className="pt-14 pb-20 md:pt-0 md:pb-0">{children}</main>
+                </FavouritesProvider>
+              </CartProvider>
+            </NotificationProvider>
           </AuthProvider>
         </AdminAuthProvider>
       </body>

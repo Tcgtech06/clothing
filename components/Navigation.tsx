@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { Home, Grid, Package, User, ShoppingCart, Heart, Headphones } from 'lucide-react';
 import { useState } from 'react';
 import ProfileMenu from './ProfileMenu';
+import NotificationBell from './NotificationBell';
 import { useCart } from '@/lib/cart-context';
 import { useFavourites } from '@/lib/favourites-context';
 import { useAuth } from '@/lib/auth-context';
@@ -114,6 +115,9 @@ export default function Navigation() {
             
             {/* Right Side Icons */}
             <div className="flex items-center gap-4">
+              {/* Notification Bell */}
+              <NotificationBell />
+
               {/* Profile Icon */}
               <div className="relative">
                 <button
