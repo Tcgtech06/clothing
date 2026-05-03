@@ -21,7 +21,7 @@ export default function AdminNotifications() {
   const [lastReturnCount, setLastReturnCount] = useState(0);
 
   useEffect(() => {
-    // Listen to new orders
+    // Listen to new orders and status changes
     const ordersQuery = query(
       collection(db, 'orders'),
       orderBy('createdAt', 'desc'),
@@ -31,36 +31,64 @@ export default function AdminNotifications() {
     const unsubscribeOrders = onSnapshot(ordersQuery, (snapshot) => {
       const orderNotifications: AdminNotification[] = [];
       
-      snapshot.forEach((doc) => {
+      snapshot.docChanges().forEach((change) => {
+        const doc = change.doc;
         const data = doc.data();
         const orderDate = data.createdAt?.toDate();
         const now = new Date();
-        const diffMinutes = (now.getTime() - orderDate?.getTime()) / (1000 * 60);
+        const diffMinutes = orderDate ? (now.getTime() - orderDate.getTime()) / (1000 * 60) : 999;
         
         // Show notifications for orders placed in the last 60 minutes
         if (diffMinutes < 60) {
-          orderNotifications.push({
-            id: `order-${doc.id}`,
-            title: '🛍️ New Order Received',
-            message: `Order #${doc.id.substring(0, 8).toUpperCase()} - ₹${data.total} from ${data.customerName}`,
-            type: 'order',
-            createdAt: data.createdAt,
-            read: false,
-          });
+          // New order notification
+          if (change.type === 'added') {
+            orderNotifications.push({
+              id: `order-new-${doc.id}`,
+              title: '🛍️ New Order Received',
+              message: `Order #${doc.id.substring(0, 8).toUpperCase()} - ₹${data.total} from ${data.customerName}`,
+              type: 'order',
+              createdAt: data.createdAt,
+              read: false,
+            });
+          }
+          
+          // Order status update notification
+          if (change.type === 'modified') {
+            const statusMessages: { [key: string]: string } = {
+              'accepted': '✅ Order Accepted',
+              'processing': '⚙️ Order Processing',
+              'shipped': '🚚 Order Shipped',
+              'nearby': '📍 Order Nearby',
+              'out-for-delivery': '🚛 Out for Delivery',
+              'delivered': '✅ Order Delivered',
+            };
+            
+            const statusMessage = statusMessages[data.status] || `📦 Order ${data.status}`;
+            
+            orderNotifications.push({
+              id: `order-update-${doc.id}-${data.status}`,
+              title: statusMessage,
+              message: `Order #${doc.id.substring(0, 8).toUpperCase()} status updated`,
+              type: 'order',
+              createdAt: data.createdAt,
+              read: false,
+            });
+          }
         }
       });
 
-      // Play notification sound if there are new orders
-      if (orderNotifications.length > lastOrderCount && lastOrderCount > 0) {
+      // Play notification sound if there are new notifications
+      if (orderNotifications.length > 0) {
         playNotificationSound();
       }
-      
-      setLastOrderCount(orderNotifications.length);
       
       // Merge with existing notifications
       setNotifications(prev => {
         const returnNotifs = prev.filter(n => n.type === 'return');
-        return [...orderNotifications, ...returnNotifs].sort((a, b) => 
+        const allNotifs = [...orderNotifications, ...returnNotifs];
+        // Remove duplicates and sort
+        const uniqueNotifs = Array.from(new Map(allNotifs.map(n => [n.id, n])).values());
+        return uniqueNotifs.sort((a, b) => 
           b.createdAt?.toMillis() - a.createdAt?.toMillis()
         );
       });
