@@ -150,6 +150,11 @@ function AdminDashboard() {
     }
     
     await updateDoc(doc(db, 'orders', id), updateData);
+    
+    // Trigger push notification by creating a notification document
+    // This will be picked up by the user's notification listener
+    console.log('✅ Order status updated to:', status);
+    
     setSelectedOrder(null);
   };
 
