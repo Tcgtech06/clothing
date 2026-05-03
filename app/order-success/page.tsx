@@ -13,20 +13,35 @@ function OrderSuccessContent() {
   const [showAnimation, setShowAnimation] = useState(true);
 
   useEffect(() => {
-    // Play success audio
+    // Create audio element
     const audio = new Audio('/sucess.mp3');
-    audio.volume = 0.5; // Set volume to 50%
+    audio.volume = 0.5;
+    audio.preload = 'auto';
     
-    const playAudio = async () => {
-      try {
-        await audio.play();
-        console.log('Success audio playing');
-      } catch (error) {
-        console.log('Audio playback failed:', error);
-        // Browsers may block autoplay, but we try anyway
-      }
+    // Play audio immediately with user interaction fallback
+    const playAudio = () => {
+      audio.play()
+        .then(() => {
+          console.log('Success audio playing');
+        })
+        .catch((error) => {
+          console.log('Audio autoplay blocked, trying with user interaction:', error);
+          // Try again on any user interaction
+          const playOnInteraction = () => {
+            audio.play()
+              .then(() => {
+                console.log('Success audio playing after user interaction');
+                document.removeEventListener('click', playOnInteraction);
+                document.removeEventListener('touchstart', playOnInteraction);
+              })
+              .catch(err => console.log('Audio play failed:', err));
+          };
+          document.addEventListener('click', playOnInteraction, { once: true });
+          document.addEventListener('touchstart', playOnInteraction, { once: true });
+        });
     };
     
+    // Start playing immediately
     playAudio();
 
     // Countdown timer

@@ -13,7 +13,7 @@ function ProfilePageContent() {
     name: userData?.displayName || user?.displayName || '',
     email: userData?.email || user?.email || '',
     phone: userData?.phone || '',
-    address: '123 Main Street, New York, NY 10001',
+    address: userData?.address || '',
   });
 
   const [editedProfile, setEditedProfile] = useState(profile);
@@ -21,6 +21,7 @@ function ProfilePageContent() {
   const handleSave = () => {
     setProfile(editedProfile);
     setIsEditing(false);
+    // TODO: Save to Firebase
   };
 
   const handleCancel = () => {
@@ -132,7 +133,7 @@ function ProfilePageContent() {
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                   />
                 ) : (
-                  <p className="text-lg text-gray-800">{profile.phone}</p>
+                  <p className="text-lg text-gray-800">{profile.phone || 'Not provided'}</p>
                 )}
               </div>
 
@@ -150,7 +151,7 @@ function ProfilePageContent() {
                     rows={3}
                   />
                 ) : (
-                  <p className="text-lg text-gray-800">{profile.address}</p>
+                  <p className="text-lg text-gray-800">{profile.address || 'Not provided'}</p>
                 )}
               </div>
             </div>
@@ -160,16 +161,19 @@ function ProfilePageContent() {
         {/* Account Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <p className="text-3xl font-bold text-primary">12</p>
+            <p className="text-3xl font-bold text-primary">0</p>
             <p className="text-gray-600 mt-1">Total Orders</p>
+            <p className="text-xs text-gray-500 mt-2">Start shopping to see your orders</p>
           </div>
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <p className="text-3xl font-bold text-green-600">₹1,234</p>
+            <p className="text-3xl font-bold text-green-600">₹0</p>
             <p className="text-gray-600 mt-1">Total Spent</p>
+            <p className="text-xs text-gray-500 mt-2">Your spending will appear here</p>
           </div>
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <p className="text-3xl font-bold text-orange-600">2,450</p>
+            <p className="text-3xl font-bold text-orange-600">0</p>
             <p className="text-gray-600 mt-1">Loyalty Points</p>
+            <p className="text-xs text-gray-500 mt-2">Earn points with every purchase</p>
           </div>
         </div>
 
