@@ -28,5 +28,9 @@
       "sizes": "540x720",
       "type": "image/png"
     }
+  ],
+  "gcm_sender_id": "103953800507",
+  "permissions": [
+    "notifications"
   ]
 }

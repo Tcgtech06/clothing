@@ -21,14 +21,34 @@ export const usePushNotifications = () => useContext(PushNotificationContext);
 export function PushNotificationProvider({ children }: { children: ReactNode }) {
   const [permission, setPermission] = useState<NotificationPermission>('default');
   const [isSupported, setIsSupported] = useState(false);
+  const [registration, setRegistration] = useState<ServiceWorkerRegistration | null>(null);
 
   useEffect(() => {
-    // Check if browser supports notifications
-    if (typeof window !== 'undefined' && 'Notification' in window) {
+    // Check if browser supports notifications and service workers
+    if (typeof window !== 'undefined' && 'Notification' in window && 'serviceWorker' in navigator) {
       setIsSupported(true);
       setPermission(Notification.permission);
+      
+      // Register service worker
+      registerServiceWorker();
     }
   }, []);
+
+  const registerServiceWorker = async () => {
+    try {
+      const reg = await navigator.serviceWorker.register('/sw.js', {
+        scope: '/',
+      });
+      console.log('Service Worker registered:', reg);
+      setRegistration(reg);
+      
+      // Wait for service worker to be ready
+      await navigator.serviceWorker.ready;
+      console.log('Service Worker ready');
+    } catch (error) {
+      console.error('Service Worker registration failed:', error);
+    }
+  };
 
   const requestPermission = async (): Promise<boolean> => {
     if (!isSupported) {
@@ -76,33 +96,45 @@ export function PushNotificationProvider({ children }: { children: ReactNode }) 
       audio.volume = 0.6;
       audio.play().catch(err => console.log('Audio play failed:', err));
 
-      // Create notification
-      const notification = new Notification(title, {
-        icon: '/icon-192x192.png',
-        badge: '/icon-192x192.png',
-        requireInteraction: false,
-        ...options,
-      });
+      // If service worker is registered and page is not visible, use service worker
+      if (registration && document.hidden) {
+        // Send notification through service worker for background notifications
+        registration.showNotification(title, {
+          icon: '/icon-192x192.png',
+          badge: '/icon-192x192.png',
+          requireInteraction: false,
+          ...options,
+        });
+        console.log('Background push notification sent via Service Worker:', title);
+      } else {
+        // Create notification directly for foreground
+        const notification = new Notification(title, {
+          icon: '/icon-192x192.png',
+          badge: '/icon-192x192.png',
+          requireInteraction: false,
+          ...options,
+        });
 
-      // Auto close after 10 seconds
-      setTimeout(() => {
-        notification.close();
-      }, 10000);
+        // Auto close after 10 seconds
+        setTimeout(() => {
+          notification.close();
+        }, 10000);
 
-      // Handle notification click
-      notification.onclick = () => {
-        window.focus();
-        notification.close();
-        
-        // Navigate to orders page if notification has tag
-        if (options?.tag === 'order-update') {
-          window.location.href = '/orders';
-        } else if (options?.tag === 'admin-order') {
-          window.location.href = '/admin-dashboard-secret';
-        }
-      };
+        // Handle notification click
+        notification.onclick = () => {
+          window.focus();
+          notification.close();
+          
+          // Navigate to orders page if notification has tag
+          if (options?.tag === 'order-update') {
+            window.location.href = '/orders';
+          } else if (options?.tag === 'admin-order') {
+            window.location.href = '/admin-dashboard-secret';
+          }
+        };
 
-      console.log('Push notification sent:', title);
+        console.log('Foreground push notification sent:', title);
+      }
     } catch (error) {
       console.error('Error sending notification:', error);
     }
