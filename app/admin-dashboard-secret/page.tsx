@@ -14,6 +14,7 @@ import {
 import InventoryTab from '@/components/InventoryTab';
 import AnalyticsTab from '@/components/AnalyticsTab';
 import ProtectedAdminRoute from '@/components/ProtectedAdminRoute';
+import AdminNotifications from '@/components/AdminNotifications';
 import { useAdminAuth } from '@/lib/admin-auth-context';
 import { initializePollsForAllProducts } from '@/lib/init-polls';
 import { CATEGORIES } from '@/data/categories';
@@ -377,14 +378,9 @@ function AdminDashboard() {
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-gray-800">Admin Dashboard</h1>
             <div className="flex items-center gap-4">
-              <div className="relative">
-                <Bell className="w-6 h-6 text-gray-600" />
-                {notifications.length > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {notifications.length}
-                  </span>
-                )}
-              </div>
+              {/* Admin Notifications */}
+              <AdminNotifications />
+              
               <span className="text-sm text-red-500 font-medium">Live Updates</span>
               <button
                 onClick={handleLogout}

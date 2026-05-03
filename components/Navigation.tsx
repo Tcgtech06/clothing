@@ -44,13 +44,19 @@ export default function Navigation() {
       {/* Mobile Navigation - Top Bar with Profile */}
       <nav className="md:hidden fixed top-0 left-0 right-0 bg-white shadow-md z-40">
         <div className="flex items-center justify-between px-4 h-14">
-          {/* Profile Icon - Left Side */}
-          <button
-            onClick={() => setShowMobileProfile(true)}
-            className="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-white hover:shadow-lg transition"
-          >
-            <User className="w-6 h-6" />
-          </button>
+          {/* Left Side - Profile and Notification */}
+          <div className="flex items-center gap-2">
+            {/* Profile Icon */}
+            <button
+              onClick={() => setShowMobileProfile(true)}
+              className="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-white hover:shadow-lg transition"
+            >
+              <User className="w-6 h-6" />
+            </button>
+            
+            {/* Notification Bell */}
+            <NotificationBell />
+          </div>
 
           {/* Logo - Center */}
           <Link href="/" className="text-xl font-bold text-primary">
