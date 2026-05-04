@@ -19,6 +19,7 @@ import { useAdminAuth } from '@/lib/admin-auth-context';
 import { initializePollsForAllProducts } from '@/lib/init-polls';
 import { CATEGORIES } from '@/data/categories';
 import { useRouter } from 'next/navigation';
+import { useAdminFCMToken } from '@/lib/use-admin-fcm-token';
 
 const IMGBB_KEY = 'c609e2ff4c762257899c035c382f6503';
 
@@ -100,6 +101,9 @@ function AdminDashboard() {
   const [adminNotes, setAdminNotes] = useState('');
   const { adminLogout } = useAdminAuth();
   const router = useRouter();
+  
+  // Store admin FCM token when logged in
+  useAdminFCMToken();
 
   const handleLogout = () => {
     if (confirm('Are you sure you want to logout?')) {

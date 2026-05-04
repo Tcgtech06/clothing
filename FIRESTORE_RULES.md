@@ -31,6 +31,16 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
     
+    // User FCM Tokens - users can only access their own tokens
+    match /userFCMTokens/{email} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Admin FCM Tokens - any authenticated user can access (for admin dashboard)
+    match /adminFCMTokens/{tokenId} {
+      allow read, write: if request.auth != null;
+    }
+    
     // User Notifications - users can only access their own notifications
     match /userNotifications/{notificationId} {
       allow read: if request.auth != null && request.auth.uid == resource.data.userId;

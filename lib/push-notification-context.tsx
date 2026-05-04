@@ -67,6 +67,10 @@ export function PushNotificationProvider({ children }: { children: ReactNode }) 
       
       if (result === 'granted') {
         console.log('Push notification permission granted');
+        
+        // Get FCM token
+        await getFCMToken();
+        
         // Show a welcome notification
         sendNotification('Notifications Enabled! 🔔', {
           body: 'You will now receive order updates and notifications',
@@ -81,6 +85,42 @@ export function PushNotificationProvider({ children }: { children: ReactNode }) 
     } catch (error) {
       console.error('Error requesting notification permission:', error);
       return false;
+    }
+  };
+
+  const getFCMToken = async () => {
+    if (!registration) {
+      console.warn('⚠️ Service worker not registered yet');
+      return;
+    }
+
+    try {
+      // Check if we have VAPID key
+      const vapidKey = process.env.NEXT_PUBLIC_VAPID_KEY;
+      if (!vapidKey) {
+        console.warn('⚠️ VAPID key not configured. Add NEXT_PUBLIC_VAPID_KEY to .env.local');
+        return;
+      }
+
+      // Get FCM token
+      const currentToken = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: vapidKey
+      });
+
+      if (currentToken) {
+        console.log('✅ FCM token obtained:', currentToken.endpoint);
+        
+        // Store token in localStorage for now
+        // In production, you would send this to your server
+        localStorage.setItem('fcmToken', JSON.stringify(currentToken.toJSON()));
+        
+        return currentToken;
+      } else {
+        console.warn('⚠️ No FCM token available');
+      }
+    } catch (error) {
+      console.error('❌ Error getting FCM token:', error);
     }
   };
 

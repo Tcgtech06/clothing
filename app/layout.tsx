@@ -9,6 +9,12 @@ import { AdminAuthProvider } from '@/lib/admin-auth-context';
 import { PushNotificationProvider } from '@/lib/push-notification-context';
 import { NotificationProvider } from '@/lib/notification-context';
 import NotificationPermissionPrompt from '@/components/NotificationPermissionPrompt';
+import { useFCMToken } from '@/lib/use-fcm-token';
+
+function FCMTokenManager() {
+  useFCMToken();
+  return null;
+}
 
 export default function RootLayout({
   children,
@@ -34,6 +40,7 @@ export default function RootLayout({
                   <FavouritesProvider>
                     <Navigation />
                     <NotificationPermissionPrompt />
+                    <FCMTokenManager />
                     <main className="pt-14 pb-20 md:pt-0 md:pb-0">{children}</main>
                   </FavouritesProvider>
                 </CartProvider>
