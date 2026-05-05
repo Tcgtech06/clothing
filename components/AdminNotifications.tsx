@@ -163,14 +163,18 @@ export default function AdminNotifications() {
             read: false,
           };
           
-          // Check if notification already exists
-          const existingNotif = notifications.find(n => 
-            n.type === 'return' && n.message.includes(data.orderId?.substring(0, 8).toUpperCase())
-          );
-          
-          if (!existingNotif) {
-            // Save notification to Firestore
-            try {
+          // Check if notification already exists in Firestore
+          try {
+            const existingQuery = query(
+              collection(db, 'adminNotifications'),
+              where('type', '==', 'return'),
+              where('message', '==', notificationData.message),
+              limit(1)
+            );
+            const existingSnapshot = await getDocs(existingQuery);
+            
+            if (existingSnapshot.empty) {
+              // Save notification to Firestore only if it doesn't exist
               await addDoc(collection(db, 'adminNotifications'), notificationData);
               console.log('💾 Return notification saved to Firestore');
               
@@ -187,9 +191,11 @@ export default function AdminNotifications() {
                   requireInteraction: true,
                 });
               }
-            } catch (error) {
-              console.error('❌ Error saving return notification:', error);
+            } else {
+              console.log('⚠️ Return notification already exists, skipping');
             }
+          } catch (error) {
+            console.error('❌ Error saving return notification:', error);
           }
         }
       });
@@ -201,7 +207,7 @@ export default function AdminNotifications() {
       unsubscribeReturns();
       clearInterval(cleanupInterval);
     };
-  }, [lastOrderCount, lastReturnCount, permission, sendPushNotification, notifications]);
+  }, [lastOrderCount, lastReturnCount, permission, sendPushNotification]);
 
   const playNotificationSound = () => {
     const audio = new Audio('/Notification.mp3');
