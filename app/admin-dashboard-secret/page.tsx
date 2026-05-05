@@ -15,6 +15,7 @@ import InventoryTab from '@/components/InventoryTab';
 import AnalyticsTab from '@/components/AnalyticsTab';
 import ProtectedAdminRoute from '@/components/ProtectedAdminRoute';
 import AdminNotifications from '@/components/AdminNotifications';
+import CleanupNotifications from './cleanup-notifications';
 import { useAdminAuth } from '@/lib/admin-auth-context';
 import { initializePollsForAllProducts } from '@/lib/init-polls';
 import { CATEGORIES } from '@/data/categories';
@@ -1161,6 +1162,7 @@ function AdminDashboardPage() {
   return (
     <ProtectedAdminRoute>
       <AdminDashboard />
+      <CleanupNotifications />
     </ProtectedAdminRoute>
   );
 }
