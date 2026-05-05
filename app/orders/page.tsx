@@ -175,19 +175,6 @@ export default function OrdersPage() {
   }, []);
 
   const animateTrucks = (ordersData: Order[]) => {
-    // Reset all truck positions to 0 first
-    const resetPositions: { [key: string]: number } = {};
-    const animatingStates: { [key: string]: boolean } = {};
-    
-    ordersData.forEach((order) => {
-      resetPositions[order.id] = 0;
-      animatingStates[order.id] = true;
-    });
-    
-    setTruckPositions(resetPositions);
-    setIsAnimating(animatingStates);
-    
-    // Animate each truck step by step with very slow speed (like 1km/h)
     ordersData.forEach((order) => {
       const orderId = order.id;
       
@@ -203,38 +190,40 @@ export default function OrdersPage() {
         currentStepIndex = steps.findIndex(s => s.status === 'current');
       }
       
-      // Animate through each step very slowly
-      let currentStep = 0;
-      const animateToNextStep = () => {
-        if (currentStep <= currentStepIndex) {
-          const position = (currentStep / (steps.length - 1)) * 100;
-          
-          // Move to this step
-          setTruckPositions(prev => ({
-            ...prev,
-            [orderId]: position
-          }));
-          
-          // Pause at this step for 800ms, then move to next very slowly
-          setTimeout(() => {
-            currentStep++;
-            if (currentStep <= currentStepIndex) {
-              animateToNextStep();
-            } else {
-              // Animation complete - truck stays at current position
-              setIsAnimating(prev => ({
-                ...prev,
-                [orderId]: false
-              }));
-            }
-          }, 800); // Longer pause at each checkpoint
-        }
-      };
+      if (currentStepIndex === -1) currentStepIndex = 0;
       
-      // Start animation after initial delay
+      // Calculate target position
+      const targetPosition = (currentStepIndex / (steps.length - 1)) * 100;
+      
+      // Start from 0
+      setTruckPositions(prev => ({
+        ...prev,
+        [orderId]: 0
+      }));
+      
+      setIsAnimating(prev => ({
+        ...prev,
+        [orderId]: true
+      }));
+      
+      // Smoothly animate to target position with slow, constant speed
+      // Duration: 3 seconds per step for smooth, slow movement
+      const duration = Math.max(currentStepIndex * 3000, 3000);
+      
       setTimeout(() => {
-        animateToNextStep();
-      }, 500);
+        setTruckPositions(prev => ({
+          ...prev,
+          [orderId]: targetPosition
+        }));
+        
+        // Stop animating after animation completes
+        setTimeout(() => {
+          setIsAnimating(prev => ({
+            ...prev,
+            [orderId]: false
+          }));
+        }, duration);
+      }, 100);
     });
   };
 
@@ -522,7 +511,9 @@ export default function OrdersPage() {
                           left: `${truckPositions[order.id] !== undefined ? truckPositions[order.id] : 0}%`,
                           transform: 'translateX(-50%)',
                           zIndex: 3,
-                          transition: isAnimating[order.id] ? 'left 3s linear' : 'none'
+                          transition: isAnimating[order.id] 
+                            ? `left ${Math.max(getTrackingSteps(order.status).findIndex(s => s.status === 'current') * 3, 3)}s linear` 
+                            : 'none'
                         }}
                       >
                         <div className="relative">
@@ -625,7 +616,9 @@ export default function OrdersPage() {
                           left: `${truckPositions[order.id] !== undefined ? truckPositions[order.id] : 0}%`,
                           transform: 'translateX(-50%)',
                           zIndex: 3,
-                          transition: isAnimating[order.id] ? 'left 3s linear' : 'none'
+                          transition: isAnimating[order.id] 
+                            ? `left ${Math.max(getReturnTrackingSteps(order.returnRequest.returnStatus || 'pending').findIndex(s => s.status === 'current') * 3, 3)}s linear` 
+                            : 'none'
                         }}
                       >
                         {/* Determine which icon to show based on return status */}
@@ -1243,9 +1236,10 @@ export default function OrdersPage() {
                 <button
                   onClick={() => {
                     setShowPollPrompt(false);
-                    // Navigate to first product
-                    if (pollProducts[0].firestoreId) {
-                      router.push(`/product/${pollProducts[0].firestoreId}`);
+                    // Navigate to first product - use firestoreId if available, otherwise use id
+                    const productId = pollProducts[0].firestoreId || pollProducts[0].id;
+                    if (productId) {
+                      router.push(`/product/${productId}`);
                     }
                   }}
                   className="flex-1 bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition font-semibold"
