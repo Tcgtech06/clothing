@@ -267,8 +267,8 @@ export default function CheckoutPage() {
       // Clear cart
       clearCart();
 
-      // Immediate redirect to success page
-      window.location.href = `/order-success?orderId=${docRef.id}`;
+      // Use Next.js router for instant navigation (no white page)
+      router.push(`/order-success?orderId=${docRef.id}`);
     } catch (error: any) {
       console.error('Error creating order:', error);
       

@@ -34,10 +34,14 @@ export default function ProductPoll({ productId, firestoreId, initialPoll, onVot
     const checkVotingEligibility = async () => {
       if (!user || !firestoreId) {
         setCheckingEligibility(false);
+        setCanVote(false);
         return;
       }
 
       try {
+        console.log('🔍 Checking voting eligibility for product:', firestoreId);
+        console.log('👤 User email:', user.email);
+        
         // Query orders where user has received this product
         const ordersRef = collection(db, 'orders');
         const q = query(
@@ -49,24 +53,34 @@ export default function ProductPoll({ productId, firestoreId, initialPoll, onVot
         const querySnapshot = await getDocs(q);
         let hasProduct = false;
 
+        console.log('📦 Found', querySnapshot.size, 'delivered orders');
+
         // Check if any delivered order contains this product
         querySnapshot.forEach((doc) => {
           const orderData = doc.data();
           const productDetails = orderData.productDetails || [];
           
+          console.log('🔎 Checking order:', doc.id, 'with', productDetails.length, 'products');
+          
           // Check if this product is in the order
-          const hasThisProduct = productDetails.some((item: any) => 
-            item.firestoreId === firestoreId || item.id === productId
-          );
+          const hasThisProduct = productDetails.some((item: any) => {
+            const matches = item.firestoreId === firestoreId || 
+                          String(item.id) === String(productId);
+            if (matches) {
+              console.log('✅ Found matching product in order!');
+            }
+            return matches;
+          });
 
           if (hasThisProduct) {
             hasProduct = true;
           }
         });
 
+        console.log('🎯 Can vote:', hasProduct);
         setCanVote(hasProduct);
       } catch (error) {
-        console.error('Error checking voting eligibility:', error);
+        console.error('❌ Error checking voting eligibility:', error);
         setCanVote(false);
       } finally {
         setCheckingEligibility(false);
@@ -74,7 +88,7 @@ export default function ProductPoll({ productId, firestoreId, initialPoll, onVot
     };
 
     checkVotingEligibility();
-  }, [user, firestoreId, productId]);
+  }, [user, user?.email, firestoreId, productId]);
 
   // Real-time listener for poll updates
   useEffect(() => {
@@ -93,30 +107,11 @@ export default function ProductPoll({ productId, firestoreId, initialPoll, onVot
     return () => unsubscribe();
   }, [firestoreId]);
 
-  // Check if user already voted
+  // Check if user already voted (removed - users can vote on every delivered order)
   useEffect(() => {
-    const checkExistingVote = async () => {
-      if (!user || !firestoreId) return;
-
-      try {
-        const userVotesRef = collection(db, 'userVotes');
-        const voteQuery = query(
-          userVotesRef,
-          where('userId', '==', user.uid),
-          where('productId', '==', firestoreId)
-        );
-        
-        const voteSnapshot = await getDocs(voteQuery);
-        if (!voteSnapshot.empty) {
-          const voteData = voteSnapshot.docs[0].data();
-          setUserVote(voteData.vote);
-        }
-      } catch (error) {
-        console.error('Error checking existing vote:', error);
-      }
-    };
-
-    checkExistingVote();
+    // Users can now vote multiple times for the same product across different orders
+    // No need to check for existing votes
+    setUserVote(null);
   }, [user, firestoreId]);
 
   const totalVotes = poll.best + poll.good + poll.average + poll.worst;
@@ -133,12 +128,6 @@ export default function ProductPoll({ productId, firestoreId, initialPoll, onVot
 
     if (!canVote) {
       alert('You can only vote for products you have received!');
-      return;
-    }
-    
-    // Check if user already voted
-    if (userVote) {
-      alert('You have already voted for this product!');
       return;
     }
 
@@ -158,8 +147,9 @@ export default function ProductPoll({ productId, firestoreId, initialPoll, onVot
       
       console.log('Vote saved to Firestore:', voteType);
 
-      // Save vote record to prevent duplicate voting
-      await setDoc(doc(db, 'userVotes', `${user.uid}_${firestoreId}`), {
+      // Save vote record to userPollVotes (allows multiple votes per product across different orders)
+      const voteId = `${user.uid}_${firestoreId}_${Date.now()}`;
+      await setDoc(doc(db, 'userPollVotes', voteId), {
         userId: user.uid,
         userEmail: user.email,
         productId: firestoreId,
@@ -282,9 +272,12 @@ export default function ProductPoll({ productId, firestoreId, initialPoll, onVot
           </p>
         </div>
       ) : userVote ? (
-        <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg text-center">
-          <p className="text-sm text-gray-600">
-            You voted: <span className="font-bold capitalize">{userVote}</span>
+        <div className="p-3 bg-green-50 border border-green-200 rounded-lg text-center">
+          <p className="text-sm text-green-800 font-medium">
+            ✓ Vote submitted: <span className="font-bold capitalize">{userVote}</span>
+          </p>
+          <p className="text-xs text-green-600 mt-1">
+            You can vote again on your next order!
           </p>
         </div>
       ) : (
