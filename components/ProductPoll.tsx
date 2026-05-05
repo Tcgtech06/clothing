@@ -61,13 +61,23 @@ export default function ProductPoll({ productId, firestoreId, initialPoll, onVot
           const productDetails = orderData.productDetails || [];
           
           console.log('🔎 Checking order:', doc.id, 'with', productDetails.length, 'products');
+          console.log('📋 Product details:', productDetails);
+          console.log('🎯 Looking for firestoreId:', firestoreId, 'or productId:', productId);
           
           // Check if this product is in the order
           const hasThisProduct = productDetails.some((item: any) => {
+            console.log('  Comparing item:', {
+              itemFirestoreId: item.firestoreId,
+              itemId: item.id,
+              targetFirestoreId: firestoreId,
+              targetProductId: productId
+            });
+            
             const matches = item.firestoreId === firestoreId || 
-                          String(item.id) === String(productId);
+                          String(item.id) === String(productId) ||
+                          item.id === productId;
             if (matches) {
-              console.log('✅ Found matching product in order!');
+              console.log('✅ Found matching product in order!', item);
             }
             return matches;
           });

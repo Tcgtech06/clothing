@@ -1239,7 +1239,8 @@ export default function OrdersPage() {
                     // Navigate to first product - use firestoreId if available, otherwise use id
                     const productId = pollProducts[0].firestoreId || pollProducts[0].id;
                     if (productId) {
-                      router.push(`/product/${productId}`);
+                      // Use instant navigation
+                      window.location.href = `/product/${productId}`;
                     }
                   }}
                   className="flex-1 bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition font-semibold"
