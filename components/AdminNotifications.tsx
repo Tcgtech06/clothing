@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Bell, X, Package, RotateCcw } from 'lucide-react';
 import { db } from '@/lib/firebase';
-import { collection, query, orderBy, limit, onSnapshot, Timestamp, addDoc, deleteDoc, doc, updateDoc, where } from 'firebase/firestore';
+import { collection, query, orderBy, limit, onSnapshot, Timestamp, addDoc, deleteDoc, doc, updateDoc, where, getDocs } from 'firebase/firestore';
 import { usePushNotifications } from '@/lib/push-notification-context';
 
 interface AdminNotification {
@@ -24,6 +24,35 @@ export default function AdminNotifications() {
   const { sendNotification: sendPushNotification, permission } = usePushNotifications();
 
   useEffect(() => {
+    // Clean up expired admin notifications (older than 48 hours)
+    const cleanupExpiredNotifications = async () => {
+      const fortyEightHoursAgo = new Date();
+      fortyEightHoursAgo.setHours(fortyEightHoursAgo.getHours() - 48);
+      
+      try {
+        const expiredQuery = query(
+          collection(db, 'adminNotifications'),
+          where('createdAt', '<', Timestamp.fromDate(fortyEightHoursAgo))
+        );
+        
+        const expiredSnapshot = await getDocs(expiredQuery);
+        const deletePromises = expiredSnapshot.docs.map(doc => 
+          deleteDoc(doc.ref)
+        );
+        
+        if (deletePromises.length > 0) {
+          await Promise.all(deletePromises);
+          console.log(`🗑️ Deleted ${deletePromises.length} expired admin notifications (>48 hours old)`);
+        }
+      } catch (error) {
+        console.error('❌ Error cleaning up expired admin notifications:', error);
+      }
+    };
+
+    // Run cleanup on mount and every hour
+    cleanupExpiredNotifications();
+    const cleanupInterval = setInterval(cleanupExpiredNotifications, 60 * 60 * 1000); // Every hour
+
     // Listen to admin notifications from Firestore
     // Removed orderBy to avoid composite index requirement - will sort client-side
     const adminNotificationsQuery = query(
@@ -167,6 +196,7 @@ export default function AdminNotifications() {
       unsubscribeAdminNotifications();
       unsubscribeOrders();
       unsubscribeReturns();
+      clearInterval(cleanupInterval);
     };
   }, [lastOrderCount, lastReturnCount, permission, sendPushNotification, notifications]);
 

@@ -208,3 +208,54 @@ export const sendNewOrderNotification = functions.firestore
       return null;
     }
   });
+
+
+// Scheduled function to clean up expired notifications (runs every 24 hours)
+export const cleanupExpiredNotifications = functions.pubsub
+  .schedule("every 24 hours")
+  .onRun(async (context) => {
+    console.log("Running scheduled cleanup of expired notifications");
+
+    const fortyEightHoursAgo = admin.firestore.Timestamp.fromDate(
+      new Date(Date.now() - 48 * 60 * 60 * 1000)
+    );
+
+    try {
+      // Clean up user notifications
+      const expiredUserNotifications = await admin
+        .firestore()
+        .collection("userNotifications")
+        .where("createdAt", "<", fortyEightHoursAgo)
+        .get();
+
+      const userDeletePromises = expiredUserNotifications.docs.map((doc) =>
+        doc.ref.delete()
+      );
+
+      await Promise.all(userDeletePromises);
+      console.log(
+        `Deleted ${userDeletePromises.length} expired user notifications`
+      );
+
+      // Clean up admin notifications
+      const expiredAdminNotifications = await admin
+        .firestore()
+        .collection("adminNotifications")
+        .where("createdAt", "<", fortyEightHoursAgo)
+        .get();
+
+      const adminDeletePromises = expiredAdminNotifications.docs.map((doc) =>
+        doc.ref.delete()
+      );
+
+      await Promise.all(adminDeletePromises);
+      console.log(
+        `Deleted ${adminDeletePromises.length} expired admin notifications`
+      );
+
+      return null;
+    } catch (error) {
+      console.error("Error cleaning up expired notifications:", error);
+      return null;
+    }
+  });

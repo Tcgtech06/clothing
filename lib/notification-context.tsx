@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { db } from './firebase';
-import { collection, query, where, onSnapshot, Timestamp, addDoc, deleteDoc, doc, updateDoc, orderBy, limit } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, Timestamp, addDoc, deleteDoc, doc, updateDoc, orderBy, limit, getDocs } from 'firebase/firestore';
 import { useAuth } from './auth-context';
 import { usePushNotifications } from './push-notification-context';
 
@@ -41,6 +41,36 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!user?.email) return;
+
+    // Clean up expired notifications (older than 48 hours)
+    const cleanupExpiredNotifications = async () => {
+      const fortyEightHoursAgo = new Date();
+      fortyEightHoursAgo.setHours(fortyEightHoursAgo.getHours() - 48);
+      
+      try {
+        const expiredQuery = query(
+          collection(db, 'userNotifications'),
+          where('userId', '==', user.uid),
+          where('createdAt', '<', Timestamp.fromDate(fortyEightHoursAgo))
+        );
+        
+        const expiredSnapshot = await getDocs(expiredQuery);
+        const deletePromises = expiredSnapshot.docs.map(doc => 
+          deleteDoc(doc.ref)
+        );
+        
+        if (deletePromises.length > 0) {
+          await Promise.all(deletePromises);
+          console.log(`🗑️ Deleted ${deletePromises.length} expired notifications (>48 hours old)`);
+        }
+      } catch (error) {
+        console.error('❌ Error cleaning up expired notifications:', error);
+      }
+    };
+
+    // Run cleanup on mount and every hour
+    cleanupExpiredNotifications();
+    const cleanupInterval = setInterval(cleanupExpiredNotifications, 60 * 60 * 1000); // Every hour
 
     // Listen to user's notifications from Firestore
     // Removed orderBy to avoid composite index requirement - will sort client-side
@@ -164,6 +194,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     return () => {
       unsubscribeNotifications();
       unsubscribeOrders();
+      clearInterval(cleanupInterval);
     };
   }, [user?.email, user?.uid, permission, sendPushNotification]);
 
