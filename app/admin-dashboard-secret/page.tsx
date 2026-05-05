@@ -34,6 +34,16 @@ interface Order {
   total: number;
   items: number;
   products: string[];
+  productDetails?: Array<{
+    id: number | string;
+    firestoreId?: string;
+    name: string;
+    price: number;
+    quantity: number;
+    image?: string;
+    color?: string;
+    size?: string;
+  }>;
   isNew?: boolean;
   deliveredAt?: any;
 }
@@ -710,6 +720,56 @@ function AdminDashboard() {
                     <p className="text-sm">{selectedOrder.shippingAddress}</p>
                   </div>
                 )}
+                
+                {/* Product Details with Images, Colors, Sizes */}
+                {selectedOrder.productDetails && selectedOrder.productDetails.length > 0 && (
+                  <div>
+                    <p className="text-sm text-gray-600 mb-3">Ordered Products</p>
+                    <div className="space-y-3">
+                      {selectedOrder.productDetails.map((item: any, index: number) => (
+                        <div key={index} className="flex gap-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                          {/* Product Image */}
+                          {item.image && (
+                            <img 
+                              src={item.image} 
+                              alt={item.name}
+                              className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
+                            />
+                          )}
+                          
+                          {/* Product Info */}
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-semibold text-gray-800 mb-1">{item.name}</h4>
+                            <div className="space-y-1">
+                              <p className="text-sm text-gray-600">
+                                <span className="font-medium">Price:</span> ₹{item.price?.toLocaleString('en-IN')} × {item.quantity}
+                              </p>
+                              {item.color && (
+                                <p className="text-sm text-gray-600 flex items-center gap-2">
+                                  <span className="font-medium">Color:</span> 
+                                  <span 
+                                    className="w-5 h-5 rounded-full border-2 border-gray-300 inline-block"
+                                    style={{ backgroundColor: item.color.toLowerCase() }}
+                                  ></span>
+                                  <span>{item.color}</span>
+                                </p>
+                              )}
+                              {item.size && (
+                                <p className="text-sm text-gray-600">
+                                  <span className="font-medium">Size:</span> {item.size}
+                                </p>
+                              )}
+                              <p className="text-sm font-semibold text-primary">
+                                Subtotal: ₹{((item.price || 0) * (item.quantity || 1)).toLocaleString('en-IN')}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
                 <div>
                   <p className="text-sm text-gray-600">Total</p>
                   <p className="text-2xl font-bold text-primary">₹{selectedOrder.total.toLocaleString('en-IN')}</p>

@@ -42,22 +42,25 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!user?.email) return;
 
-    // Clean up expired notifications (older than 48 hours)
+    // Clean up expired notifications (older than 48 hours) - simplified to avoid index requirement
     const cleanupExpiredNotifications = async () => {
-      const fortyEightHoursAgo = new Date();
-      fortyEightHoursAgo.setHours(fortyEightHoursAgo.getHours() - 48);
-      
       try {
-        const expiredQuery = query(
+        // Get all user notifications
+        const allNotificationsQuery = query(
           collection(db, 'userNotifications'),
-          where('userId', '==', user.uid),
-          where('createdAt', '<', Timestamp.fromDate(fortyEightHoursAgo))
+          where('userId', '==', user.uid)
         );
         
-        const expiredSnapshot = await getDocs(expiredQuery);
-        const deletePromises = expiredSnapshot.docs.map(doc => 
-          deleteDoc(doc.ref)
-        );
+        const snapshot = await getDocs(allNotificationsQuery);
+        const fortyEightHoursAgo = Date.now() - (48 * 60 * 60 * 1000);
+        
+        // Filter and delete expired ones client-side
+        const deletePromises = snapshot.docs
+          .filter(doc => {
+            const createdAt = doc.data().createdAt?.toMillis() || 0;
+            return createdAt < fortyEightHoursAgo;
+          })
+          .map(doc => deleteDoc(doc.ref));
         
         if (deletePromises.length > 0) {
           await Promise.all(deletePromises);
@@ -219,15 +222,27 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   };
 
   const clearAll = async () => {
+    if (notifications.length === 0) {
+      console.log('⚠️ No notifications to clear');
+      return;
+    }
+
     try {
+      console.log(`🗑️ Attempting to delete ${notifications.length} user notifications...`);
+      
       // Delete all notifications for this user from Firestore
-      const deletePromises = notifications.map(notif => 
-        deleteDoc(doc(db, 'userNotifications', notif.id))
-      );
+      const deletePromises = notifications.map(notif => {
+        console.log('Deleting notification:', notif.id);
+        return deleteDoc(doc(db, 'userNotifications', notif.id));
+      });
+      
       await Promise.all(deletePromises);
-      console.log('✅ All notifications cleared from Firestore');
-    } catch (error) {
+      console.log('✅ All user notifications cleared from Firebase');
+    } catch (error: any) {
       console.error('❌ Error clearing notifications:', error);
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
+      alert(`Failed to clear notifications: ${error.message}`);
     }
   };
 

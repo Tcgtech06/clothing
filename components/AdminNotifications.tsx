@@ -24,21 +24,24 @@ export default function AdminNotifications() {
   const { sendNotification: sendPushNotification, permission } = usePushNotifications();
 
   useEffect(() => {
-    // Clean up expired admin notifications (older than 48 hours)
+    // Clean up expired admin notifications (older than 48 hours) - simplified to avoid index requirement
     const cleanupExpiredNotifications = async () => {
-      const fortyEightHoursAgo = new Date();
-      fortyEightHoursAgo.setHours(fortyEightHoursAgo.getHours() - 48);
-      
       try {
-        const expiredQuery = query(
-          collection(db, 'adminNotifications'),
-          where('createdAt', '<', Timestamp.fromDate(fortyEightHoursAgo))
+        // Get all admin notifications
+        const allNotificationsQuery = query(
+          collection(db, 'adminNotifications')
         );
         
-        const expiredSnapshot = await getDocs(expiredQuery);
-        const deletePromises = expiredSnapshot.docs.map(doc => 
-          deleteDoc(doc.ref)
-        );
+        const snapshot = await getDocs(allNotificationsQuery);
+        const fortyEightHoursAgo = Date.now() - (48 * 60 * 60 * 1000);
+        
+        // Filter and delete expired ones client-side
+        const deletePromises = snapshot.docs
+          .filter(doc => {
+            const createdAt = doc.data().createdAt?.toMillis() || 0;
+            return createdAt < fortyEightHoursAgo;
+          })
+          .map(doc => deleteDoc(doc.ref));
         
         if (deletePromises.length > 0) {
           await Promise.all(deletePromises);
@@ -220,14 +223,29 @@ export default function AdminNotifications() {
   };
 
   const clearAll = async () => {
+    if (notifications.length === 0) {
+      console.log('⚠️ No notifications to clear');
+      return;
+    }
+
     try {
-      const deletePromises = notifications.map(notif => 
-        deleteDoc(doc(db, 'adminNotifications', notif.id))
-      );
+      console.log(`🗑️ Attempting to delete ${notifications.length} admin notifications...`);
+      
+      const deletePromises = notifications.map(notif => {
+        console.log('Deleting notification:', notif.id);
+        return deleteDoc(doc(db, 'adminNotifications', notif.id));
+      });
+      
       await Promise.all(deletePromises);
-      console.log('✅ All admin notifications cleared');
-    } catch (error) {
+      console.log('✅ All admin notifications cleared from Firebase');
+      
+      // Close the dropdown after clearing
+      setShowNotifications(false);
+    } catch (error: any) {
       console.error('❌ Error clearing admin notifications:', error);
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
+      alert(`Failed to clear notifications: ${error.message}`);
     }
   };
 
