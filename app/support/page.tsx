@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Mail, Phone, MessageCircle, Send, Headphones, X, Minimize2, Maximize2 } from 'lucide-react';
+import { Mail, Phone, Send, Headphones, X, Minimize2, Maximize2 } from 'lucide-react';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useAuth } from '@/lib/auth-context';
 
@@ -14,12 +14,12 @@ export default function SupportPage() {
     phone: ''
   });
   const [submitted, setSubmitted] = useState(false);
-  const [showChat, setShowChat] = useState(false);
-  const [chatMinimized, setChatMinimized] = useState(false);
-  const [chatMessage, setChatMessage] = useState('');
-  const [chatMessages, setChatMessages] = useState<Array<{text: string, sender: 'user' | 'support', time: string}>>([
-    { text: 'Hello! How can we help you today?', sender: 'support', time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }
-  ]);
+  const [showWhatsAppForm, setShowWhatsAppForm] = useState(false);
+  const [whatsappData, setWhatsappData] = useState({
+    queryType: '',
+    query: '',
+    orderNumber: ''
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,36 +39,37 @@ export default function SupportPage() {
     });
   };
 
-  const handleSendChatMessage = (e: React.FormEvent) => {
+  const handleWhatsAppFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setWhatsappData({
+      ...whatsappData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleWhatsAppSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!chatMessage.trim()) return;
+    
+    // Construct WhatsApp message
+    const message = `Hello! I need help with the following:
 
-    const newMessage = {
-      text: chatMessage,
-      sender: 'user' as const,
-      time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-    };
+*Query Type:* ${whatsappData.queryType}
+*Order Number:* ${whatsappData.orderNumber || 'N/A'}
+*Query:* ${whatsappData.query}
 
-    setChatMessages([...chatMessages, newMessage]);
-    setChatMessage('');
+*User:* ${user?.email || 'Guest'}`;
 
-    // Simulate support response after 2 seconds
-    setTimeout(() => {
-      const responses = [
-        "Thank you for your message! Our team will assist you shortly.",
-        "I understand your concern. Let me help you with that.",
-        "Could you please provide more details about your issue?",
-        "I'm checking that for you. Please hold on.",
-        "Thank you for contacting us! How else can I help you?"
-      ];
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-      
-      setChatMessages(prev => [...prev, {
-        text: randomResponse,
-        sender: 'support',
-        time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-      }]);
-    }, 2000);
+    // Encode message for URL
+    const encodedMessage = encodeURIComponent(message);
+    
+    // WhatsApp number (remove + and spaces)
+    const whatsappNumber = '919791962802';
+    
+    // Redirect to WhatsApp
+    window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, '_blank');
+    
+    // Close form
+    setShowWhatsAppForm(false);
+    setWhatsappData({ queryType: '', query: '', orderNumber: '' });
   };
 
   return (
@@ -113,17 +114,22 @@ export default function SupportPage() {
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <MessageCircle className="w-5 h-5 text-purple-600" />
+                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                    </svg>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-800">Live Chat</h3>
-                    <p className="text-sm text-gray-600">Chat with our team</p>
+                    <h3 className="font-semibold text-gray-800">WhatsApp Chat</h3>
+                    <p className="text-sm text-gray-600">Chat with us on WhatsApp</p>
                     <button
-                      onClick={() => setShowChat(true)}
-                      className="text-xs text-primary hover:underline mt-1 font-medium"
+                      onClick={() => setShowWhatsAppForm(true)}
+                      className="text-xs text-primary hover:underline mt-1 font-medium flex items-center gap-1"
                     >
-                      Start Chat →
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                      </svg>
+                      Start WhatsApp Chat →
                     </button>
                   </div>
                 </div>
@@ -365,88 +371,113 @@ export default function SupportPage() {
           </div>
         </div>
 
-        {/* Live Chat Widget */}
-        {showChat && (
-          <div className={`fixed ${chatMinimized ? 'bottom-4 right-4' : 'bottom-0 right-0 md:bottom-4 md:right-4'} z-50 ${chatMinimized ? 'w-auto' : 'w-full md:w-96'} transition-all duration-300`}>
-            {chatMinimized ? (
-              <button
-                onClick={() => setChatMinimized(false)}
-                className="bg-primary text-white px-6 py-3 rounded-full shadow-lg hover:bg-primary/90 transition flex items-center gap-2"
-              >
-                <MessageCircle className="w-5 h-5" />
-                <span className="font-semibold">Chat Support</span>
-                {chatMessages.length > 1 && (
-                  <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {chatMessages.length - 1}
-                  </span>
-                )}
-              </button>
-            ) : (
-              <div className="bg-white rounded-t-lg md:rounded-lg shadow-2xl flex flex-col h-[600px] md:h-[500px]">
-                {/* Chat Header */}
-                <div className="bg-primary text-white p-4 rounded-t-lg flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                      <Headphones className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">Customer Support</h3>
-                      <p className="text-xs text-white/80">Online • Typically replies instantly</p>
-                    </div>
+        {/* WhatsApp Chat Form Modal */}
+        {showWhatsAppForm && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg max-w-md w-full shadow-2xl">
+              {/* Header */}
+              <div className="bg-green-600 text-white p-4 rounded-t-lg flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                    </svg>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setChatMinimized(true)}
-                      className="hover:bg-white/20 p-2 rounded transition"
-                    >
-                      <Minimize2 className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => setShowChat(false)}
-                      className="hover:bg-white/20 p-2 rounded transition"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
+                  <div>
+                    <h3 className="font-semibold">WhatsApp Support</h3>
+                    <p className="text-xs text-white/80">Chat with us on WhatsApp</p>
                   </div>
                 </div>
-
-                {/* Chat Messages */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-                  {chatMessages.map((msg, index) => (
-                    <div
-                      key={index}
-                      className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div className={`max-w-[80%] ${msg.sender === 'user' ? 'bg-primary text-white' : 'bg-white text-gray-800'} rounded-lg p-3 shadow`}>
-                        <p className="text-sm">{msg.text}</p>
-                        <p className={`text-xs mt-1 ${msg.sender === 'user' ? 'text-white/70' : 'text-gray-500'}`}>
-                          {msg.time}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Chat Input */}
-                <form onSubmit={handleSendChatMessage} className="p-4 border-t border-gray-200 bg-white rounded-b-lg">
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={chatMessage}
-                      onChange={(e) => setChatMessage(e.target.value)}
-                      placeholder="Type your message..."
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                    />
-                    <button
-                      type="submit"
-                      className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition"
-                    >
-                      <Send className="w-5 h-5" />
-                    </button>
-                  </div>
-                </form>
+                <button
+                  onClick={() => setShowWhatsAppForm(false)}
+                  className="hover:bg-white/20 p-2 rounded transition"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-            )}
+
+              {/* Form */}
+              <form onSubmit={handleWhatsAppSubmit} className="p-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Query Type *
+                  </label>
+                  <select
+                    name="queryType"
+                    value={whatsappData.queryType}
+                    onChange={handleWhatsAppFormChange}
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  >
+                    <option value="">Select query type</option>
+                    <option value="Order Status">Order Status</option>
+                    <option value="Return/Refund">Return/Refund</option>
+                    <option value="Payment Issue">Payment Issue</option>
+                    <option value="Product Inquiry">Product Inquiry</option>
+                    <option value="Delivery Issue">Delivery Issue</option>
+                    <option value="Account Issue">Account Issue</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Order Number (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    name="orderNumber"
+                    value={whatsappData.orderNumber}
+                    onChange={handleWhatsAppFormChange}
+                    placeholder="e.g., 4RXQTRKY"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    You can find this in &quot;My Orders&quot; section
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Your Query *
+                  </label>
+                  <textarea
+                    name="query"
+                    value={whatsappData.query}
+                    onChange={handleWhatsAppFormChange}
+                    required
+                    rows={4}
+                    placeholder="Please describe your issue or question..."
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+                  />
+                </div>
+
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                  <p className="text-sm text-green-800">
+                    <strong>Note:</strong> You&apos;ll be redirected to WhatsApp to continue the conversation with our support team.
+                  </p>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowWhatsAppForm(false)}
+                    className="flex-1 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition font-semibold"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 transition font-semibold flex items-center justify-center gap-2"
+                  >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                    </svg>
+                    Open WhatsApp
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         )}
       </div>

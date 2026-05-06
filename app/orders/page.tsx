@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Package, Truck, CheckCircle, Clock, X, MapPin, RotateCcw, TruckIcon } from 'lucide-react';
+import { Package, Truck, CheckCircle, Clock, X, MapPin, RotateCcw, TruckIcon, Copy, Check } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { collection, query, orderBy, where, onSnapshot, doc, updateDoc, addDoc, serverTimestamp } from 'firebase/firestore';
 import Link from 'next/link';
@@ -137,6 +137,7 @@ export default function OrdersPage() {
   const [submittingReturn, setSubmittingReturn] = useState(false);
   const [showPollPrompt, setShowPollPrompt] = useState(false);
   const [pollProducts, setPollProducts] = useState<any[]>([]);
+  const [copiedOrderId, setCopiedOrderId] = useState<string | null>(null);
   const router = useRouter();
   
   // Track truck positions for animation
@@ -173,6 +174,12 @@ export default function OrdersPage() {
 
     return () => unsubscribe();
   }, []);
+
+  const copyOrderId = (orderId: string) => {
+    navigator.clipboard.writeText(orderId.substring(0, 12).toUpperCase());
+    setCopiedOrderId(orderId);
+    setTimeout(() => setCopiedOrderId(null), 2000);
+  };
 
   const animateTrucks = (ordersData: Order[]) => {
     ordersData.forEach((order) => {
@@ -470,9 +477,22 @@ export default function OrdersPage() {
                 {/* Order Header */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
                   <div className="mb-4 md:mb-0">
-                    <h3 className="text-lg font-bold text-gray-800 mb-1">
-                      Order #{order.id.substring(0, 12).toUpperCase()}
-                    </h3>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="text-lg font-bold text-gray-800">
+                        Order #{order.id.substring(0, 12).toUpperCase()}
+                      </h3>
+                      <button
+                        onClick={() => copyOrderId(order.id)}
+                        className="p-1.5 hover:bg-gray-100 rounded transition-colors"
+                        title="Copy Order ID"
+                      >
+                        {copiedOrderId === order.id ? (
+                          <Check className="w-4 h-4 text-green-600" />
+                        ) : (
+                          <Copy className="w-4 h-4 text-gray-600" />
+                        )}
+                      </button>
+                    </div>
                     <p className="text-sm text-gray-500">Placed on {formatDate(order.createdAt)}</p>
                     {order.paymentMethod && (
                       <p className="text-sm text-gray-600 mt-1">Payment: {order.paymentMethod}</p>
@@ -850,9 +870,22 @@ export default function OrdersPage() {
               <div className="space-y-4 md:space-y-6">
                 <div className="bg-gray-50 p-3 md:p-4 rounded-lg">
                   <p className="text-xs md:text-sm text-gray-600 mb-1">Order ID</p>
-                  <p className="font-mono text-sm md:text-base font-semibold text-gray-800 break-all">
-                    #{selectedOrder.id.substring(0, 12).toUpperCase()}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-mono text-sm md:text-base font-semibold text-gray-800 break-all">
+                      #{selectedOrder.id.substring(0, 12).toUpperCase()}
+                    </p>
+                    <button
+                      onClick={() => copyOrderId(selectedOrder.id)}
+                      className="p-1.5 hover:bg-gray-200 rounded transition-colors flex-shrink-0"
+                      title="Copy Order ID"
+                    >
+                      {copiedOrderId === selectedOrder.id ? (
+                        <Check className="w-4 h-4 text-green-600" />
+                      ) : (
+                        <Copy className="w-4 h-4 text-gray-600" />
+                      )}
+                    </button>
+                  </div>
                 </div>
 
                 {selectedOrder.returnRequest && (
@@ -1000,9 +1033,22 @@ export default function OrdersPage() {
                 {/* Order Info */}
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <p className="text-sm text-gray-600 mb-1">Order ID</p>
-                  <p className="font-mono font-semibold text-gray-800 mb-3">
-                    #{selectedOrder.id.substring(0, 12).toUpperCase()}
-                  </p>
+                  <div className="flex items-center gap-2 mb-3">
+                    <p className="font-mono font-semibold text-gray-800">
+                      #{selectedOrder.id.substring(0, 12).toUpperCase()}
+                    </p>
+                    <button
+                      onClick={() => copyOrderId(selectedOrder.id)}
+                      className="p-1.5 hover:bg-gray-200 rounded transition-colors"
+                      title="Copy Order ID"
+                    >
+                      {copiedOrderId === selectedOrder.id ? (
+                        <Check className="w-4 h-4 text-green-600" />
+                      ) : (
+                        <Copy className="w-4 h-4 text-gray-600" />
+                      )}
+                    </button>
+                  </div>
                   <p className="text-sm text-gray-600 mb-1">Total Amount</p>
                   <p className="text-xl font-bold text-primary">
                     ₹{selectedOrder.total.toLocaleString('en-IN')}
