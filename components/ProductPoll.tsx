@@ -117,12 +117,82 @@ export default function ProductPoll({ productId, firestoreId, initialPoll, onVot
     return () => unsubscribe();
   }, [firestoreId]);
 
-  // Check if user already voted (removed - users can vote on every delivered order)
+  // Check if user has already voted for this product from any of their delivered orders
   useEffect(() => {
-    // Users can now vote multiple times for the same product across different orders
-    // No need to check for existing votes
-    setUserVote(null);
-  }, [user, firestoreId]);
+    const checkExistingVotes = async () => {
+      if (!user || !firestoreId) {
+        setUserVote(null);
+        return;
+      }
+
+      try {
+        // Get all votes by this user for this product
+        const userVotesRef = collection(db, 'userPollVotes');
+        const voteQuery = query(
+          userVotesRef,
+          where('userId', '==', user.uid),
+          where('productId', '==', firestoreId)
+        );
+        
+        const voteSnapshot = await getDocs(voteQuery);
+        
+        // Get all delivered orders with this product
+        const ordersRef = collection(db, 'orders');
+        const ordersQuery = query(
+          ordersRef,
+          where('customerEmail', '==', user.email),
+          where('status', '==', 'delivered')
+        );
+        
+        const ordersSnapshot = await getDocs(ordersQuery);
+        
+        // Get order IDs that contain this product
+        const orderIdsWithProduct: string[] = [];
+        ordersSnapshot.forEach((doc) => {
+          const orderData = doc.data();
+          const productDetails = orderData.productDetails || [];
+          const hasThisProduct = productDetails.some((item: any) => 
+            item.firestoreId === firestoreId || 
+            String(item.id) === String(productId) ||
+            item.id === productId
+          );
+          if (hasThisProduct) {
+            orderIdsWithProduct.push(doc.id);
+          }
+        });
+        
+        // Get order IDs that user has already voted for
+        const votedOrderIds: string[] = [];
+        voteSnapshot.forEach((doc) => {
+          const voteData = doc.data();
+          if (voteData.orderId) {
+            votedOrderIds.push(voteData.orderId);
+          }
+        });
+        
+        console.log('📊 Orders with this product:', orderIdsWithProduct);
+        console.log('✅ Already voted for orders:', votedOrderIds);
+        
+        // Check if user has voted for ALL orders containing this product
+        const hasUnvotedOrder = orderIdsWithProduct.some(orderId => !votedOrderIds.includes(orderId));
+        
+        if (!hasUnvotedOrder && orderIdsWithProduct.length > 0) {
+          // User has voted for all orders with this product
+          setUserVote('completed');
+          console.log('🔒 User has already voted for all delivered orders with this product');
+        } else {
+          setUserVote(null);
+          console.log('✅ User can vote (has unvoted orders)');
+        }
+        
+      } catch (error) {
+        console.error('Error checking existing votes:', error);
+        setUserVote(null);
+      }
+    };
+
+    checkExistingVotes();
+  }, [user, user?.email, firestoreId, productId]);
 
   const totalVotes = poll.best + poll.good + poll.average + poll.worst;
 
@@ -149,6 +219,50 @@ export default function ProductPoll({ productId, firestoreId, initialPoll, onVot
     setIsVoting(true);
 
     try {
+      // Find the first unvoted order with this product
+      const ordersRef = collection(db, 'orders');
+      const ordersQuery = query(
+        ordersRef,
+        where('customerEmail', '==', user.email),
+        where('status', '==', 'delivered')
+      );
+      
+      const ordersSnapshot = await getDocs(ordersQuery);
+      
+      // Get order IDs that contain this product
+      const orderIdsWithProduct: string[] = [];
+      ordersSnapshot.forEach((doc) => {
+        const orderData = doc.data();
+        const productDetails = orderData.productDetails || [];
+        const hasThisProduct = productDetails.some((item: any) => 
+          item.firestoreId === firestoreId || 
+          String(item.id) === String(productId) ||
+          item.id === productId
+        );
+        if (hasThisProduct) {
+          orderIdsWithProduct.push(doc.id);
+        }
+      });
+      
+      // Get already voted order IDs
+      const userVotesRef = collection(db, 'userPollVotes');
+      const voteQuery = query(
+        userVotesRef,
+        where('userId', '==', user.uid),
+        where('productId', '==', firestoreId)
+      );
+      const voteSnapshot = await getDocs(voteQuery);
+      const votedOrderIds = voteSnapshot.docs.map(doc => doc.data().orderId).filter(Boolean);
+      
+      // Find first unvoted order
+      const unvotedOrderId = orderIdsWithProduct.find(orderId => !votedOrderIds.includes(orderId));
+      
+      if (!unvotedOrderId) {
+        alert('You have already voted for all your orders with this product!');
+        setIsVoting(false);
+        return;
+      }
+      
       // Update in Firestore
       const productRef = doc(db, 'products', firestoreId);
       await updateDoc(productRef, {
@@ -157,12 +271,13 @@ export default function ProductPoll({ productId, firestoreId, initialPoll, onVot
       
       console.log('Vote saved to Firestore:', voteType);
 
-      // Save vote record to userPollVotes (allows multiple votes per product across different orders)
-      const voteId = `${user.uid}_${firestoreId}_${Date.now()}`;
+      // Save vote record with orderId
+      const voteId = `${user.uid}_${firestoreId}_${unvotedOrderId}`;
       await setDoc(doc(db, 'userPollVotes', voteId), {
         userId: user.uid,
         userEmail: user.email,
         productId: firestoreId,
+        orderId: unvotedOrderId,
         vote: voteType,
         votedAt: new Date().toISOString()
       });
