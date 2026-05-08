@@ -308,22 +308,34 @@ function AdminDashboard() {
         'refunded': 'Your refund has been completed and credited to your account.'
       };
       
-      // Update return request document
-      await updateDoc(doc(db, 'returnRequests', returnId), {
+      // Prepare update data - only include adminNotes if it's not empty
+      const updateData: any = {
         status,
-        adminNotes: adminNotes || undefined,
         updatedAt: serverTimestamp()
-      });
+      };
+      
+      if (adminNotes && adminNotes.trim()) {
+        updateData.adminNotes = adminNotes.trim();
+      }
+      
+      // Update return request document
+      await updateDoc(doc(db, 'returnRequests', returnId), updateData);
 
       console.log('Return request updated successfully');
 
       // Also update the order's return request status
       if (selectedReturn) {
         console.log('Updating order:', selectedReturn.orderId);
-        await updateDoc(doc(db, 'orders', selectedReturn.orderId), {
-          'returnRequest.status': status,
-          'returnRequest.adminNotes': adminNotes || undefined
-        });
+        
+        const orderUpdateData: any = {
+          'returnRequest.status': status
+        };
+        
+        if (adminNotes && adminNotes.trim()) {
+          orderUpdateData['returnRequest.adminNotes'] = adminNotes.trim();
+        }
+        
+        await updateDoc(doc(db, 'orders', selectedReturn.orderId), orderUpdateData);
         console.log('Order updated successfully');
         
         // Send notification to user
@@ -331,7 +343,7 @@ function AdminDashboard() {
           await addDoc(collection(db, 'userNotifications'), {
             userId: selectedReturn.customerEmail,
             title: statusTitles[status] || 'Return Status Updated',
-            message: adminNotes || statusMessages[status] || 'Your return status has been updated',
+            message: adminNotes && adminNotes.trim() ? adminNotes.trim() : statusMessages[status] || 'Your return status has been updated',
             type: 'return',
             orderId: selectedReturn.orderId,
             read: false,
