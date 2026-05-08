@@ -124,7 +124,7 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
+  const { user, userData } = useAuth();
   const [showReturnModal, setShowReturnModal] = useState(false);
   const [returnForm, setReturnForm] = useState({
     reason: '',
@@ -366,11 +366,12 @@ export default function OrdersPage() {
 
     setSubmittingReturn(true);
     try {
-      // Create return request document
+      // Create return request document with user details for refund
       const returnRequestData = {
         orderId: selectedOrder.id,
         customerEmail: selectedOrder.customerEmail,
         customerName: selectedOrder.customerName,
+        customerPhone: selectedOrder.customerPhone || user?.phoneNumber || '',
         reason: returnForm.reason.trim(),
         paymentMethod: returnForm.paymentMethod,
         ...(returnForm.paymentMethod === 'upi' ? { 
@@ -384,7 +385,21 @@ export default function OrdersPage() {
         status: 'pending',
         total: selectedOrder.total,
         products: selectedOrder.products || [],
-        productDetails: selectedOrder.productDetails || []
+        productDetails: selectedOrder.productDetails || [],
+        // Include user details for admin to process refund
+        refundDetails: {
+          name: selectedOrder.customerName,
+          email: selectedOrder.customerEmail,
+          phone: selectedOrder.customerPhone || user?.phoneNumber || '',
+          method: returnForm.paymentMethod,
+          ...(returnForm.paymentMethod === 'upi' ? {
+            upiId: returnForm.upiId.trim()
+          } : {
+            accountNumber: returnForm.accountNumber.trim(),
+            ifscCode: returnForm.ifscCode.trim().toUpperCase(),
+            accountHolderName: returnForm.accountHolderName.trim()
+          })
+        }
       };
 
       console.log('Submitting return request:', returnRequestData);
@@ -830,6 +845,11 @@ export default function OrdersPage() {
                               <button
                                 onClick={() => {
                                   setSelectedOrder(order);
+                                  // Pre-fill UPI ID from user profile if available
+                                  setReturnForm(prev => ({
+                                    ...prev,
+                                    upiId: userData?.upiId || ''
+                                  }));
                                   setShowReturnModal(true);
                                 }}
                                 className="text-xs md:text-sm text-primary hover:text-primary/80 font-semibold flex items-center gap-1"

@@ -10,47 +10,98 @@ import { useCart } from '@/lib/cart-context';
 import { useFavourites } from '@/lib/favourites-context';
 import { useAuth } from '@/lib/auth-context';
 
-// Gender Icons - Realistic and Professional
+// Gender Icons - Realistic Avatar Style
 const MaleIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-    {/* Head */}
-    <circle cx="32" cy="16" r="10" fill="#3B82F6"/>
+  <svg className={className} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Background circle */}
+    <circle cx="50" cy="50" r="50" fill="#E8F4F8"/>
+    {/* Face */}
+    <circle cx="50" cy="40" r="18" fill="#D4A574"/>
+    {/* Hair */}
+    <path d="M32 32 Q32 20 40 18 Q45 15 50 15 Q55 15 60 18 Q68 20 68 32 L68 38 Q68 40 66 40 L34 40 Q32 40 32 38 Z" fill="#2C3E50"/>
+    {/* Eyebrows */}
+    <path d="M40 36 Q42 35 44 36" stroke="#1A252F" strokeWidth="1.5" strokeLinecap="round"/>
+    <path d="M56 36 Q58 35 60 36" stroke="#1A252F" strokeWidth="1.5" strokeLinecap="round"/>
+    {/* Eyes */}
+    <circle cx="42" cy="40" r="2" fill="#2C3E50"/>
+    <circle cx="58" cy="40" r="2" fill="#2C3E50"/>
+    {/* Nose */}
+    <path d="M50 44 L50 48" stroke="#B8956A" strokeWidth="1" strokeLinecap="round"/>
+    {/* Smile */}
+    <path d="M44 50 Q50 54 56 50" stroke="#8B4513" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+    {/* Facial hair - goatee */}
+    <ellipse cx="50" cy="54" rx="3" ry="2" fill="#2C3E50"/>
     {/* Neck */}
-    <rect x="28" y="24" width="8" height="4" fill="#2563EB" rx="2"/>
-    {/* Shoulders and torso */}
-    <path d="M20 28 L20 32 Q20 34 22 34 L22 50 Q22 52 24 52 L28 52 L28 62 L36 62 L36 52 L40 52 Q42 52 42 50 L42 34 Q44 34 44 32 L44 28 Q44 28 42 28 L38 28 L38 32 L26 32 L26 28 L22 28 Q20 28 20 28 Z" fill="#60A5FA"/>
-    {/* Arms */}
-    <rect x="16" y="30" width="6" height="18" fill="#3B82F6" rx="3"/>
-    <rect x="42" y="30" width="6" height="18" fill="#3B82F6" rx="3"/>
+    <rect x="44" y="56" width="12" height="8" fill="#C49B6B" rx="2"/>
+    {/* Shoulders - Blue shirt */}
+    <path d="M30 64 Q30 62 32 62 L44 62 L44 100 L56 100 L56 62 L68 62 Q70 62 70 64 L70 100 L30 100 Z" fill="#3498DB"/>
+    {/* Collar */}
+    <path d="M44 62 L46 66 L50 64 L54 66 L56 62" stroke="#2980B9" strokeWidth="1.5" fill="none"/>
   </svg>
 );
 
 const FemaleIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-    {/* Head */}
-    <circle cx="32" cy="16" r="10" fill="#EC4899"/>
-    {/* Hair */}
-    <path d="M22 12 Q22 8 26 8 Q28 6 32 6 Q36 6 38 8 Q42 8 42 12 L42 18 Q42 20 40 20 L24 20 Q22 20 22 18 Z" fill="#BE185D"/>
+  <svg className={className} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Background circle */}
+    <circle cx="50" cy="50" r="50" fill="#FFF0F5"/>
+    {/* Face */}
+    <circle cx="50" cy="40" r="18" fill="#E8B4A0"/>
+    {/* Hair - Long with bangs */}
+    <path d="M32 28 Q32 18 38 15 Q44 12 50 12 Q56 12 62 15 Q68 18 68 28 L68 45 Q68 50 65 52 L60 48 L60 42 L40 42 L40 48 L35 52 Q32 50 32 45 Z" fill="#4A2C2A"/>
+    {/* Bangs */}
+    <path d="M35 28 Q38 24 42 24 Q46 22 50 22 Q54 22 58 24 Q62 24 65 28 L65 32 L35 32 Z" fill="#3A1F1F"/>
+    {/* Eyebrows */}
+    <path d="M40 36 Q42 35 44 36" stroke="#2C1810" strokeWidth="1.5" strokeLinecap="round"/>
+    <path d="M56 36 Q58 35 60 36" stroke="#2C1810" strokeWidth="1.5" strokeLinecap="round"/>
+    {/* Eyes with lashes */}
+    <circle cx="42" cy="40" r="2" fill="#2C3E50"/>
+    <circle cx="58" cy="40" r="2" fill="#2C3E50"/>
+    <path d="M40 38 L38 36" stroke="#2C1810" strokeWidth="1" strokeLinecap="round"/>
+    <path d="M60 38 L62 36" stroke="#2C1810" strokeWidth="1" strokeLinecap="round"/>
+    {/* Nose */}
+    <path d="M50 44 L50 47" stroke="#D4A089" strokeWidth="1" strokeLinecap="round"/>
+    {/* Smile with lipstick */}
+    <path d="M44 50 Q50 54 56 50" stroke="#C85A7C" strokeWidth="2" strokeLinecap="round" fill="none"/>
     {/* Neck */}
-    <rect x="28" y="24" width="8" height="4" fill="#DB2777" rx="2"/>
-    {/* Dress/Body */}
-    <path d="M24 28 L24 32 Q24 34 26 34 L26 50 Q26 52 28 52 L28 62 L36 62 L36 52 Q38 52 38 50 L38 34 Q40 34 40 32 L40 28 Q40 28 38 30 L36 32 L36 48 L28 48 L28 32 L26 30 Q24 28 24 28 Z" fill="#F472B6"/>
-    {/* Dress skirt */}
-    <path d="M26 48 L22 58 Q22 60 24 60 L40 60 Q42 60 42 58 L38 48 Z" fill="#FBCFE8"/>
+    <rect x="44" y="56" width="12" height="8" fill="#DDA790" rx="2"/>
+    {/* Shoulders - Pink top */}
+    <path d="M30 64 Q30 62 32 62 L44 62 L44 100 L56 100 L56 62 L68 62 Q70 62 70 64 L70 100 L30 100 Z" fill="#FF69B4"/>
+    {/* Neckline detail */}
+    <path d="M44 62 Q50 68 56 62" stroke="#FF1493" strokeWidth="1.5" fill="none"/>
   </svg>
 );
 
 const TransgenderIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-    {/* Head */}
-    <circle cx="32" cy="16" r="10" fill="#8B5CF6"/>
+  <svg className={className} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Background circle */}
+    <circle cx="50" cy="50" r="50" fill="#F5F0FF"/>
+    {/* Face */}
+    <circle cx="50" cy="40" r="18" fill="#D9C4A8"/>
+    {/* Hair - Modern asymmetric style */}
+    <path d="M32 30 Q32 20 38 16 Q44 13 50 13 Q56 13 62 16 Q68 20 68 30 L68 40 Q68 42 66 42 L58 42 L58 38 L42 38 L42 42 L34 42 Q32 42 32 40 Z" fill="#6B4E9A"/>
+    {/* Side swept bangs */}
+    <path d="M32 30 Q35 26 40 25 Q45 24 50 24 L50 32 L35 32 Z" fill="#5A3D7F"/>
+    {/* Eyebrows */}
+    <path d="M40 36 Q42 35 44 36" stroke="#4A3560" strokeWidth="1.5" strokeLinecap="round"/>
+    <path d="M56 36 Q58 35 60 36" stroke="#4A3560" strokeWidth="1.5" strokeLinecap="round"/>
+    {/* Eyes */}
+    <circle cx="42" cy="40" r="2" fill="#2C3E50"/>
+    <circle cx="58" cy="40" r="2" fill="#2C3E50"/>
+    {/* Nose */}
+    <path d="M50 44 L50 48" stroke="#C4B098" strokeWidth="1" strokeLinecap="round"/>
+    {/* Smile */}
+    <path d="M44 50 Q50 54 56 50" stroke="#8B6F9C" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
     {/* Neck */}
-    <rect x="28" y="24" width="8" height="4" fill="#7C3AED" rx="2"/>
-    {/* Body - Neutral style */}
-    <path d="M22 28 L22 32 Q22 34 24 34 L24 50 Q24 52 26 52 L28 52 L28 62 L36 62 L36 52 L38 52 Q40 52 40 50 L40 34 Q42 34 42 32 L42 28 Q42 28 40 28 L38 28 L38 48 L26 48 L26 28 L24 28 Q22 28 22 28 Z" fill="#A78BFA"/>
-    {/* Transgender symbol overlay */}
-    <circle cx="48" cy="48" r="8" fill="#FFFFFF" opacity="0.9"/>
-    <path d="M48 44 L48 52 M44 48 L52 48 M46 46 L50 50 M50 46 L46 50" stroke="#8B5CF6" strokeWidth="2" strokeLinecap="round"/>
+    <rect x="44" y="56" width="12" height="8" fill="#CFBAA0" rx="2"/>
+    {/* Shoulders - Purple shirt */}
+    <path d="M30 64 Q30 62 32 62 L44 62 L44 100 L56 100 L56 62 L68 62 Q70 62 70 64 L70 100 L30 100 Z" fill="#9B59B6"/>
+    {/* Collar V-neck */}
+    <path d="M44 62 L50 68 L56 62" stroke="#7D3C98" strokeWidth="1.5" fill="none"/>
+    {/* Transgender symbol badge */}
+    <circle cx="70" cy="70" r="12" fill="#FFFFFF" opacity="0.95"/>
+    <circle cx="70" cy="70" r="4" stroke="#9B59B6" strokeWidth="1.5" fill="none"/>
+    <path d="M70 66 L70 62 M68 64 L72 64" stroke="#9B59B6" strokeWidth="1.5" strokeLinecap="round"/>
+    <path d="M73 73 L76 76 M76 73 L73 76" stroke="#9B59B6" strokeWidth="1.5" strokeLinecap="round"/>
   </svg>
 );
 

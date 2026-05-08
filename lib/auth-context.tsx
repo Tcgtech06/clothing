@@ -14,6 +14,7 @@ interface UserData {
   phone?: string;
   loyaltyPoints?: number;
   gender?: 'male' | 'female' | 'transgender' | null;
+  upiId?: string;
 }
 
 interface AuthContextType {
@@ -51,6 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           phone: data.phone || '',
           loyaltyPoints: data.loyaltyPoints || 0,
           gender: data.gender || null,
+          upiId: data.upiId || '',
         });
       } else {
         setUserData({
@@ -59,6 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           displayName: currentUser.displayName,
           photoURL: currentUser.photoURL,
           gender: null,
+          upiId: '',
         });
       }
     } catch (error) {
@@ -69,6 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         displayName: currentUser.displayName,
         photoURL: currentUser.photoURL,
         gender: null,
+        upiId: '',
       });
     }
   };
