@@ -8,23 +8,47 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import { db } from '@/lib/firebase';
 import { doc, setDoc, getDoc, collection, query, where, getDocs, deleteDoc } from 'firebase/firestore';
 
-// Gender Icons - Colorful versions
+// Gender Icons - Realistic and Professional
 const MaleIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg className={className} viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
     {/* Head */}
-    <circle cx="12" cy="3.5" r="2.5" fill="#3B82F6"/>
-    {/* Body */}
-    <path d="M9 7h6l1.5 7H15l-1 8h-4l-1-8H7.5L9 7z" fill="#60A5FA"/>
+    <circle cx="32" cy="16" r="10" fill="#3B82F6"/>
+    {/* Neck */}
+    <rect x="28" y="24" width="8" height="4" fill="#2563EB" rx="2"/>
+    {/* Shoulders and torso */}
+    <path d="M20 28 L20 32 Q20 34 22 34 L22 50 Q22 52 24 52 L28 52 L28 62 L36 62 L36 52 L40 52 Q42 52 42 50 L42 34 Q44 34 44 32 L44 28 Q44 28 42 28 L38 28 L38 32 L26 32 L26 28 L22 28 Q20 28 20 28 Z" fill="#60A5FA"/>
+    {/* Arms */}
+    <rect x="16" y="30" width="6" height="18" fill="#3B82F6" rx="3"/>
+    <rect x="42" y="30" width="6" height="18" fill="#3B82F6" rx="3"/>
   </svg>
 );
 
 const FemaleIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg className={className} viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
     {/* Head */}
-    <circle cx="12" cy="3.5" r="2.5" fill="#EC4899"/>
-    {/* Body */}
-    <path d="M8 9.5C8 8.12 9.12 7 10.5 7h3C14.88 7 16 8.12 16 9.5v4l-1.5 1L12 22l-2.5-7.5L8 13.5V9.5z" fill="#F472B6"/>
-    <path d="M9.5 13.5L8 20h8l-1.5-6.5" fill="#FBCFE8"/>
+    <circle cx="32" cy="16" r="10" fill="#EC4899"/>
+    {/* Hair */}
+    <path d="M22 12 Q22 8 26 8 Q28 6 32 6 Q36 6 38 8 Q42 8 42 12 L42 18 Q42 20 40 20 L24 20 Q22 20 22 18 Z" fill="#BE185D"/>
+    {/* Neck */}
+    <rect x="28" y="24" width="8" height="4" fill="#DB2777" rx="2"/>
+    {/* Dress/Body */}
+    <path d="M24 28 L24 32 Q24 34 26 34 L26 50 Q26 52 28 52 L28 62 L36 62 L36 52 Q38 52 38 50 L38 34 Q40 34 40 32 L40 28 Q40 28 38 30 L36 32 L36 48 L28 48 L28 32 L26 30 Q24 28 24 28 Z" fill="#F472B6"/>
+    {/* Dress skirt */}
+    <path d="M26 48 L22 58 Q22 60 24 60 L40 60 Q42 60 42 58 L38 48 Z" fill="#FBCFE8"/>
+  </svg>
+);
+
+const TransgenderIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Head */}
+    <circle cx="32" cy="16" r="10" fill="#8B5CF6"/>
+    {/* Neck */}
+    <rect x="28" y="24" width="8" height="4" fill="#7C3AED" rx="2"/>
+    {/* Body - Neutral style */}
+    <path d="M22 28 L22 32 Q22 34 24 34 L24 50 Q24 52 26 52 L28 52 L28 62 L36 62 L36 52 L38 52 Q40 52 40 50 L40 34 Q42 34 42 32 L42 28 Q42 28 40 28 L38 28 L38 48 L26 48 L26 28 L24 28 Q22 28 22 28 Z" fill="#A78BFA"/>
+    {/* Transgender symbol overlay */}
+    <circle cx="48" cy="48" r="8" fill="#FFFFFF" opacity="0.9"/>
+    <path d="M48 44 L48 52 M44 48 L52 48 M46 46 L50 50 M50 46 L46 50" stroke="#8B5CF6" strokeWidth="2" strokeLinecap="round"/>
   </svg>
 );
 
@@ -42,7 +66,7 @@ interface Address {
 function ProfilePageContent() {
   const { user, userData, refreshUserData } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
-  const [selectedGender, setSelectedGender] = useState<'male' | 'female' | null>(null);
+  const [selectedGender, setSelectedGender] = useState<'male' | 'female' | 'transgender' | null>(null);
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
@@ -160,7 +184,7 @@ function ProfilePageContent() {
     setIsEditing(false);
   };
 
-  const handleGenderSelect = async (gender: 'male' | 'female') => {
+  const handleGenderSelect = async (gender: 'male' | 'female' | 'transgender') => {
     if (!user?.uid) return;
     
     setSelectedGender(gender);
@@ -275,6 +299,8 @@ function ProfilePageContent() {
                     <MaleIcon className="w-20 h-20" />
                   ) : selectedGender === 'female' ? (
                     <FemaleIcon className="w-20 h-20" />
+                  ) : selectedGender === 'transgender' ? (
+                    <TransgenderIcon className="w-20 h-20" />
                   ) : (
                     <div className="text-primary text-3xl font-bold">
                       {profile.name.charAt(0)}
@@ -306,6 +332,17 @@ function ProfilePageContent() {
                 >
                   <FemaleIcon className="w-5 h-5" />
                   Female
+                </button>
+                <button
+                  onClick={() => handleGenderSelect('transgender')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition ${
+                    selectedGender === 'transgender'
+                      ? 'bg-white text-primary font-semibold shadow-lg'
+                      : 'bg-white/20 text-white hover:bg-white/30'
+                  }`}
+                >
+                  <TransgenderIcon className="w-5 h-5" />
+                  Other
                 </button>
               </div>
               

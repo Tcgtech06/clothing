@@ -13,7 +13,7 @@ interface UserData {
   photoURL: string | null;
   phone?: string;
   loyaltyPoints?: number;
-  gender?: 'male' | 'female' | null;
+  gender?: 'male' | 'female' | 'transgender' | null;
 }
 
 interface AuthContextType {
