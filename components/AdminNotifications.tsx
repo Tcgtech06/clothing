@@ -99,41 +99,56 @@ export default function AdminNotifications() {
         
         // Show notifications ONLY for NEW orders (not status updates)
         if (diffMinutes < 60 && change.type === 'added') {
-          const notificationData = {
-            title: '🛍️ New Order Received',
-            message: `Order #${doc.id.substring(0, 8).toUpperCase()} - ₹${data.total} from ${data.customerName}`,
-            type: 'order' as const,
-            createdAt: data.createdAt,
-            read: false,
-          };
+          const notificationMessage = `Order #${doc.id.substring(0, 8).toUpperCase()} - ₹${data.total} from ${data.customerName}`;
           
-          console.log('🔔 New order detected:', doc.id);
-          console.log('📧 Sending admin notification:', notificationData.title);
-          
-          // Save notification to Firestore
+          // Check if notification already exists
           try {
-            await addDoc(collection(db, 'adminNotifications'), notificationData);
-            console.log('💾 Admin notification saved to Firestore');
+            const existingQuery = query(
+              collection(db, 'adminNotifications'),
+              where('type', '==', 'order'),
+              where('message', '==', notificationMessage),
+              limit(1)
+            );
+            const existingSnapshot = await getDocs(existingQuery);
+            
+            if (existingSnapshot.empty) {
+              const notificationData = {
+                title: '🛍️ New Order Received',
+                message: notificationMessage,
+                type: 'order' as const,
+                createdAt: data.createdAt,
+                read: false,
+              };
+              
+              console.log('🔔 New order detected:', doc.id);
+              console.log('📧 Sending admin notification:', notificationData.title);
+              
+              // Save notification to Firestore
+              await addDoc(collection(db, 'adminNotifications'), notificationData);
+              console.log('💾 Admin notification saved to Firestore');
+              
+              // Play notification sound
+              playNotificationSound();
+              
+              // Send push notification for new order
+              console.log('🔐 Admin permission status:', permission);
+              if (permission === 'granted') {
+                console.log('✅ Calling sendPushNotification for admin...');
+                sendPushNotification(notificationData.title, {
+                  body: notificationData.message,
+                  icon: '/icon-192x192.png',
+                  badge: '/icon-192x192.png',
+                  tag: 'admin-order',
+                  requireInteraction: true,
+                });
+              } else {
+                console.warn('⚠️ Cannot send admin push notification - permission not granted');
+              }
+            } else {
+              console.log('⚠️ Order notification already exists, skipping');
+            }
           } catch (error) {
-            console.error('❌ Error saving admin notification:', error);
-          }
-          
-          // Play notification sound
-          playNotificationSound();
-          
-          // Send push notification for new order
-          console.log('🔐 Admin permission status:', permission);
-          if (permission === 'granted') {
-            console.log('✅ Calling sendPushNotification for admin...');
-            sendPushNotification(notificationData.title, {
-              body: notificationData.message,
-              icon: '/icon-192x192.png',
-              badge: '/icon-192x192.png',
-              tag: 'admin-order',
-              requireInteraction: true,
-            });
-          } else {
-            console.warn('⚠️ Cannot send admin push notification - permission not granted');
+            console.error('❌ Error checking/saving order notification:', error);
           }
         }
       });
