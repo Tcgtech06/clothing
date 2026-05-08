@@ -548,7 +548,8 @@ export default function OrdersPage() {
                         }}
                       ></div>
                       
-                      {/* Animated Truck Video */}
+                      {/* Animated Truck Video - Hide when delivered */}
+                      {order.status !== 'delivered' && (
                       <div 
                         className="absolute top-[-8px] md:top-[-6px] truck-container"
                         style={{ 
@@ -605,6 +606,7 @@ export default function OrdersPage() {
                           )}
                         </div>
                       </div>
+                      )}
                       
                       {/* Steps - Reduced Gap */}
                       <div className="relative flex justify-between min-w-[400px] md:min-w-0 gap-2" style={{ zIndex: 2 }}>
