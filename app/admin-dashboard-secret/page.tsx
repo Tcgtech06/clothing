@@ -794,22 +794,46 @@ function AdminDashboard() {
                 <div>
                   <p className="text-sm text-gray-600 mb-2">Update Status</p>
                   <div className="grid grid-cols-2 gap-2">
-                    <button onClick={() => updateOrderStatus(selectedOrder.id, 'accepted')} className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-sm font-medium flex items-center justify-center gap-2">
+                    <button 
+                      onClick={() => updateOrderStatus(selectedOrder.id, 'accepted')} 
+                      disabled={selectedOrder.status === 'accepted' || selectedOrder.status === 'processing' || selectedOrder.status === 'shipped' || selectedOrder.status === 'nearby' || selectedOrder.status === 'out-for-delivery' || selectedOrder.status === 'delivered'}
+                      className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
                       <CheckCircle className="w-4 h-4" />Accept
                     </button>
-                    <button onClick={() => updateOrderStatus(selectedOrder.id, 'processing')} className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 text-sm font-medium flex items-center justify-center gap-2">
+                    <button 
+                      onClick={() => updateOrderStatus(selectedOrder.id, 'processing')} 
+                      disabled={selectedOrder.status === 'processing' || selectedOrder.status === 'shipped' || selectedOrder.status === 'nearby' || selectedOrder.status === 'out-for-delivery' || selectedOrder.status === 'delivered'}
+                      className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
                       <Clock className="w-4 h-4" />Processing
                     </button>
-                    <button onClick={() => updateOrderStatus(selectedOrder.id, 'shipped')} className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 text-sm font-medium flex items-center justify-center gap-2">
+                    <button 
+                      onClick={() => updateOrderStatus(selectedOrder.id, 'shipped')} 
+                      disabled={selectedOrder.status === 'shipped' || selectedOrder.status === 'nearby' || selectedOrder.status === 'out-for-delivery' || selectedOrder.status === 'delivered'}
+                      className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
                       <Package className="w-4 h-4" />Shipped
                     </button>
-                    <button onClick={() => updateOrderStatus(selectedOrder.id, 'nearby')} className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 text-sm font-medium flex items-center justify-center gap-2">
+                    <button 
+                      onClick={() => updateOrderStatus(selectedOrder.id, 'nearby')} 
+                      disabled={selectedOrder.status === 'nearby' || selectedOrder.status === 'out-for-delivery' || selectedOrder.status === 'delivered'}
+                      className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
                       <MapPin className="w-4 h-4" />Nearby
                     </button>
-                    <button onClick={() => updateOrderStatus(selectedOrder.id, 'out-for-delivery')} className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 text-sm font-medium flex items-center justify-center gap-2">
+                    <button 
+                      onClick={() => updateOrderStatus(selectedOrder.id, 'out-for-delivery')} 
+                      disabled={selectedOrder.status === 'out-for-delivery' || selectedOrder.status === 'delivered'}
+                      className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
                       <Truck className="w-4 h-4" />Out for Delivery
                     </button>
-                    <button onClick={() => updateOrderStatus(selectedOrder.id, 'delivered')} className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm font-medium flex items-center justify-center gap-2">
+                    <button 
+                      onClick={() => updateOrderStatus(selectedOrder.id, 'delivered')} 
+                      disabled={selectedOrder.status === 'delivered'}
+                      className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
                       <PackageCheck className="w-4 h-4" />Delivered
                     </button>
                   </div>
@@ -1065,28 +1089,28 @@ function AdminDashboard() {
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       onClick={() => updateReturnTrackingStatus(selectedReturn.id, 'approved')}
-                      className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-sm font-medium"
-                      disabled={selectedReturn.returnStatus === 'approved'}
+                      className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={selectedReturn.returnStatus === 'approved' || selectedReturn.returnStatus === 'pickup-scheduled' || selectedReturn.returnStatus === 'picked-up' || selectedReturn.returnStatus === 'refund-completed'}
                     >
                       Return Approved
                     </button>
                     <button
                       onClick={() => updateReturnTrackingStatus(selectedReturn.id, 'pickup-scheduled')}
-                      className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 text-sm font-medium"
-                      disabled={selectedReturn.returnStatus === 'pickup-scheduled'}
+                      className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={selectedReturn.returnStatus === 'pickup-scheduled' || selectedReturn.returnStatus === 'picked-up' || selectedReturn.returnStatus === 'refund-completed'}
                     >
                       Pickup Scheduled
                     </button>
                     <button
                       onClick={() => updateReturnTrackingStatus(selectedReturn.id, 'picked-up')}
-                      className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 text-sm font-medium"
-                      disabled={selectedReturn.returnStatus === 'picked-up'}
+                      className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={selectedReturn.returnStatus === 'picked-up' || selectedReturn.returnStatus === 'refund-completed'}
                     >
                       Product Picked Up
                     </button>
                     <button
                       onClick={() => updateReturnTrackingStatus(selectedReturn.id, 'refund-completed')}
-                      className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm font-medium"
+                      className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                       disabled={selectedReturn.returnStatus === 'refund-completed'}
                     >
                       Refund Completed

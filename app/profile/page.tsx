@@ -122,6 +122,7 @@ function ProfilePageContent() {
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
   const [totalOrders, setTotalOrders] = useState(0);
+  const [totalReturns, setTotalReturns] = useState(0);
   const [loyaltyPoints, setLoyaltyPoints] = useState(0);
   
   const [profile, setProfile] = useState({
@@ -190,11 +191,22 @@ function ProfilePageContent() {
         const ordersSnapshot = await getDocs(ordersQuery);
         setTotalOrders(ordersSnapshot.size);
         
+        // Load total returns - count orders with returnRequest
+        let returnsCount = 0;
+        ordersSnapshot.forEach((doc) => {
+          const orderData = doc.data();
+          if (orderData.returnRequest) {
+            returnsCount++;
+          }
+        });
+        setTotalReturns(returnsCount);
+        
         console.log('Loaded user data:', {
           gender: userDoc.exists() ? userDoc.data().gender : null,
           loyaltyPoints: userDoc.exists() ? userDoc.data().loyaltyPoints : 0,
           addresses: loadedAddresses.length,
           totalOrders: ordersSnapshot.size,
+          totalReturns: returnsCount,
           userEmail: user.email
         });
         
@@ -703,13 +715,26 @@ function ProfilePageContent() {
         </div>
 
         {/* Account Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
             <Package className="w-12 h-12 text-primary mx-auto mb-2" />
             <p className="text-3xl font-bold text-primary">{totalOrders}</p>
             <p className="text-gray-600 mt-1">Total Orders</p>
             <p className="text-xs text-gray-500 mt-2">
               {totalOrders === 0 ? 'Start shopping to see your orders' : 'View all your orders'}
+            </p>
+          </div>
+          <div className="bg-white rounded-lg shadow-md p-6 text-center">
+            <svg className="w-12 h-12 text-red-600 mx-auto mb-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M9 22V12H15V22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M12 2L12 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <circle cx="12" cy="8" r="1.5" fill="currentColor"/>
+            </svg>
+            <p className="text-3xl font-bold text-red-600">{totalReturns}</p>
+            <p className="text-gray-600 mt-1">Total Returns</p>
+            <p className="text-xs text-gray-500 mt-2">
+              {totalReturns === 0 ? 'No returns yet' : 'Products returned'}
             </p>
           </div>
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
