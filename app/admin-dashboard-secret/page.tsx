@@ -294,26 +294,35 @@ function AdminDashboard() {
 
   const updateReturnStatus = async (returnId: string, status: 'approved' | 'rejected' | 'refunded') => {
     try {
+      console.log('Updating return status:', { returnId, status, adminNotes });
+      
+      // Update return request document
       await updateDoc(doc(db, 'returnRequests', returnId), {
         status,
         adminNotes: adminNotes || undefined,
         updatedAt: serverTimestamp()
       });
 
+      console.log('Return request updated successfully');
+
       // Also update the order's return request status
       if (selectedReturn) {
+        console.log('Updating order:', selectedReturn.orderId);
         await updateDoc(doc(db, 'orders', selectedReturn.orderId), {
           'returnRequest.status': status,
           'returnRequest.adminNotes': adminNotes || undefined
         });
+        console.log('Order updated successfully');
       }
 
       alert(`Return request ${status} successfully!`);
       setSelectedReturn(null);
       setAdminNotes('');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating return status:', error);
-      alert('Failed to update return status');
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
+      alert(`Failed to update return status: ${error.message || 'Unknown error'}`);
     }
   };
 
@@ -321,6 +330,8 @@ function AdminDashboard() {
     if (!selectedReturn) return;
     
     try {
+      console.log('Updating return tracking status:', { returnId, trackingStatus });
+      
       const statusDescriptions: { [key: string]: string } = {
         'pending': 'Return request received and under review',
         'approved': 'Return request has been approved',
@@ -338,26 +349,31 @@ function AdminDashboard() {
       const existingHistory = selectedReturn.returnTrackingHistory || [];
       const updatedHistory = [...existingHistory, newTrackingEntry];
 
+      console.log('Updating returnRequests document...');
       await updateDoc(doc(db, 'returnRequests', returnId), {
         returnStatus: trackingStatus,
         returnTrackingHistory: updatedHistory,
         updatedAt: serverTimestamp()
       });
 
+      console.log('Updating orders document...');
       // Also update the order's return request
       await updateDoc(doc(db, 'orders', selectedReturn.orderId), {
         'returnRequest.returnStatus': trackingStatus,
         'returnRequest.returnTrackingHistory': updatedHistory
       });
 
+      console.log('Return tracking status updated successfully');
       alert('Return tracking status updated successfully!');
       
       // Refresh the selected return to show updated data
       const updatedReturn = { ...selectedReturn, returnStatus: trackingStatus as any, returnTrackingHistory: updatedHistory };
       setSelectedReturn(updatedReturn);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating return tracking status:', error);
-      alert('Failed to update return tracking status');
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
+      alert(`Failed to update return tracking status: ${error.message || 'Unknown error'}`);
     }
   };
 
