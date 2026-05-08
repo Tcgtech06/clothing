@@ -115,10 +115,11 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
         const data = doc.data();
         
         // Only show notifications for status updates (not new orders)
-        if (change.type === 'modified') {
+        // Skip if this is a return request update (we handle those separately in admin dashboard)
+        if (change.type === 'modified' && !data.returnRequest) {
           const statusMessages: { [key: string]: { title: string; message: string; emoji: string } } = {
             'accepted': {
-              title: '✅ Order Accepted by Admin',
+              title: '✅ Order Accepted',
               message: `Your order #${doc.id.substring(0, 8).toUpperCase()} has been accepted and is being prepared`,
               emoji: '✅'
             },
@@ -155,39 +156,53 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
             console.log('🔔 Order status changed:', data.status);
             console.log('📧 Sending notification:', statusInfo.title);
             
-            // Save notification to Firestore
+            // Check if notification already exists to avoid duplicates
             try {
-              await addDoc(collection(db, 'userNotifications'), {
-                userId: user.uid,
-                orderId: doc.id,
-                title: statusInfo.title,
-                message: statusInfo.message,
-                type: 'order',
-                status: data.status,
-                createdAt: Timestamp.now(),
-                read: false,
-              });
-              console.log('💾 Notification saved to Firestore');
+              const existingQuery = query(
+                collection(db, 'userNotifications'),
+                where('userId', '==', user.uid),
+                where('orderId', '==', doc.id),
+                where('title', '==', statusInfo.title),
+                limit(1)
+              );
+              const existingSnapshot = await getDocs(existingQuery);
+              
+              if (existingSnapshot.empty) {
+                // Save notification to Firestore
+                await addDoc(collection(db, 'userNotifications'), {
+                  userId: user.uid,
+                  orderId: doc.id,
+                  title: statusInfo.title,
+                  message: statusInfo.message,
+                  type: 'order',
+                  status: data.status,
+                  createdAt: Timestamp.now(),
+                  read: false,
+                });
+                console.log('💾 Notification saved to Firestore');
+                
+                // Play notification sound
+                playNotificationSound();
+                
+                // Send push notification if permission granted
+                console.log('🔐 Permission status:', permission);
+                if (permission === 'granted') {
+                  console.log('✅ Calling sendPushNotification...');
+                  sendPushNotification(statusInfo.title, {
+                    body: statusInfo.message,
+                    icon: '/icon-192x192.png',
+                    badge: '/icon-192x192.png',
+                    tag: 'order-update',
+                    requireInteraction: false,
+                  });
+                } else {
+                  console.warn('⚠️ Cannot send push notification - permission not granted');
+                }
+              } else {
+                console.log('⚠️ Notification already exists, skipping');
+              }
             } catch (error) {
               console.error('❌ Error saving notification to Firestore:', error);
-            }
-            
-            // Play notification sound
-            playNotificationSound();
-            
-            // Send push notification if permission granted
-            console.log('🔐 Permission status:', permission);
-            if (permission === 'granted') {
-              console.log('✅ Calling sendPushNotification...');
-              sendPushNotification(statusInfo.title, {
-                body: statusInfo.message,
-                icon: '/icon-192x192.png',
-                badge: '/icon-192x192.png',
-                tag: 'order-update',
-                requireInteraction: false,
-              });
-            } else {
-              console.warn('⚠️ Cannot send push notification - permission not granted');
             }
           }
         }
