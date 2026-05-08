@@ -3,15 +3,15 @@
 import { useState, useEffect } from 'react';
 import { useCart } from '@/lib/cart-context';
 import { useRouter } from 'next/navigation';
-import { CreditCard, Wallet, MapPin, User, Phone, Mail, Edit2, Plus, Check } from 'lucide-react';
+import { CreditCard, Wallet, MapPin, User, Phone, Mail, Edit2, Plus, Check, ArrowLeft } from 'lucide-react';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp, doc, setDoc, getDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, doc, setDoc, getDoc, getDocs } from 'firebase/firestore';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useAuth } from '@/lib/auth-context';
 
 interface SavedAddress {
+  id: string;
   name: string;
-  email: string;
   phone: string;
   address: string;
   city: string;
@@ -25,14 +25,14 @@ export default function CheckoutPage() {
   const { user } = useAuth();
   const [paymentMethod, setPaymentMethod] = useState<'cod' | 'online'>('cod');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [savedAddress, setSavedAddress] = useState<SavedAddress | null>(null);
+  const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const [isEditingAddress, setIsEditingAddress] = useState(false);
-  const [saveAddress, setSaveAddress] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(false);
   
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
+    email: user?.email || '',
     phone: '',
     address: '',
     city: '',
@@ -40,27 +40,53 @@ export default function CheckoutPage() {
     pincode: '',
   });
 
-  // Load saved address from Firebase
+  // Load saved addresses from Firebase
   useEffect(() => {
-    const loadSavedAddress = async () => {
-      if (!user?.uid) return;
+    const loadSavedAddresses = async () => {
+      if (!user?.uid) {
+        console.log('No user UID, skipping address load');
+        return;
+      }
       
       try {
-        const addressDoc = await getDoc(doc(db, 'userAddresses', user.uid));
-        if (addressDoc.exists()) {
-          const addressData = addressDoc.data() as SavedAddress;
-          setSavedAddress(addressData);
-          setFormData(addressData);
-        } else {
+        console.log('Loading addresses for user:', user.uid);
+        const addressesSnapshot = await getDocs(
+          collection(db, 'users', user.uid, 'addresses')
+        );
+        const loadedAddresses: SavedAddress[] = [];
+        addressesSnapshot.forEach((doc) => {
+          loadedAddresses.push({ id: doc.id, ...doc.data() } as SavedAddress);
+        });
+        
+        console.log('Loaded addresses:', loadedAddresses);
+        setSavedAddresses(loadedAddresses);
+        
+        // Auto-select first address if available
+        if (loadedAddresses.length > 0 && !selectedAddressId) {
+          console.log('Auto-selecting first address');
+          setSelectedAddressId(loadedAddresses[0].id);
+          const firstAddr = loadedAddresses[0];
+          setFormData({
+            name: firstAddr.name,
+            email: user.email || '',
+            phone: firstAddr.phone,
+            address: firstAddr.address,
+            city: firstAddr.city,
+            state: firstAddr.state,
+            pincode: firstAddr.pincode,
+          });
+          setIsEditingAddress(false); // Explicitly set to false to show address cards
+        } else if (loadedAddresses.length === 0) {
+          console.log('No addresses found, showing form');
           setIsEditingAddress(true);
         }
       } catch (error) {
-        console.error('Error loading address:', error);
+        console.error('Error loading addresses:', error);
         setIsEditingAddress(true);
       }
     };
     
-    loadSavedAddress();
+    loadSavedAddresses();
   }, [user]);
 
   // Redirect if cart is empty (but not if order was just placed)
@@ -70,29 +96,22 @@ export default function CheckoutPage() {
     }
   }, [cart.length, router, orderPlaced]);
 
-  const handleSaveAddress = async () => {
-    if (!user?.uid) return;
-    
-    try {
-      // Save to Firebase
-      await setDoc(doc(db, 'userAddresses', user.uid), formData);
-      setSavedAddress(formData);
-      setIsEditingAddress(false);
-      setSaveAddress(false);
-      console.log('Address saved to Firebase');
-    } catch (error) {
-      console.error('Error saving address:', error);
-      alert('Failed to save address. Please try again.');
-    }
+  const handleSelectAddress = (address: SavedAddress) => {
+    setSelectedAddressId(address.id);
+    setFormData({
+      name: address.name,
+      email: user?.email || '',
+      phone: address.phone,
+      address: address.address,
+      city: address.city,
+      state: address.state,
+      pincode: address.pincode,
+    });
+    setIsEditingAddress(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Save address if checkbox is checked
-    if (saveAddress && !savedAddress) {
-      await handleSaveAddress();
-    }
 
     setIsProcessing(true);
 
@@ -292,6 +311,15 @@ export default function CheckoutPage() {
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 py-8">
+          {/* Back Button */}
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-2 text-gray-600 hover:text-primary transition mb-4"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span className="font-medium">Back</span>
+          </button>
+          
           <h1 className="text-3xl font-bold mb-8 text-gray-800">Checkout</h1>
 
           <form onSubmit={handleSubmit}>
@@ -305,49 +333,58 @@ export default function CheckoutPage() {
                     <MapPin className="w-5 h-5 text-primary" />
                     Shipping Address
                   </h2>
-                  {savedAddress && !isEditingAddress && (
+                  {savedAddresses.length > 0 && !isEditingAddress && (
                     <button
                       type="button"
                       onClick={() => setIsEditingAddress(true)}
                       className="flex items-center gap-2 text-primary hover:text-primary/80 transition text-sm font-medium"
                     >
-                      <Edit2 className="w-4 h-4" />
-                      Edit
+                      <Plus className="w-4 h-4" />
+                      New Address
                     </button>
                   )}
                 </div>
 
-                {savedAddress && !isEditingAddress ? (
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                    <div className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                      <div className="flex-1">
-                        <p className="font-semibold text-gray-800">{savedAddress.name}</p>
-                        <p className="text-sm text-gray-600">{savedAddress.email} • {savedAddress.phone}</p>
-                        <p className="text-sm text-gray-600 mt-2">
-                          {savedAddress.address}, {savedAddress.city}, {savedAddress.state} - {savedAddress.pincode}
-                        </p>
+                {/* Debug logging */}
+                {console.log('Render state:', { 
+                  savedAddressesCount: savedAddresses.length, 
+                  isEditingAddress, 
+                  selectedAddressId,
+                  showingCards: savedAddresses.length > 0 && !isEditingAddress 
+                })}
+
+                {savedAddresses.length > 0 && !isEditingAddress ? (
+                  <div className="space-y-3">
+                    {savedAddresses.map((address) => (
+                      <div
+                        key={address.id}
+                        onClick={() => handleSelectAddress(address)}
+                        className={`border-2 rounded-lg p-4 cursor-pointer transition ${
+                          selectedAddressId === address.id
+                            ? 'border-primary bg-primary/5'
+                            : 'border-gray-200 hover:border-primary/50'
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                            selectedAddressId === address.id
+                              ? 'border-primary bg-primary'
+                              : 'border-gray-300'
+                          }`}>
+                            {selectedAddressId === address.id && (
+                              <Check className="w-3 h-3 text-white" />
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-semibold text-gray-800">{address.name}</p>
+                            <p className="text-sm text-gray-600">{address.phone}</p>
+                            <p className="text-sm text-gray-600 mt-1">
+                              {address.address}, {address.city}, {address.state} - {address.pincode}
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setFormData({
-                          name: '',
-                          email: '',
-                          phone: '',
-                          address: '',
-                          city: '',
-                          state: '',
-                          pincode: '',
-                        });
-                        setIsEditingAddress(true);
-                      }}
-                      className="mt-4 flex items-center gap-2 text-primary hover:text-primary/80 transition text-sm font-medium"
-                    >
-                      <Plus className="w-4 h-4" />
-                      Use Different Address
-                    </button>
+                    ))}
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -458,36 +495,17 @@ export default function CheckoutPage() {
                       />
                     </div>
 
-                    {!savedAddress && (
+                    {savedAddresses.length > 0 && (
                       <div className="md:col-span-2">
-                        <label className="flex items-center gap-2 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={saveAddress}
-                            onChange={(e) => setSaveAddress(e.target.checked)}
-                            className="w-4 h-4 text-primary rounded focus:ring-2 focus:ring-primary"
-                          />
-                          <span className="text-sm text-gray-700">Save this address for future orders</span>
-                        </label>
-                      </div>
-                    )}
-
-                    {savedAddress && isEditingAddress && (
-                      <div className="md:col-span-2 flex gap-3">
-                        <button
-                          type="button"
-                          onClick={handleSaveAddress}
-                          className="flex-1 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition font-medium"
-                        >
-                          Save Address
-                        </button>
                         <button
                           type="button"
                           onClick={() => {
-                            setFormData(savedAddress);
+                            if (savedAddresses.length > 0) {
+                              handleSelectAddress(savedAddresses[0]);
+                            }
                             setIsEditingAddress(false);
                           }}
-                          className="flex-1 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition font-medium"
+                          className="w-full border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition font-medium"
                         >
                           Cancel
                         </button>

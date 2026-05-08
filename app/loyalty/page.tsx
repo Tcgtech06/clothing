@@ -1,4 +1,6 @@
-import { Award, Gift, Star, TrendingUp } from 'lucide-react';
+'use client';
+
+import { Award, Gift, Star, TrendingUp, ArrowLeft } from 'lucide-react';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
 export default function LoyaltyPage() {
@@ -24,6 +26,15 @@ export default function LoyaltyPage() {
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 py-8">
+          {/* Back Button */}
+          <button
+            onClick={() => window.history.back()}
+            className="flex items-center gap-2 text-gray-600 hover:text-primary transition mb-4"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span className="font-medium">Back</span>
+          </button>
+          
           <h1 className="text-3xl font-bold mb-8 text-gray-800">Loyalty Points</h1>
 
           {/* Points Summary Card */}

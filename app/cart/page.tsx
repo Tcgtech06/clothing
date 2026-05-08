@@ -3,7 +3,7 @@
 import { useCart } from '@/lib/cart-context';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Trash2, Plus, Minus, ShoppingBag } from 'lucide-react';
+import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function CartPage() {
@@ -31,6 +31,15 @@ export default function CartPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-3 md:px-4 py-4 md:py-8">
+        {/* Back Button */}
+        <button
+          onClick={() => window.history.back()}
+          className="flex items-center gap-2 text-gray-600 hover:text-primary transition mb-4"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          <span className="font-medium">Back</span>
+        </button>
+        
         <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-8 text-gray-800">
           Shopping Cart ({getCartCount()} items)
         </h1>

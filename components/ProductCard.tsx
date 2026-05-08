@@ -54,9 +54,9 @@ export default function ProductCard({ product }: { product: Product }) {
       className="bg-white rounded-lg shadow-md hover:shadow-xl transition overflow-hidden group"
       onMouseEnter={handleMouseEnter}
     >
-      {/* Product Image - Clickable - Full Size */}
+      {/* Product Image - Clickable - Responsive Height */}
       <Link href={productLink}>
-        <div className="relative h-80 bg-gray-100 overflow-hidden cursor-pointer">
+        <div className="relative h-48 sm:h-64 md:h-72 lg:h-80 bg-gray-100 overflow-hidden cursor-pointer">
           <img
             src={product.images[0]}
             alt={product.name}
@@ -65,8 +65,8 @@ export default function ProductCard({ product }: { product: Product }) {
           />
           {/* Loyalty Points Badge */}
           {product.loyaltyPoints && (
-            <div className="absolute top-2 left-2 bg-gradient-to-r from-amber-500 to-yellow-500 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg flex items-center gap-1.5">
-              <Coins className="w-4 h-4" />
+            <div className="absolute top-2 left-2 bg-gradient-to-r from-amber-500 to-yellow-500 text-white px-2 py-1 sm:px-3 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-bold shadow-lg flex items-center gap-1 sm:gap-1.5">
+              <Coins className="w-3 h-3 sm:w-4 sm:h-4" />
               <span>+{product.loyaltyPoints}</span>
             </div>
           )}
@@ -74,9 +74,9 @@ export default function ProductCard({ product }: { product: Product }) {
       </Link>
 
       {/* Product Info */}
-      <div className="p-4">
+      <div className="p-3 sm:p-4">
         <Link href={productLink}>
-          <h3 className="font-semibold text-gray-800 mb-2 line-clamp-2 hover:text-primary transition cursor-pointer">
+          <h3 className="font-semibold text-gray-800 mb-2 line-clamp-2 hover:text-primary transition cursor-pointer text-sm sm:text-base">
             {product.name}
           </h3>
         </Link>
@@ -85,7 +85,7 @@ export default function ProductCard({ product }: { product: Product }) {
         <div className="mb-3">
           {/* Always show poll bar - gray if no data */}
           <div className="flex items-center gap-1 mb-2">
-            <div className="flex-1 flex gap-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div className="flex-1 flex gap-0.5 sm:gap-1 h-1.5 sm:h-2 bg-gray-200 rounded-full overflow-hidden">
               {product.poll && totalVotes > 0 ? (
                 <>
                   {product.poll.best > 0 && (
@@ -121,22 +121,22 @@ export default function ProductCard({ product }: { product: Product }) {
             </div>
           </div>
           {/* Always show color dots and counts */}
-          <div className="flex items-center justify-between text-xs">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+          <div className="flex items-center justify-between text-[10px] sm:text-xs">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="flex items-center gap-0.5 sm:gap-1">
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-500 rounded-full"></div>
                 <span className="text-gray-600">{product.poll?.best || 0}</span>
               </div>
-              <div className="flex items-center gap-1">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+              <div className="flex items-center gap-0.5 sm:gap-1">
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-500 rounded-full"></div>
                 <span className="text-gray-600">{product.poll?.good || 0}</span>
               </div>
-              <div className="flex items-center gap-1">
-                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+              <div className="flex items-center gap-0.5 sm:gap-1">
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-yellow-500 rounded-full"></div>
                 <span className="text-gray-600">{product.poll?.average || 0}</span>
               </div>
-              <div className="flex items-center gap-1">
-                <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+              <div className="flex items-center gap-0.5 sm:gap-1">
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-red-500 rounded-full"></div>
                 <span className="text-gray-600">{product.poll?.worst || 0}</span>
               </div>
             </div>
@@ -145,9 +145,9 @@ export default function ProductCard({ product }: { product: Product }) {
         </div>
 
         {/* Price and Add to Cart */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2">
           <div>
-            <p className="text-2xl font-bold text-primary">₹{product.price.toLocaleString('en-IN')}</p>
+            <p className="text-lg sm:text-xl md:text-2xl font-bold text-primary">₹{product.price.toLocaleString('en-IN')}</p>
           </div>
           <CheckoutButton 
             productName={product.name} 

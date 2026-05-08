@@ -2,7 +2,7 @@
 
 import { useFavourites } from '@/lib/favourites-context';
 import ProductCard from '@/components/ProductCard';
-import { Heart, X } from 'lucide-react';
+import { Heart, X, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -14,6 +14,15 @@ export default function FavouritesPage() {
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50 pt-16 pb-20 md:pt-20 md:pb-8">
         <div className="max-w-7xl mx-auto px-4 py-8">
+          {/* Back Button */}
+          <button
+            onClick={() => window.history.back()}
+            className="flex items-center gap-2 text-gray-600 hover:text-primary transition mb-4"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span className="font-medium">Back</span>
+          </button>
+          
           <div className="flex items-center gap-3 mb-8">
             <Heart className="w-8 h-8 text-red-500 fill-red-500" />
             <h1 className="text-3xl font-bold text-gray-800">My Favourites</h1>

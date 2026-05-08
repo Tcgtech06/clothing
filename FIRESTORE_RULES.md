@@ -24,6 +24,11 @@ service cloud.firestore {
       allow read: if request.auth != null;
       allow list: if true;
       allow write: if request.auth != null && request.auth.uid == userId;
+      
+      // User Addresses subcollection
+      match /addresses/{addressId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
     }
 
     // User Addresses - users can only access their own address

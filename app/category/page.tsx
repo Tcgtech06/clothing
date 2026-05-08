@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Filter, ChevronDown, X, SlidersHorizontal, Watch, Footprints, Tag, ShoppingBag } from 'lucide-react';
+import { Filter, ChevronDown, X, SlidersHorizontal, Watch, Footprints, Tag, ShoppingBag, ArrowLeft } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { products as staticProducts } from '@/data/products';
@@ -9,7 +9,7 @@ import { CATEGORIES } from '@/data/categories';
 import ProductCard from '@/components/ProductCard';
 import type { Product } from '@/data/products';
 
-type SortOption = 'default' | 'price-low-high' | 'price-high-low' | 'rating';
+type SortOption = 'default' | 'price-low-high' | 'price-high-low' | 'top-polled';
 
 // Custom SVG icons for male/female
 const WomanIcon = ({ className }: { className?: string }) => (
@@ -62,7 +62,14 @@ export default function CategoryPage() {
     .sort((a, b) => {
       if (sortBy === 'price-low-high') return a.price - b.price;
       if (sortBy === 'price-high-low') return b.price - a.price;
-      if (sortBy === 'rating') return (b.rating || 0) - (a.rating || 0);
+      if (sortBy === 'top-polled') {
+        // Calculate total poll votes for each product
+        const getTotalVotes = (product: Product) => {
+          if (!product.poll) return 0;
+          return product.poll.best + product.poll.good + product.poll.average + product.poll.worst;
+        };
+        return getTotalVotes(b) - getTotalVotes(a);
+      }
       return 0;
     });
 
@@ -74,6 +81,15 @@ export default function CategoryPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
+
+        {/* Back Button */}
+        <button
+          onClick={() => window.history.back()}
+          className="flex items-center gap-2 text-gray-600 hover:text-primary transition mb-4"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          <span className="font-medium">Back</span>
+        </button>
 
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -110,7 +126,7 @@ export default function CategoryPage() {
                 { value: 'default', label: 'Default' },
                 { value: 'price-low-high', label: 'Price: Low to High' },
                 { value: 'price-high-low', label: 'Price: High to Low' },
-                { value: 'rating', label: 'Top Rated' },
+                { value: 'top-polled', label: 'Top Polled' },
               ].map((opt) => (
                 <button
                   key={opt.value}
@@ -164,7 +180,7 @@ export default function CategoryPage() {
           </p>
           {sortBy !== 'default' && (
             <span className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-medium">
-              {sortBy === 'price-low-high' ? 'Price: Low to High' : sortBy === 'price-high-low' ? 'Price: High to Low' : 'Top Rated'}
+              {sortBy === 'price-low-high' ? 'Price: Low to High' : sortBy === 'price-high-low' ? 'Price: High to Low' : 'Top Polled'}
             </span>
           )}
         </div>
@@ -177,7 +193,7 @@ export default function CategoryPage() {
             <p className="text-gray-500">Try selecting a different category</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
             {filtered.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}

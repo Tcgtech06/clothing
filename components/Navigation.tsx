@@ -10,6 +10,22 @@ import { useCart } from '@/lib/cart-context';
 import { useFavourites } from '@/lib/favourites-context';
 import { useAuth } from '@/lib/auth-context';
 
+// Gender Icons - Colorful versions
+const MaleIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="3.5" r="2.5" fill="#3B82F6"/>
+    <path d="M9 7h6l1.5 7H15l-1 8h-4l-1-8H7.5L9 7z" fill="#60A5FA"/>
+  </svg>
+);
+
+const FemaleIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="3.5" r="2.5" fill="#EC4899"/>
+    <path d="M8 9.5C8 8.12 9.12 7 10.5 7h3C14.88 7 16 8.12 16 9.5v4l-1.5 1L12 22l-2.5-7.5L8 13.5V9.5z" fill="#F472B6"/>
+    <path d="M9.5 13.5L8 20h8l-1.5-6.5" fill="#FBCFE8"/>
+  </svg>
+);
+
 const navItems = [
   { name: 'Home', href: '/', icon: Home },
   { name: 'Explore', href: '/category', icon: Grid },
@@ -49,9 +65,17 @@ export default function Navigation() {
             {/* Profile Icon */}
             <button
               onClick={() => setShowMobileProfile(true)}
-              className="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-white hover:shadow-lg transition"
+              className="w-10 h-10 rounded-full bg-white border-2 border-primary flex items-center justify-center hover:shadow-lg transition"
             >
-              <User className="w-6 h-6" />
+              {userData?.gender === 'male' ? (
+                <MaleIcon className="w-8 h-8" />
+              ) : userData?.gender === 'female' ? (
+                <FemaleIcon className="w-8 h-8" />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-white">
+                  <User className="w-6 h-6" />
+                </div>
+              )}
             </button>
           </div>
 
@@ -128,9 +152,17 @@ export default function Navigation() {
               <div className="relative">
                 <button
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
-                  className="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-white hover:shadow-lg transition"
+                  className="w-10 h-10 rounded-full bg-white border-2 border-primary flex items-center justify-center hover:shadow-lg transition"
                 >
-                  <User className="w-5 h-5" />
+                  {userData?.gender === 'male' ? (
+                    <MaleIcon className="w-8 h-8" />
+                  ) : userData?.gender === 'female' ? (
+                    <FemaleIcon className="w-8 h-8" />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-white">
+                      <User className="w-5 h-5" />
+                    </div>
+                  )}
                 </button>
                 
                 {/* Profile Dropdown */}

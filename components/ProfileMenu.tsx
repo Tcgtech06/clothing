@@ -4,6 +4,22 @@ import { User, LogOut, X } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 
+// Gender Icons - Colorful versions
+const MaleIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="3.5" r="2.5" fill="#3B82F6"/>
+    <path d="M9 7h6l1.5 7H15l-1 8h-4l-1-8H7.5L9 7z" fill="#60A5FA"/>
+  </svg>
+);
+
+const FemaleIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="3.5" r="2.5" fill="#EC4899"/>
+    <path d="M8 9.5C8 8.12 9.12 7 10.5 7h3C14.88 7 16 8.12 16 9.5v4l-1.5 1L12 22l-2.5-7.5L8 13.5V9.5z" fill="#F472B6"/>
+    <path d="M9.5 13.5L8 20h8l-1.5-6.5" fill="#FBCFE8"/>
+  </svg>
+);
+
 interface ProfileMenuProps {
   isOpen: boolean;
   onClose: () => void;
@@ -114,8 +130,14 @@ export default function ProfileMenu({ isOpen, onClose }: ProfileMenuProps) {
             
             {/* User Info */}
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-primary text-xl font-bold">
-                {initial}
+              <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center">
+                {userData?.gender === 'male' ? (
+                  <MaleIcon className="w-10 h-10" />
+                ) : userData?.gender === 'female' ? (
+                  <FemaleIcon className="w-10 h-10" />
+                ) : (
+                  <div className="text-primary text-xl font-bold">{initial}</div>
+                )}
               </div>
               <div>
                 <p className="font-semibold text-base">{displayName}</p>
