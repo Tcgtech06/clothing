@@ -296,6 +296,18 @@ function AdminDashboard() {
     try {
       console.log('Updating return status:', { returnId, status, adminNotes });
       
+      const statusTitles: { [key: string]: string } = {
+        'approved': 'Return Approved',
+        'rejected': 'Return Rejected',
+        'refunded': 'Refund Completed'
+      };
+
+      const statusMessages: { [key: string]: string } = {
+        'approved': 'Your return request has been approved. We will schedule a pickup soon.',
+        'rejected': 'Your return request has been rejected. Please contact support for more details.',
+        'refunded': 'Your refund has been completed and credited to your account.'
+      };
+      
       // Update return request document
       await updateDoc(doc(db, 'returnRequests', returnId), {
         status,
@@ -313,6 +325,22 @@ function AdminDashboard() {
           'returnRequest.adminNotes': adminNotes || undefined
         });
         console.log('Order updated successfully');
+        
+        // Send notification to user
+        try {
+          await addDoc(collection(db, 'userNotifications'), {
+            userId: selectedReturn.customerEmail,
+            title: statusTitles[status] || 'Return Status Updated',
+            message: adminNotes || statusMessages[status] || 'Your return status has been updated',
+            type: 'return',
+            orderId: selectedReturn.orderId,
+            read: false,
+            createdAt: serverTimestamp()
+          });
+          console.log('User notification sent');
+        } catch (notifError) {
+          console.error('Error sending notification:', notifError);
+        }
       }
 
       alert(`Return request ${status} successfully!`);
@@ -340,6 +368,14 @@ function AdminDashboard() {
         'refund-completed': 'Refund has been completed and credited to your account'
       };
 
+      const statusTitles: { [key: string]: string } = {
+        'pending': 'Return Pending',
+        'approved': 'Return Approved',
+        'pickup-scheduled': 'Pickup Scheduled',
+        'picked-up': 'Product Picked Up',
+        'refund-completed': 'Refund Completed'
+      };
+
       const newTrackingEntry = {
         status: trackingStatus.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
         date: new Date().toISOString(),
@@ -362,6 +398,22 @@ function AdminDashboard() {
         'returnRequest.returnStatus': trackingStatus,
         'returnRequest.returnTrackingHistory': updatedHistory
       });
+
+      // Send notification to user
+      try {
+        await addDoc(collection(db, 'userNotifications'), {
+          userId: selectedReturn.customerEmail,
+          title: statusTitles[trackingStatus] || 'Return Status Updated',
+          message: statusDescriptions[trackingStatus] || 'Your return status has been updated',
+          type: 'return',
+          orderId: selectedReturn.orderId,
+          read: false,
+          createdAt: serverTimestamp()
+        });
+        console.log('User notification sent');
+      } catch (notifError) {
+        console.error('Error sending notification:', notifError);
+      }
 
       console.log('Return tracking status updated successfully');
       alert('Return tracking status updated successfully!');

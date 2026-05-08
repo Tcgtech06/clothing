@@ -637,10 +637,30 @@ export default function OrdersPage() {
                         <RotateCcw className="w-3 h-3 md:w-4 md:h-4" />
                         Return Request Active - Tracking Return Process
                       </p>
-                      {/* Debug: Show actual return status */}
-                      <p className="text-xs text-gray-600 mt-1">
-                        Debug: returnStatus = &quot;{order.returnRequest?.returnStatus || 'undefined'}&quot;
-                      </p>
+                      {/* Return Status Badge */}
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className={`text-xs px-3 py-1 rounded-full font-semibold ${
+                          order.returnRequest.returnStatus === 'refund-completed' ? 'bg-green-100 text-green-800' :
+                          order.returnRequest.returnStatus === 'picked-up' ? 'bg-purple-100 text-purple-800' :
+                          order.returnRequest.returnStatus === 'pickup-scheduled' ? 'bg-indigo-100 text-indigo-800' :
+                          order.returnRequest.returnStatus === 'approved' ? 'bg-blue-100 text-blue-800' :
+                          'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {order.returnRequest.returnStatus === 'refund-completed' ? 'Refund Completed' :
+                           order.returnRequest.returnStatus === 'picked-up' ? 'Product Picked Up' :
+                           order.returnRequest.returnStatus === 'pickup-scheduled' ? 'Pickup Scheduled' :
+                           order.returnRequest.returnStatus === 'approved' ? 'Return Approved' :
+                           'Return Pending'}
+                        </span>
+                      </div>
+                      
+                      {/* Admin Notes */}
+                      {order.returnRequest.adminNotes && (
+                        <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                          <p className="text-xs font-semibold text-blue-800 mb-1">Admin Notes:</p>
+                          <p className="text-sm text-blue-900">{order.returnRequest.adminNotes}</p>
+                        </div>
+                      )}
                     </div>
                     <div className="relative overflow-x-auto pb-2">
                       {/* Progress Line */}
