@@ -222,8 +222,8 @@ export default function OrdersPage() {
         [orderId]: true
       }));
       
-      // MUCH SLOWER animation: 8 seconds per step for very slow, smooth movement
-      const duration = Math.max(currentStepIndex * 8000, 8000);
+      // MUCH SLOWER animation: 5 seconds per step for smooth movement
+      const duration = Math.max(currentStepIndex * 5000, 5000);
       
       setTimeout(() => {
         setTruckPositions(prev => ({
@@ -556,8 +556,7 @@ export default function OrdersPage() {
                         }}
                       ></div>
                       
-                      {/* Animated Truck Video - Hide when delivered */}
-                      {order.status !== 'delivered' && (
+                      {/* Animated Truck Video */}
                       <div 
                         className="absolute top-[-8px] md:top-[-6px] truck-container"
                         style={{ 
@@ -565,7 +564,7 @@ export default function OrdersPage() {
                           transform: 'translateX(-50%)',
                           zIndex: 3,
                           transition: isAnimating[order.id] 
-                            ? `left ${Math.max(getTrackingSteps(order.status).findIndex(s => s.status === 'current') * 8, 8)}s linear` 
+                            ? `left ${Math.max(getTrackingSteps(order.status).findIndex(s => s.status === 'current') * 5, 5)}s linear` 
                             : 'none'
                         }}
                       >
@@ -614,7 +613,6 @@ export default function OrdersPage() {
                           )}
                         </div>
                       </div>
-                      )}
                       
                       {/* Steps - Reduced Gap */}
                       <div className="relative flex justify-between min-w-[400px] md:min-w-0 gap-2" style={{ zIndex: 2 }}>
@@ -691,7 +689,7 @@ export default function OrdersPage() {
                           transform: 'translateX(-50%)',
                           zIndex: 3,
                           transition: isAnimating[order.id] 
-                            ? `left ${Math.max(getReturnTrackingSteps(order.returnRequest.returnStatus || 'pending').findIndex(s => s.status === 'current') * 8, 8)}s linear` 
+                            ? `left ${Math.max(getReturnTrackingSteps(order.returnRequest.returnStatus || 'pending').findIndex(s => s.status === 'current') * 5, 5)}s linear` 
                             : 'none'
                         }}
                       >
