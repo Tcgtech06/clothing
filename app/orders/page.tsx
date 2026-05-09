@@ -222,8 +222,8 @@ export default function OrdersPage() {
         [orderId]: true
       }));
       
-      // MUCH SLOWER animation: 5 seconds per step for smooth movement
-      const duration = Math.max(currentStepIndex * 5000, 5000);
+      // Smooth animation: 1.8 seconds per step for faster movement
+      const duration = Math.max(currentStepIndex * 1800, 1800);
       
       setTimeout(() => {
         setTruckPositions(prev => ({
@@ -564,7 +564,7 @@ export default function OrdersPage() {
                           transform: 'translateX(-50%)',
                           zIndex: 3,
                           transition: isAnimating[order.id] 
-                            ? `left ${Math.max(getTrackingSteps(order.status).findIndex(s => s.status === 'current') * 5, 5)}s linear` 
+                            ? `left ${Math.max(getTrackingSteps(order.status).findIndex(s => s.status === 'current') * 1.8, 1.8)}s linear` 
                             : 'none'
                         }}
                       >
@@ -689,7 +689,7 @@ export default function OrdersPage() {
                           transform: 'translateX(-50%)',
                           zIndex: 3,
                           transition: isAnimating[order.id] 
-                            ? `left ${Math.max(getReturnTrackingSteps(order.returnRequest.returnStatus || 'pending').findIndex(s => s.status === 'current') * 5, 5)}s linear` 
+                            ? `left ${Math.max(getReturnTrackingSteps(order.returnRequest.returnStatus || 'pending').findIndex(s => s.status === 'current') * 1.8, 1.8)}s linear` 
                             : 'none'
                         }}
                       >
