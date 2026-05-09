@@ -82,22 +82,21 @@ const getTrackingSteps = (status: string) => {
     { key: 'delivered', label: 'Delivered' },
   ];
 
-  // Map status to last completed step index
-  // currentStepIndex represents the LAST COMPLETED step
-  let currentStepIndex = -1; // -1 means no steps completed yet
-  if (status === 'new' || status === 'placed') currentStepIndex = -1; // No steps completed
-  else if (status === 'accepted' || status === 'processing') currentStepIndex = 0; // Step 0 completed
-  else if (status === 'shipped') currentStepIndex = 1; // Step 1 completed
-  else if (status === 'nearby') currentStepIndex = 2; // Step 2 completed
-  else if (status === 'out-for-delivery') currentStepIndex = 3; // Step 3 completed
-  else if (status === 'delivered') currentStepIndex = 4; // Step 4 completed
+  // Map status to current step index (the step that is IN PROGRESS or just completed)
+  let currentStepIndex = 0;
+  if (status === 'new' || status === 'placed') currentStepIndex = 0; // Step 0 is current
+  else if (status === 'accepted' || status === 'processing') currentStepIndex = 0; // Step 0 is current
+  else if (status === 'shipped') currentStepIndex = 1; // Step 1 is current
+  else if (status === 'nearby') currentStepIndex = 2; // Step 2 is current
+  else if (status === 'out-for-delivery') currentStepIndex = 3; // Step 3 is current
+  else if (status === 'delivered') currentStepIndex = 4; // Step 4 is current (completed)
 
   return allSteps.map((step, index) => ({
     ...step,
-    // If index <= currentStepIndex, it's completed
-    // If index === currentStepIndex + 1, it's current (in progress)
+    // If index < currentStepIndex, it's completed
+    // If index === currentStepIndex, it's current (in progress)
     // Otherwise it's pending
-    status: index <= currentStepIndex ? 'completed' : index === currentStepIndex + 1 ? 'current' : 'pending'
+    status: index < currentStepIndex ? 'completed' : index === currentStepIndex ? 'current' : 'pending'
   }));
 };
 
@@ -109,25 +108,23 @@ const getReturnTrackingSteps = (returnStatus: string) => {
     { key: 'refund-completed', label: 'Refund Completed' },
   ];
 
-  // Map return status to step index
-  // currentStepIndex represents the LAST COMPLETED step
-  // When status is 'approved', step 0 is completed, so currentStepIndex = 0
-  // When status is 'pickup-scheduled', step 1 is completed, so currentStepIndex = 1
-  let currentStepIndex = -1; // -1 means no steps completed yet
-  if (returnStatus === 'pending') currentStepIndex = -1; // No steps completed
-  else if (returnStatus === 'approved') currentStepIndex = 0; // Step 0 completed
-  else if (returnStatus === 'pickup-scheduled') currentStepIndex = 1; // Step 1 completed
-  else if (returnStatus === 'picked-up') currentStepIndex = 2; // Step 2 completed
+  // Map return status to current step index (the step that is IN PROGRESS)
+  // currentStepIndex represents the step that is CURRENTLY IN PROGRESS
+  let currentStepIndex = 0;
+  if (returnStatus === 'pending') currentStepIndex = 0; // Step 0 is current
+  else if (returnStatus === 'approved') currentStepIndex = 0; // Step 0 is current (just approved)
+  else if (returnStatus === 'pickup-scheduled') currentStepIndex = 1; // Step 1 is current
+  else if (returnStatus === 'picked-up') currentStepIndex = 2; // Step 2 is current
   else if (returnStatus === 'return-successful') currentStepIndex = 2;
   else if (returnStatus === 'refund-initiated') currentStepIndex = 2;
-  else if (returnStatus === 'refund-completed') currentStepIndex = 3; // Step 3 completed
+  else if (returnStatus === 'refund-completed') currentStepIndex = 3; // Step 3 is current (completed)
 
   return allSteps.map((step, index) => ({
     ...step,
-    // If index <= currentStepIndex, it's completed
-    // If index === currentStepIndex + 1, it's current (in progress)
+    // If index < currentStepIndex, it's completed
+    // If index === currentStepIndex, it's current (in progress)
     // Otherwise it's pending
-    status: index <= currentStepIndex ? 'completed' : index === currentStepIndex + 1 ? 'current' : 'pending'
+    status: index < currentStepIndex ? 'completed' : index === currentStepIndex ? 'current' : 'pending'
   }));
 };
 
@@ -198,40 +195,21 @@ export default function OrdersPage() {
       
       // Get all steps
       let steps;
-      let completedSteps;
+      let currentStepIndex;
       
       if (order.returnRequest) {
         steps = getReturnTrackingSteps(order.returnRequest.returnStatus || 'pending');
-        // Count completed steps to determine truck position
-        completedSteps = steps.filter(s => s.status === 'completed').length;
+        currentStepIndex = steps.findIndex(s => s.status === 'current');
       } else {
         steps = getTrackingSteps(order.status);
-        // Count completed steps to determine truck position
-        completedSteps = steps.filter(s => s.status === 'completed').length;
+        currentStepIndex = steps.findIndex(s => s.status === 'current');
       }
       
-      // For pending return status, truck should be at 0%
-      if (order.returnRequest && order.returnRequest.returnStatus === 'pending') {
-        setTruckPositions(prev => ({
-          ...prev,
-          [orderId]: 0
-        }));
-        setIsAnimating(prev => ({
-          ...prev,
-          [orderId]: false
-        }));
-        return;
-      }
+      if (currentStepIndex === -1) currentStepIndex = 0;
       
-      // Calculate target position based on last completed step
-      // Steps are indexed 0, 1, 2, 3 (4 total steps)
-      // Positions are 0%, 33.33%, 66.66%, 100%
-      // If 1 step completed (index 0), position = 0 / 3 * 100 = 0%
-      // If 2 steps completed (index 1), position = 1 / 3 * 100 = 33.33%
-      // If 3 steps completed (index 2), position = 2 / 3 * 100 = 66.66%
-      // If 4 steps completed (index 3), position = 3 / 3 * 100 = 100%
-      const lastCompletedIndex = completedSteps - 1; // -1 because array is 0-indexed
-      const targetPosition = lastCompletedIndex >= 0 ? (lastCompletedIndex / (steps.length - 1)) * 100 : 0;
+      // Calculate target position based on current step
+      // Truck should be AT the current step position
+      const targetPosition = (currentStepIndex / (steps.length - 1)) * 100;
       
       // Start from 0
       setTruckPositions(prev => ({
@@ -244,9 +222,8 @@ export default function OrdersPage() {
         [orderId]: true
       }));
       
-      // Smoothly animate to target position with slow, constant speed
-      // Duration: 3 seconds per step for smooth, slow movement
-      const duration = Math.max(completedSteps * 3000, 3000);
+      // MUCH SLOWER animation: 8 seconds per step for very slow, smooth movement
+      const duration = Math.max(currentStepIndex * 8000, 8000);
       
       setTimeout(() => {
         setTruckPositions(prev => ({
@@ -588,7 +565,7 @@ export default function OrdersPage() {
                           transform: 'translateX(-50%)',
                           zIndex: 3,
                           transition: isAnimating[order.id] 
-                            ? `left ${Math.max(getTrackingSteps(order.status).findIndex(s => s.status === 'current') * 3, 3)}s linear` 
+                            ? `left ${Math.max(getTrackingSteps(order.status).findIndex(s => s.status === 'current') * 8, 8)}s linear` 
                             : 'none'
                         }}
                       >
@@ -714,7 +691,7 @@ export default function OrdersPage() {
                           transform: 'translateX(-50%)',
                           zIndex: 3,
                           transition: isAnimating[order.id] 
-                            ? `left ${Math.max(getReturnTrackingSteps(order.returnRequest.returnStatus || 'pending').findIndex(s => s.status === 'current') * 3, 3)}s linear` 
+                            ? `left ${Math.max(getReturnTrackingSteps(order.returnRequest.returnStatus || 'pending').findIndex(s => s.status === 'current') * 8, 8)}s linear` 
                             : 'none'
                         }}
                       >
