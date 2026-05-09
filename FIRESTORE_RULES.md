@@ -47,10 +47,11 @@ service cloud.firestore {
     }
     
     // User Notifications - users can only access their own notifications
+    // Note: userId field stores user's email for compatibility
     match /userNotifications/{notificationId} {
-      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow read: if request.auth != null && request.auth.token.email == resource.data.userId;
       allow create: if request.auth != null;
-      allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow update, delete: if request.auth != null && request.auth.token.email == resource.data.userId;
     }
     
     // Admin Notifications - any authenticated user can access (for admin dashboard)
