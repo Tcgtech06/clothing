@@ -398,7 +398,15 @@ function AdminDashboard() {
       const updatedHistory = [...existingHistory, newTrackingEntry];
 
       console.log('Updating returnRequests document...');
+      
+      // Determine the main status based on tracking status
+      let mainStatus: 'pending' | 'approved' | 'rejected' | 'refunded' = 'approved';
+      if (trackingStatus === 'pending') mainStatus = 'pending';
+      else if (trackingStatus === 'refund-completed') mainStatus = 'refunded';
+      else mainStatus = 'approved'; // For approved, pickup-scheduled, picked-up
+      
       await updateDoc(doc(db, 'returnRequests', returnId), {
+        status: mainStatus, // Update main status field
         returnStatus: trackingStatus,
         returnTrackingHistory: updatedHistory,
         updatedAt: serverTimestamp()
@@ -407,6 +415,7 @@ function AdminDashboard() {
       console.log('Updating orders document...');
       // Also update the order's return request
       await updateDoc(doc(db, 'orders', selectedReturn.orderId), {
+        'returnRequest.status': mainStatus, // Update main status field
         'returnRequest.returnStatus': trackingStatus,
         'returnRequest.returnTrackingHistory': updatedHistory
       });
@@ -431,7 +440,12 @@ function AdminDashboard() {
       alert('Return tracking status updated successfully!');
       
       // Refresh the selected return to show updated data
-      const updatedReturn = { ...selectedReturn, returnStatus: trackingStatus as any, returnTrackingHistory: updatedHistory };
+      const updatedReturn = { 
+        ...selectedReturn, 
+        status: mainStatus, // Update main status
+        returnStatus: trackingStatus as any, 
+        returnTrackingHistory: updatedHistory 
+      };
       setSelectedReturn(updatedReturn);
     } catch (error: any) {
       console.error('Error updating return tracking status:', error);
