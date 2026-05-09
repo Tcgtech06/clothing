@@ -9,8 +9,9 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: '#FFB5A7', // Peach
-        secondary: '#E6B8FF', // Lavender
+        primary: '#FF9482', // Peach - Main brand color
+        secondary: '#FFB5A7', // Lighter Peach
+        accent: '#FF7461', // Darker Peach for accents
         peach: {
           50: '#FFF5F3',
           100: '#FFE8E3',

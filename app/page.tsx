@@ -80,12 +80,12 @@ export default function Home() {
   const featuredProducts = products.slice(0, 6);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-peach-50 via-white to-peach-50">
+    <div className="min-h-screen bg-gradient-to-b from-peach-50 via-white to-peach-100">
       {/* Hero Slideshow Section */}
       <HeroSlideshow />
 
       {/* Premium Features Banner */}
-      <section className="bg-gradient-to-r from-peach-100 via-peach-50 to-lavender-50 py-8 md:py-12">
+      <section className="bg-gradient-to-r from-peach-100 via-peach-50 to-peach-100 py-8 md:py-12">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
             <div className="flex flex-col items-center text-center p-4 bg-white/60 backdrop-blur-sm rounded-2xl shadow-sm hover:shadow-md transition">
@@ -97,7 +97,7 @@ export default function Home() {
             </div>
             
             <div className="flex flex-col items-center text-center p-4 bg-white/60 backdrop-blur-sm rounded-2xl shadow-sm hover:shadow-md transition">
-              <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-lavender-400 to-lavender-500 rounded-full flex items-center justify-center mb-3 shadow-lg">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-peach-500 to-peach-600 rounded-full flex items-center justify-center mb-3 shadow-lg">
                 <TrendingUp className="w-6 h-6 md:w-8 md:h-8 text-white" />
               </div>
               <h3 className="font-bold text-sm md:text-base text-gray-800 mb-1">Trending Styles</h3>
@@ -113,7 +113,7 @@ export default function Home() {
             </div>
             
             <div className="flex flex-col items-center text-center p-4 bg-white/60 backdrop-blur-sm rounded-2xl shadow-sm hover:shadow-md transition">
-              <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-lavender-400 to-lavender-500 rounded-full flex items-center justify-center mb-3 shadow-lg">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-peach-500 to-peach-600 rounded-full flex items-center justify-center mb-3 shadow-lg">
                 <ShoppingBag className="w-6 h-6 md:w-8 md:h-8 text-white" />
               </div>
               <h3 className="font-bold text-sm md:text-base text-gray-800 mb-1">Easy Returns</h3>
@@ -126,7 +126,7 @@ export default function Home() {
       {/* Featured Products */}
       <section className="max-w-7xl mx-auto px-4 py-12 md:py-16">
         <div className="text-center mb-10 md:mb-12">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 bg-gradient-to-r from-peach-500 to-lavender-500 bg-clip-text text-transparent">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 bg-gradient-to-r from-peach-500 via-peach-400 to-peach-600 bg-clip-text text-transparent">
             Featured Collection
           </h2>
           <p className="text-gray-600 text-sm md:text-base max-w-2xl mx-auto">
@@ -161,7 +161,7 @@ export default function Home() {
       <section className="bg-gradient-to-b from-white to-peach-50 py-12 md:py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-10 md:mb-12">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 bg-gradient-to-r from-peach-500 to-lavender-500 bg-clip-text text-transparent">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 bg-gradient-to-r from-peach-500 via-peach-400 to-peach-600 bg-clip-text text-transparent">
               Shop by Category
             </h2>
             <p className="text-gray-600 text-sm md:text-base">
@@ -176,11 +176,7 @@ export default function Home() {
                 href="/category"
                 className="group relative overflow-hidden bg-white p-6 md:p-8 rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 cursor-pointer text-center transform hover:scale-105"
               >
-                <div className={`absolute inset-0 bg-gradient-to-br ${
-                  index % 2 === 0 
-                    ? 'from-peach-100 to-peach-200' 
-                    : 'from-lavender-100 to-lavender-200'
-                } opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-peach-100 to-peach-200 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="relative z-10">
                   <h3 className="font-bold text-base md:text-lg text-gray-800 group-hover:text-peach-600 transition">
                     {category}
@@ -194,7 +190,7 @@ export default function Home() {
       </section>
 
       {/* Newsletter Section */}
-      <section className="bg-gradient-to-r from-peach-400 via-peach-500 to-lavender-400 py-12 md:py-16">
+      <section className="bg-gradient-to-r from-peach-400 via-peach-500 to-peach-600 py-12 md:py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 md:mb-4">
             Join Our Exclusive Club
