@@ -162,7 +162,7 @@ export default function Navigation() {
 
           {/* Logo - Center */}
           <Link href="/" className="text-xl font-bold text-primary">
-            E-Shop
+            Layara
           </Link>
 
           {/* Right Side Icons */}
@@ -199,7 +199,7 @@ export default function Navigation() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
               <Link href="/" className="text-2xl font-bold text-primary">
-                E-Shop
+                Layara
               </Link>
             </div>
             <div className="flex items-center space-x-1">

@@ -159,8 +159,8 @@ export default function CheckoutPage() {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: data.amount,
         currency: data.currency,
-        name: 'E-Shop',
-        description: 'Purchase from E-Shop',
+        name: 'Layara',
+        description: 'Purchase from Layara',
         order_id: data.orderId,
         prefill: {
           name: formData.name,

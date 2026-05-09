@@ -7,6 +7,8 @@ import { products as staticProducts, Product as StaticProduct } from '@/data/pro
 import { CATEGORIES } from '@/data/categories';
 import { db } from '@/lib/firebase';
 import { collection, getDocs, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { Sparkles, TrendingUp, Award, ShoppingBag } from 'lucide-react';
+import Link from 'next/link';
 
 // No caching - always fetch fresh data
 export default function Home() {
@@ -78,39 +80,138 @@ export default function Home() {
   const featuredProducts = products.slice(0, 6);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-b from-peach-50 via-white to-peach-50">
       {/* Hero Slideshow Section */}
       <HeroSlideshow />
 
+      {/* Premium Features Banner */}
+      <section className="bg-gradient-to-r from-peach-100 via-peach-50 to-lavender-50 py-8 md:py-12">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+            <div className="flex flex-col items-center text-center p-4 bg-white/60 backdrop-blur-sm rounded-2xl shadow-sm hover:shadow-md transition">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-peach-400 to-peach-500 rounded-full flex items-center justify-center mb-3 shadow-lg">
+                <Sparkles className="w-6 h-6 md:w-8 md:h-8 text-white" />
+              </div>
+              <h3 className="font-bold text-sm md:text-base text-gray-800 mb-1">Premium Quality</h3>
+              <p className="text-xs text-gray-600 hidden md:block">Handpicked Collections</p>
+            </div>
+            
+            <div className="flex flex-col items-center text-center p-4 bg-white/60 backdrop-blur-sm rounded-2xl shadow-sm hover:shadow-md transition">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-lavender-400 to-lavender-500 rounded-full flex items-center justify-center mb-3 shadow-lg">
+                <TrendingUp className="w-6 h-6 md:w-8 md:h-8 text-white" />
+              </div>
+              <h3 className="font-bold text-sm md:text-base text-gray-800 mb-1">Trending Styles</h3>
+              <p className="text-xs text-gray-600 hidden md:block">Latest Fashion</p>
+            </div>
+            
+            <div className="flex flex-col items-center text-center p-4 bg-white/60 backdrop-blur-sm rounded-2xl shadow-sm hover:shadow-md transition">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-peach-400 to-peach-500 rounded-full flex items-center justify-center mb-3 shadow-lg">
+                <Award className="w-6 h-6 md:w-8 md:h-8 text-white" />
+              </div>
+              <h3 className="font-bold text-sm md:text-base text-gray-800 mb-1">Best Rated</h3>
+              <p className="text-xs text-gray-600 hidden md:block">Customer Favorites</p>
+            </div>
+            
+            <div className="flex flex-col items-center text-center p-4 bg-white/60 backdrop-blur-sm rounded-2xl shadow-sm hover:shadow-md transition">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-lavender-400 to-lavender-500 rounded-full flex items-center justify-center mb-3 shadow-lg">
+                <ShoppingBag className="w-6 h-6 md:w-8 md:h-8 text-white" />
+              </div>
+              <h3 className="font-bold text-sm md:text-base text-gray-800 mb-1">Easy Returns</h3>
+              <p className="text-xs text-gray-600 hidden md:block">7 Days Return</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Featured Products */}
-      <section className="max-w-7xl mx-auto px-4 py-12">
-        <h2 className="text-3xl font-bold mb-8 text-gray-800">Featured Products</h2>
+      <section className="max-w-7xl mx-auto px-4 py-12 md:py-16">
+        <div className="text-center mb-10 md:mb-12">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 bg-gradient-to-r from-peach-500 to-lavender-500 bg-clip-text text-transparent">
+            Featured Collection
+          </h2>
+          <p className="text-gray-600 text-sm md:text-base max-w-2xl mx-auto">
+            Discover our handpicked selection of premium fashion pieces
+          </p>
+        </div>
         
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
           {featuredProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
         
         {loading && (
-          <div className="text-center mt-4">
-            <p className="text-sm text-gray-500">Loading more products...</p>
+          <div className="text-center mt-8">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-peach-200 border-t-peach-500"></div>
+            <p className="text-sm text-gray-500 mt-2">Loading more products...</p>
           </div>
         )}
+
+        <div className="text-center mt-10">
+          <Link
+            href="/category"
+            className="inline-block bg-gradient-to-r from-peach-400 to-peach-500 text-white px-8 py-3 md:px-10 md:py-4 rounded-full hover:from-peach-500 hover:to-peach-600 transition font-semibold text-sm md:text-base shadow-lg hover:shadow-xl transform hover:scale-105"
+          >
+            View All Products
+          </Link>
+        </div>
       </section>
 
       {/* Categories Preview */}
-      <section className="max-w-7xl mx-auto px-4 py-12">
-        <h2 className="text-3xl font-bold mb-8 text-gray-800">Shop by Category</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {CATEGORIES.map((category) => (
-            <div
-              key={category}
-              className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition cursor-pointer text-center"
-            >
-              <h3 className="font-semibold text-lg text-gray-800">{category}</h3>
-            </div>
-          ))}
+      <section className="bg-gradient-to-b from-white to-peach-50 py-12 md:py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-10 md:mb-12">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 bg-gradient-to-r from-peach-500 to-lavender-500 bg-clip-text text-transparent">
+              Shop by Category
+            </h2>
+            <p className="text-gray-600 text-sm md:text-base">
+              Explore our curated collections
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            {CATEGORIES.map((category, index) => (
+              <Link
+                key={category}
+                href="/category"
+                className="group relative overflow-hidden bg-white p-6 md:p-8 rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 cursor-pointer text-center transform hover:scale-105"
+              >
+                <div className={`absolute inset-0 bg-gradient-to-br ${
+                  index % 2 === 0 
+                    ? 'from-peach-100 to-peach-200' 
+                    : 'from-lavender-100 to-lavender-200'
+                } opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
+                <div className="relative z-10">
+                  <h3 className="font-bold text-base md:text-lg text-gray-800 group-hover:text-peach-600 transition">
+                    {category}
+                  </h3>
+                  <p className="text-xs text-gray-500 mt-2 hidden md:block">Explore Collection</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Newsletter Section */}
+      <section className="bg-gradient-to-r from-peach-400 via-peach-500 to-lavender-400 py-12 md:py-16">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 md:mb-4">
+            Join Our Exclusive Club
+          </h2>
+          <p className="text-white/90 text-sm md:text-base mb-6 md:mb-8">
+            Subscribe to get special offers, free giveaways, and exclusive deals
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+            <input
+              type="email"
+              placeholder="Enter your email"
+              className="flex-1 px-4 md:px-6 py-3 md:py-4 rounded-full focus:outline-none focus:ring-4 focus:ring-white/50 text-sm md:text-base"
+            />
+            <button className="bg-white text-peach-500 px-6 md:px-8 py-3 md:py-4 rounded-full hover:bg-gray-100 transition font-semibold text-sm md:text-base shadow-lg">
+              Subscribe
+            </button>
+          </div>
         </div>
       </section>
     </div>

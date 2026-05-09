@@ -139,7 +139,7 @@ export default function SignupPage() {
       <div className="max-w-md w-full">
         {/* Logo/Brand */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-primary mb-2">E-Shop</h1>
+          <h1 className="text-4xl font-bold text-primary mb-2">Layara</h1>
           <p className="text-gray-600">Create your account and start shopping</p>
         </div>
 
