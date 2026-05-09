@@ -675,7 +675,7 @@ export default function OrdersPage() {
                         }}
                       ></div>
                       
-                      {/* Animated Return Truck Video */}
+                      {/* Animated Return Truck Video - Same as order truck */}
                       <div 
                         className="absolute top-[-8px] md:top-[-6px] truck-container"
                         style={{ 
@@ -687,104 +687,50 @@ export default function OrdersPage() {
                             : 'none'
                         }}
                       >
-                        {/* Determine which icon to show based on return status */}
-                        {/* TRUCK: Show for pending, approved, pickup-scheduled, picked-up, or undefined */}
-                        {/* MONEY: Show ONLY for refund-completed */}
-                        {(() => {
-                          const returnStatus = order.returnRequest?.returnStatus;
-                          const showMoney = returnStatus === 'refund-completed';
+                        <div className="relative">
+                          {/* Glow effect behind truck */}
+                          <div className="absolute inset-0 bg-orange-400 rounded-full blur-lg opacity-30 scale-150 animate-pulse"></div>
                           
-                          if (showMoney) {
-                            // MONEY ANIMATION - Only at final stage
-                            return (
-                          <div className="relative">
-                            <div className="money-handover-animation">
-                              {/* Person receiving money */}
-                              <div className="flex items-center gap-1">
-                                <div className="relative">
-                                  {/* Glow effect */}
-                                  <div className="absolute inset-0 bg-green-400 rounded-full blur-lg opacity-30 scale-150"></div>
-                                  
-                                  {/* Person icon - larger */}
-                                  <svg className="relative w-8 h-8 md:w-10 md:h-10 text-green-600 drop-shadow-xl" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                                  </svg>
-                                  
-                                  {/* Money bills flying to person - larger */}
-                                  <div className="absolute -top-3 -right-3 animate-money-fly">
-                                    <svg className="w-5 h-5 md:w-6 md:h-6 text-green-500 drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
-                                      <path d="M2 6h20v12H2V6zm2 2v8h16V8H4zm7 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/>
-                                    </svg>
-                                  </div>
-                                  <div className="absolute -top-2 -right-4 animate-money-fly" style={{ animationDelay: '0.2s' }}>
-                                    <svg className="w-4 h-4 md:w-5 md:h-5 text-green-400 drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
-                                      <path d="M2 6h20v12H2V6zm2 2v8h16V8H4zm7 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/>
-                                    </svg>
-                                  </div>
-                                  <div className="absolute -top-1 -right-5 animate-money-fly" style={{ animationDelay: '0.4s' }}>
-                                    <svg className="w-4 h-4 md:w-5 md:h-5 text-green-300 drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
-                                      <path d="M2 6h20v12H2V6zm2 2v8h16V8H4zm7 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/>
-                                    </svg>
-                                  </div>
-                                </div>
+                          {/* Truck Video Animation */}
+                          <video 
+                            className="relative w-12 h-12 md:w-14 md:h-14 object-contain drop-shadow-2xl filter drop-shadow-[0_4px_16px_rgba(234,88,12,0.7)]"
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                          >
+                            <source src="/truck.webm" type="video/webm" />
+                            {/* Fallback to icon if video doesn't load */}
+                            <Truck className="w-12 h-12 md:w-14 md:h-14 text-orange-600" strokeWidth={2.5} />
+                          </video>
+                          
+                          {/* Enhanced shadow with movement */}
+                          <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1.5 bg-gradient-to-r from-transparent via-orange-500 to-transparent blur-md opacity-50 animate-pulse"></div>
+                          
+                          {/* Animated speed lines - only show when moving */}
+                          {isAnimating[order.id] && (
+                            <div className="absolute top-1/2 -left-5 transform -translate-y-1/2 flex flex-col gap-1 opacity-80">
+                              <div className="flex gap-1 animate-speed-line">
+                                <div className="w-3 h-0.5 bg-orange-500 rounded-full"></div>
+                                <div className="w-2 h-0.5 bg-orange-400 rounded-full"></div>
+                                <div className="w-1.5 h-0.5 bg-orange-300 rounded-full"></div>
                               </div>
-                              {/* Success checkmark - larger */}
-                              <div className="absolute -top-2 -right-2 bg-green-500 rounded-full p-1 animate-scale-in shadow-lg">
-                                <CheckCircle className="w-4 h-4 text-white" />
+                              <div className="flex gap-1 animate-speed-line" style={{ animationDelay: '0.15s' }}>
+                                <div className="w-2.5 h-0.5 bg-orange-400 rounded-full"></div>
+                                <div className="w-1.5 h-0.5 bg-orange-300 rounded-full"></div>
                               </div>
                             </div>
-                          </div>
-                            );
-                          } else {
-                            // TRUCK ANIMATION - All other stages
-                            return (
-                          <div className="relative">
-                            {/* Glow effect behind truck */}
-                            <div className="absolute inset-0 bg-orange-400 rounded-full blur-lg opacity-30 scale-150 animate-pulse"></div>
-                            
-                            {/* Truck Video Animation */}
-                            <video 
-                              className="relative w-12 h-12 md:w-14 md:h-14 object-contain drop-shadow-2xl filter drop-shadow-[0_4px_16px_rgba(234,88,12,0.7)]"
-                              autoPlay
-                              loop
-                              muted
-                              playsInline
-                            >
-                              <source src="/truck.webm" type="video/webm" />
-                              {/* Fallback to icon if video doesn't load */}
-                              <Truck className="w-12 h-12 md:w-14 md:h-14 text-orange-600" strokeWidth={2.5} />
-                            </video>
-                            
-                            {/* Enhanced shadow with movement */}
-                            <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1.5 bg-gradient-to-r from-transparent via-orange-500 to-transparent blur-md opacity-50 animate-pulse"></div>
-                            
-                            {/* Animated speed lines - only show when moving */}
-                            {isAnimating[order.id] && (
-                              <div className="absolute top-1/2 -left-5 transform -translate-y-1/2 flex flex-col gap-1 opacity-80">
-                                <div className="flex gap-1 animate-speed-line">
-                                  <div className="w-3 h-0.5 bg-orange-500 rounded-full"></div>
-                                  <div className="w-2 h-0.5 bg-orange-400 rounded-full"></div>
-                                  <div className="w-1.5 h-0.5 bg-orange-300 rounded-full"></div>
-                                </div>
-                                <div className="flex gap-1 animate-speed-line" style={{ animationDelay: '0.15s' }}>
-                                  <div className="w-2.5 h-0.5 bg-orange-400 rounded-full"></div>
-                                  <div className="w-1.5 h-0.5 bg-orange-300 rounded-full"></div>
-                                </div>
-                              </div>
-                            )}
-                            
-                            {/* Dust cloud effect - only when moving */}
-                            {isAnimating[order.id] && (
-                              <div className="absolute -bottom-1 -left-3 flex gap-1.5 opacity-40">
-                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-dust-cloud"></div>
-                                <div className="w-1.5 h-1.5 bg-gray-300 rounded-full animate-dust-cloud" style={{ animationDelay: '0.2s' }}></div>
-                                <div className="w-1 h-1 bg-gray-200 rounded-full animate-dust-cloud" style={{ animationDelay: '0.4s' }}></div>
-                              </div>
-                            )}
-                          </div>
-                            );
-                          }
-                        })()}
+                          )}
+                          
+                          {/* Dust cloud effect - only when moving */}
+                          {isAnimating[order.id] && (
+                            <div className="absolute -bottom-1 -left-3 flex gap-1.5 opacity-40">
+                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-dust-cloud"></div>
+                              <div className="w-1.5 h-1.5 bg-gray-300 rounded-full animate-dust-cloud" style={{ animationDelay: '0.2s' }}></div>
+                              <div className="w-1 h-1 bg-gray-200 rounded-full animate-dust-cloud" style={{ animationDelay: '0.4s' }}></div>
+                            </div>
+                          )}
+                        </div>
                       </div>
                       
                       {/* Steps - Reduced Gap */}
