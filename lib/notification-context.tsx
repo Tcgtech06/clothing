@@ -48,7 +48,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
         // Get all user notifications
         const allNotificationsQuery = query(
           collection(db, 'userNotifications'),
-          where('userId', '==', user.uid)
+          where('userId', '==', user.email)
         );
         
         const snapshot = await getDocs(allNotificationsQuery);
@@ -76,10 +76,10 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     const cleanupInterval = setInterval(cleanupExpiredNotifications, 60 * 60 * 1000); // Every hour
 
     // Listen to user's notifications from Firestore
-    // Removed orderBy to avoid composite index requirement - will sort client-side
+    // Query by email since that's what we use as userId in notifications
     const notificationsQuery = query(
       collection(db, 'userNotifications'),
-      where('userId', '==', user.uid),
+      where('userId', '==', user.email),
       limit(50)
     );
 
@@ -160,7 +160,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
             try {
               const existingQuery = query(
                 collection(db, 'userNotifications'),
-                where('userId', '==', user.uid),
+                where('userId', '==', user.email),
                 where('orderId', '==', doc.id),
                 where('title', '==', statusInfo.title),
                 limit(1)
@@ -168,9 +168,9 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
               const existingSnapshot = await getDocs(existingQuery);
               
               if (existingSnapshot.empty) {
-                // Save notification to Firestore
+                // Save notification to Firestore - use email as userId
                 await addDoc(collection(db, 'userNotifications'), {
-                  userId: user.uid,
+                  userId: user.email,
                   orderId: doc.id,
                   title: statusInfo.title,
                   message: statusInfo.message,

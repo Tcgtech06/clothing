@@ -411,10 +411,10 @@ function AdminDashboard() {
         'returnRequest.returnTrackingHistory': updatedHistory
       });
 
-      // Send notification to user
+      // Send notification to user - use email as userId since that's what we have
       try {
         await addDoc(collection(db, 'userNotifications'), {
-          userId: selectedReturn.customerEmail,
+          userId: selectedReturn.customerEmail, // Use email as userId
           title: statusTitles[trackingStatus] || 'Return Status Updated',
           message: statusDescriptions[trackingStatus] || 'Your return status has been updated',
           type: 'return',
@@ -422,7 +422,7 @@ function AdminDashboard() {
           read: false,
           createdAt: serverTimestamp()
         });
-        console.log('User notification sent');
+        console.log('User notification sent to:', selectedReturn.customerEmail);
       } catch (notifError) {
         console.error('Error sending notification:', notifError);
       }
@@ -1209,38 +1209,6 @@ function AdminDashboard() {
                     placeholder="Add notes about this return request..."
                   />
                 </div>
-
-                {/* Action Buttons */}
-                {selectedReturn.status === 'pending' && (
-                  <div className="grid grid-cols-2 gap-3 pt-4 border-t">
-                    <button
-                      onClick={() => updateReturnStatus(selectedReturn.id, 'approved')}
-                      className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-semibold flex items-center justify-center gap-2"
-                    >
-                      <CheckCircle className="w-5 h-5" />
-                      Approve Return
-                    </button>
-                    <button
-                      onClick={() => updateReturnStatus(selectedReturn.id, 'rejected')}
-                      className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-semibold flex items-center justify-center gap-2"
-                    >
-                      <X className="w-5 h-5" />
-                      Reject Return
-                    </button>
-                  </div>
-                )}
-
-                {selectedReturn.status === 'approved' && (
-                  <div className="pt-4 border-t">
-                    <button
-                      onClick={() => updateReturnStatus(selectedReturn.id, 'refunded')}
-                      className="w-full px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition font-semibold flex items-center justify-center gap-2"
-                    >
-                      <CheckCircle className="w-5 h-5" />
-                      Mark as Refunded
-                    </button>
-                  </div>
-                )}
 
                 {/* Delete Button */}
                 <div className="pt-2">
