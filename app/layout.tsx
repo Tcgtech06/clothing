@@ -24,14 +24,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <title>E-Commerce PWA</title>
-        <meta name="description" content="Progressive Web App E-Commerce Store" />
+        <title>Layara - Premium Fashion</title>
+        <meta name="description" content="Layara - Your Premium Fashion Destination" />
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#6366f1" />
+        <meta name="theme-color" content="#FF9482" />
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
       </head>
-      <body className="bg-gray-50">
+      <body className="bg-gradient-to-b from-peach-50 to-peach-100">
         <AdminAuthProvider>
           <AuthProvider>
             <PushNotificationProvider>

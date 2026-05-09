@@ -20,6 +20,8 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(to bottom, #FFF5F3, #FFE8E3);
+  min-height: 100vh;
 }
 
 /* Custom animations for hero slideshow */
