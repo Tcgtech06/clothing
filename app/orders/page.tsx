@@ -39,6 +39,7 @@ interface Order {
     requestedAt: any;
     status: 'pending' | 'approved' | 'rejected' | 'refunded';
     returnStatus?: 'pending' | 'approved' | 'pickup-scheduled' | 'picked-up' | 'refund-completed';
+    adminNotes?: string;
     returnTrackingHistory?: Array<{
       status: string;
       date: string;
