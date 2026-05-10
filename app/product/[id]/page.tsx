@@ -25,12 +25,10 @@ export default function ProductPage() {
   const loadProduct = async () => {
     try {
       setLoading(true);
-      console.log('Loading product with ID:', id);
       
       // Check cache first
       const cached = productCache.get(id);
       if (cached && (Date.now() - cached.timestamp) < CACHE_DURATION) {
-        console.log('Using cached product:', id);
         setProduct(cached.data);
         setLoading(false);
         return;
@@ -39,10 +37,8 @@ export default function ProductPage() {
       // Try to get from static products first (numeric ID)
       const numericId = parseInt(id);
       if (!isNaN(numericId)) {
-        console.log('Trying static products with numeric ID:', numericId);
         const staticProduct = getProductById(numericId);
         if (staticProduct) {
-          console.log('Found in static products:', staticProduct.name);
           setProduct(staticProduct);
           setLoading(false);
           return;
@@ -50,12 +46,10 @@ export default function ProductPage() {
       }
 
       // Try to get from Firestore (string ID - document ID)
-      console.log('Fetching product from Firestore with ID:', id);
       const docRef = doc(db, 'products', id);
       const docSnap = await getDoc(docRef);
       
       if (docSnap.exists()) {
-        console.log('Found in Firestore:', docSnap.id);
         const data = docSnap.data();
         const firestoreProduct = {
           id: numericId || parseInt(docSnap.id.substring(0, 8), 16),
@@ -77,8 +71,6 @@ export default function ProductPage() {
           loyaltyPoints: data.loyaltyPoints || 0,
         };
         
-        console.log('Firestore product loaded:', firestoreProduct.name);
-        
         // Cache the product
         productCache.set(id, {
           data: firestoreProduct,
@@ -88,7 +80,6 @@ export default function ProductPage() {
         setProduct(firestoreProduct);
         setLoading(false);
       } else {
-        console.error('Product not found in Firestore:', id);
         setNotFoundError(true);
         setLoading(false);
       }
