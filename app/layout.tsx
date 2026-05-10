@@ -30,8 +30,9 @@ export default function RootLayout({
         <meta name="theme-color" content="#A855F7" />
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
-      <body className="bg-gradient-to-b from-lavender-50 via-lavender-100 to-lavender-200">
+      <body className="bg-gradient-to-b from-purple-50 via-purple-100 to-purple-50">
         <AdminAuthProvider>
           <AuthProvider>
             <PushNotificationProvider>

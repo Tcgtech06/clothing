@@ -202,17 +202,3 @@ body {
     transform: translateY(-3px);
   }
 }
-
-/* Override all white backgrounds with light lavender for premium feel */
-.bg-white {
-  background-color: #F3E8FF !important; /* Light lavender instead of white */
-}
-
-/* Additional lavender shades for variety */
-.bg-gray-50 {
-  background-color: #FAF5FF !important;
-}
-
-.bg-gray-100 {
-  background-color: #F3E8FF !important;
-}
