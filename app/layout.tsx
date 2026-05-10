@@ -27,11 +27,11 @@ export default function RootLayout({
         <title>Layara - Premium Fashion</title>
         <meta name="description" content="Layara - Your Premium Fashion Destination" />
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#FF9482" />
+        <meta name="theme-color" content="#A855F7" />
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
       </head>
-      <body className="bg-gradient-to-b from-peach-50 to-peach-100">
+      <body className="bg-gradient-to-b from-lavender-50 via-lavender-100 to-lavender-200">
         <AdminAuthProvider>
           <AuthProvider>
             <PushNotificationProvider>

@@ -12,7 +12,7 @@ export default function CartPage() {
 
   if (cart.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-purple-50 via-purple-100/50 to-purple-50 flex items-center justify-center">
         <div className="text-center">
           <ShoppingBag className="w-24 h-24 text-gray-300 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Your cart is empty</h2>
@@ -29,7 +29,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-purple-50 via-purple-100/50 to-purple-50">
       <div className="max-w-7xl mx-auto px-3 md:px-4 py-4 md:py-8">
         {/* Back Button */}
         <button
@@ -48,7 +48,7 @@ export default function CartPage() {
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-3 md:space-y-4">
             {cart.map((item) => (
-              <div key={`${item.product.id}-${item.selectedColor}-${item.selectedSize}`} className="bg-white rounded-lg shadow-md p-3 md:p-4">
+              <div key={`${item.product.id}-${item.selectedColor}-${item.selectedSize}`} className="bg-purple-50/60 backdrop-blur-sm rounded-lg shadow-md p-3 md:p-4">
                 <div className="flex gap-3 md:gap-4">
                   {/* Product Image */}
                   <Link href={`/product/${item.product.id}`} className="relative w-20 h-20 md:w-24 md:h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
@@ -140,7 +140,7 @@ export default function CartPage() {
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-md p-4 md:p-6 lg:sticky lg:top-20">
+            <div className="bg-purple-50/60 backdrop-blur-sm rounded-lg shadow-md p-4 md:p-6 lg:sticky lg:top-20">
               <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4 text-gray-800">Order Summary</h2>
               
               <div className="space-y-2 md:space-y-3 mb-3 md:mb-4">

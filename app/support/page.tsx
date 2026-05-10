@@ -49,7 +49,7 @@ export default function SupportPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50 py-8 px-4">
+      <div className="min-h-screen bg-gradient-to-b from-purple-50 via-purple-100/50 to-purple-50 py-8 px-4">
         <div className="max-w-4xl mx-auto">
           {/* Back Button */}
           <button
@@ -106,7 +106,7 @@ export default function SupportPage() {
           </div>
 
           {/* Contact Methods */}
-          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+          <div className="bg-purple-50/60 backdrop-blur-sm rounded-lg shadow-md p-6 mb-8">
             <h2 className="text-xl font-bold text-gray-800 mb-4">Other Ways to Reach Us</h2>
             
             <div className="grid md:grid-cols-2 gap-4">
@@ -145,7 +145,7 @@ export default function SupportPage() {
           </div>
 
           {/* FAQ Section */}
-          <div className="mt-8 bg-white rounded-lg shadow-md p-6">
+          <div className="mt-8 bg-purple-50/60 backdrop-blur-sm rounded-lg shadow-md p-6">
             <h2 className="text-xl font-bold text-gray-800 mb-4">Frequently Asked Questions</h2>
             
             <div className="space-y-4">
@@ -263,7 +263,7 @@ export default function SupportPage() {
         {/* WhatsApp Chat Form Modal */}
         {showWhatsAppForm && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg max-w-md w-full shadow-2xl">
+            <div className="bg-purple-50/95 backdrop-blur-sm rounded-lg max-w-md w-full shadow-2xl">
               {/* Header */}
               <div className="bg-green-600 text-white p-4 rounded-t-lg flex items-center justify-between">
                 <div className="flex items-center gap-3">

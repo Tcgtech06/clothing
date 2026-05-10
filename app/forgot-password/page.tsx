@@ -39,7 +39,7 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-white to-secondary/10 flex items-center justify-center px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-purple-50 to-purple-100 flex items-center justify-center px-4 py-8">
       <div className="max-w-md w-full">
         {/* Logo/Brand */}
         <div className="text-center mb-8">
@@ -48,7 +48,7 @@ export default function ForgotPasswordPage() {
         </div>
 
         {/* Reset Password Card */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-purple-50/80 backdrop-blur-sm rounded-2xl shadow-xl p-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Forgot Password?</h2>
           <p className="text-gray-600 text-sm mb-6">
             Enter your email address and we&apos;ll send you a link to reset your password.

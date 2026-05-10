@@ -341,7 +341,7 @@ function ProfilePageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-purple-50 via-purple-100/50 to-purple-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Back Button */}
         <button
@@ -355,7 +355,7 @@ function ProfilePageContent() {
         <h1 className="text-3xl font-bold mb-8 text-gray-800">My Profile</h1>
 
         {/* Profile Card */}
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="bg-purple-50/60 backdrop-blur-sm rounded-lg shadow-md overflow-hidden">
           {/* Header with Avatar and Gender Selection */}
           <div className="bg-gradient-to-r from-primary to-secondary p-8 text-white">
             <div className="flex flex-col items-center">
@@ -529,7 +529,7 @@ function ProfilePageContent() {
         </div>
 
         {/* Saved Addresses Section */}
-        <div className="bg-white rounded-lg shadow-md p-6 mt-6">
+        <div className="bg-purple-50/60 backdrop-blur-sm rounded-lg shadow-md p-6 mt-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
               <MapPin className="w-5 h-5 text-primary" />
@@ -716,7 +716,7 @@ function ProfilePageContent() {
 
         {/* Account Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-          <div className="bg-white rounded-lg shadow-md p-6 text-center">
+          <div className="bg-purple-50/60 backdrop-blur-sm rounded-lg shadow-md p-6 text-center">
             <Package className="w-12 h-12 text-primary mx-auto mb-2" />
             <p className="text-3xl font-bold text-primary">{totalOrders}</p>
             <p className="text-gray-600 mt-1">Total Orders</p>
@@ -724,7 +724,7 @@ function ProfilePageContent() {
               {totalOrders === 0 ? 'Start shopping to see your orders' : 'View all your orders'}
             </p>
           </div>
-          <div className="bg-white rounded-lg shadow-md p-6 text-center">
+          <div className="bg-purple-50/60 backdrop-blur-sm rounded-lg shadow-md p-6 text-center">
             <svg className="w-12 h-12 text-red-600 mx-auto mb-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               <path d="M9 22V12H15V22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -737,7 +737,7 @@ function ProfilePageContent() {
               {totalReturns === 0 ? 'No returns yet' : 'Products returned'}
             </p>
           </div>
-          <div className="bg-white rounded-lg shadow-md p-6 text-center">
+          <div className="bg-purple-50/60 backdrop-blur-sm rounded-lg shadow-md p-6 text-center">
             <Award className="w-12 h-12 text-orange-600 mx-auto mb-2" />
             <p className="text-3xl font-bold text-orange-600">{loyaltyPoints}</p>
             <p className="text-gray-600 mt-1">Loyalty Points</p>
@@ -750,7 +750,7 @@ function ProfilePageContent() {
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
           <Link href="/orders">
-            <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition cursor-pointer group">
+            <div className="bg-purple-50/60 backdrop-blur-sm rounded-lg shadow-md p-6 hover:shadow-lg transition cursor-pointer group">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center group-hover:bg-primary/20 transition">
@@ -767,7 +767,7 @@ function ProfilePageContent() {
           </Link>
 
           <Link href="/loyalty">
-            <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition cursor-pointer group">
+            <div className="bg-purple-50/60 backdrop-blur-sm rounded-lg shadow-md p-6 hover:shadow-lg transition cursor-pointer group">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center group-hover:bg-orange-200 transition">

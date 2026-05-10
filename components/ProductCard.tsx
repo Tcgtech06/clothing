@@ -51,7 +51,7 @@ export default function ProductCard({ product }: { product: Product }) {
   
   return (
     <div 
-      className="bg-white rounded-lg shadow-md hover:shadow-xl transition overflow-hidden group"
+      className="bg-purple-50/60 backdrop-blur-sm rounded-lg shadow-md hover:shadow-xl transition overflow-hidden group"
       onMouseEnter={handleMouseEnter}
     >
       {/* Product Image - Clickable - Responsive Height */}

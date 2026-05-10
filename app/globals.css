@@ -20,7 +20,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(to bottom, #FFF5F3, #FFE8E3);
+  background: linear-gradient(to bottom, #FAF5FF, #F3E8FF, #E9D5FF);
   min-height: 100vh;
 }
 
@@ -201,4 +201,9 @@ body {
   50% {
     transform: translateY(-3px);
   }
+}
+
+/* Override all white backgrounds with light lavender for premium feel */
+.bg-white {
+  background-color: #FAF5FF !important;
 }

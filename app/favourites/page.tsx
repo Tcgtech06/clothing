@@ -12,7 +12,7 @@ export default function FavouritesPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50 pt-16 pb-20 md:pt-20 md:pb-8">
+      <div className="min-h-screen bg-gradient-to-b from-purple-50 via-purple-100/50 to-purple-50 pt-16 pb-20 md:pt-20 md:pb-8">
         <div className="max-w-7xl mx-auto px-4 py-8">
           {/* Back Button */}
           <button

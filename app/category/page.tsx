@@ -79,7 +79,7 @@ export default function CategoryPage() {
       : allProducts.filter((p) => p.category === cat).length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-purple-50 via-purple-100/50 to-purple-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
 
         {/* Back Button */}
