@@ -8,12 +8,6 @@
   NODE_VERSION = "20.11.0"
   NPM_VERSION = "10"
 
-# Redirect all requests to index.html for client-side routing
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-
 # Headers for security and caching
 [[headers]]
   for = "/*"
