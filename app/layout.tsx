@@ -3,6 +3,7 @@
 import './globals.css';
 import Navigation from '@/components/Navigation';
 import SplashScreen from '@/components/SplashScreen';
+import PageLoader from '@/components/PageLoader';
 import { CartProvider } from '@/lib/cart-context';
 import { FavouritesProvider } from '@/lib/favourites-context';
 import { AuthProvider } from '@/lib/auth-context';
@@ -34,6 +35,7 @@ export default function RootLayout({
       </head>
       <body className="bg-gray-50">
         <SplashScreen />
+        <PageLoader />
         <AdminAuthProvider>
           <AuthProvider>
             <PushNotificationProvider>

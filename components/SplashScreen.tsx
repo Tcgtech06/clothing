@@ -23,10 +23,10 @@ export default function SplashScreen() {
         {/* Logo with animation */}
         <div className="splash-logo">
           <Image
-            src="/logo1.jpg"
+            src="/logo (2).png"
             alt="LE WORE"
-            width={200}
-            height={200}
+            width={250}
+            height={250}
             className="object-contain"
             priority
           />
