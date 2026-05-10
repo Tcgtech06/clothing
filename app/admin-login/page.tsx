@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import { Shield, Lock, User, Eye, EyeOff } from 'lucide-react';
 import { useAdminAuth } from '@/lib/admin-auth-context';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 export default function AdminLoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');

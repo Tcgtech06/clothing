@@ -18,6 +18,9 @@ import AdminNotifications from '@/components/AdminNotifications';
 import CleanupNotifications from './cleanup-notifications';
 import { useAdminAuth } from '@/lib/admin-auth-context';
 import { initializePollsForAllProducts } from '@/lib/init-polls';
+
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
 import { CATEGORIES } from '@/data/categories';
 import { useRouter } from 'next/navigation';
 import { useAdminFCMToken } from '@/lib/use-admin-fcm-token';
