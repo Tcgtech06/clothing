@@ -1,11 +1,11 @@
 {
-  "name": "E-Commerce PWA",
-  "short_name": "E-Shop",
-  "description": "Progressive Web App E-Commerce Store",
+  "name": "LE WORE",
+  "short_name": "LE WORE",
+  "description": "LE WORE - Premium Fashion E-Commerce Store",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#6366f1",
+  "theme_color": "#000000",
   "orientation": "portrait-primary",
   "icons": [
     {

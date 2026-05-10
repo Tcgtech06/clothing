@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, Grid, Package, User, ShoppingCart, Heart, Headphones } from 'lucide-react';
 import { useState } from 'react';
+import Image from 'next/image';
 import ProfileMenu from './ProfileMenu';
 import NotificationBell from './NotificationBell';
 import { useCart } from '@/lib/cart-context';
@@ -161,8 +162,15 @@ export default function Navigation() {
           </div>
 
           {/* Logo - Center */}
-          <Link href="/" className="text-xl font-bold text-primary">
-            E-Shop
+          <Link href="/" className="flex items-center">
+            <Image 
+              src="/logo (2).png" 
+              alt="LE WORE Logo" 
+              width={120} 
+              height={40} 
+              className="object-contain"
+              priority
+            />
           </Link>
 
           {/* Right Side Icons */}
@@ -198,8 +206,15 @@ export default function Navigation() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
-              <Link href="/" className="text-2xl font-bold text-primary">
-                E-Shop
+              <Link href="/" className="flex items-center">
+                <Image 
+                  src="/logo (2).png" 
+                  alt="LE WORE Logo" 
+                  width={150} 
+                  height={50} 
+                  className="object-contain"
+                  priority
+                />
               </Link>
             </div>
             <div className="flex items-center space-x-1">

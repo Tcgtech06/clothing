@@ -24,12 +24,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <title>E-Commerce PWA</title>
-        <meta name="description" content="Progressive Web App E-Commerce Store" />
+        <title>LE WORE - Premium Fashion</title>
+        <meta name="description" content="LE WORE - Premium Fashion E-Commerce Store" />
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#6366f1" />
-        <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" href="/icon-192x192.png" />
+        <meta name="theme-color" content="#000000" />
+        <link rel="icon" href="/logo (2).png" />
+        <link rel="apple-touch-icon" href="/logo (2).png" />
       </head>
       <body className="bg-gray-50">
         <AdminAuthProvider>
