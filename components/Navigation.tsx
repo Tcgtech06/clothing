@@ -161,18 +161,6 @@ export default function Navigation() {
             </button>
           </div>
 
-          {/* Logo - Center */}
-          <Link href="/" className="flex items-center">
-            <Image 
-              src="/logo (2).png" 
-              alt="LE WORE Logo" 
-              width={120} 
-              height={40} 
-              className="object-contain"
-              priority
-            />
-          </Link>
-
           {/* Right Side Icons */}
           <div className="flex items-center gap-3">
             {/* Notification Bell */}

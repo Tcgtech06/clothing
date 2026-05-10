@@ -2,6 +2,7 @@
 
 import './globals.css';
 import Navigation from '@/components/Navigation';
+import SplashScreen from '@/components/SplashScreen';
 import { CartProvider } from '@/lib/cart-context';
 import { FavouritesProvider } from '@/lib/favourites-context';
 import { AuthProvider } from '@/lib/auth-context';
@@ -28,10 +29,11 @@ export default function RootLayout({
         <meta name="description" content="LE WORE - Premium Fashion E-Commerce Store" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#000000" />
-        <link rel="icon" href="/logo (2).png" />
-        <link rel="apple-touch-icon" href="/logo (2).png" />
+        <link rel="icon" href="/logo1.jpg" />
+        <link rel="apple-touch-icon" href="/logo1.jpg" />
       </head>
       <body className="bg-gray-50">
+        <SplashScreen />
         <AdminAuthProvider>
           <AuthProvider>
             <PushNotificationProvider>
