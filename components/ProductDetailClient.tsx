@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo, useMemo } from 'react';
 import { Star, ShoppingCart, Heart, Share2, Check, Truck, Shield, RotateCcw, Minus, Plus, ArrowLeft, ChevronLeft, ChevronRight, Coins, MessageSquare, User as UserIcon } from 'lucide-react';
 import { Product } from '@/data/products';
 import Link from 'next/link';
@@ -17,12 +17,106 @@ interface ProductDetailClientProps {
   product: Product;
 }
 
-export default function ProductDetailClient({ product }: ProductDetailClientProps) {
+// Memoized Image Gallery Component
+const ImageGallery = memo(({ images, name, discount }: { images: string[], name: string, discount: number }) => {
+  const [selectedImage, setSelectedImage] = useState(0);
+
+  // Auto-slide images every 3 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSelectedImage((prev) => (prev + 1) % images.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [images.length]);
+
+  const handlePrevImage = () => {
+    setSelectedImage((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  const handleNextImage = () => {
+    setSelectedImage((prev) => (prev + 1) % images.length);
+  };
+
+  return (
+    <>
+      {/* Main Image */}
+      <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden mb-4 group">
+        <Image
+          src={images[selectedImage]}
+          alt={name}
+          fill
+          className="object-cover"
+          priority={selectedImage === 0}
+          loading={selectedImage === 0 ? "eager" : "lazy"}
+        />
+        {discount > 0 && (
+          <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full font-semibold text-sm z-10">
+            -{discount}%
+          </div>
+        )}
+
+        {/* Navigation Arrows */}
+        <button
+          onClick={handlePrevImage}
+          className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm p-2 rounded-full hover:bg-white transition opacity-0 group-hover:opacity-100 shadow-lg"
+          aria-label="Previous image"
+        >
+          <ChevronLeft className="w-6 h-6 text-gray-700" />
+        </button>
+        <button
+          onClick={handleNextImage}
+          className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm p-2 rounded-full hover:bg-white transition opacity-0 group-hover:opacity-100 shadow-lg"
+          aria-label="Next image"
+        >
+          <ChevronRight className="w-6 h-6 text-gray-700" />
+        </button>
+
+        {/* Image Indicators */}
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+          {images.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setSelectedImage(index)}
+              className={`w-2 h-2 rounded-full transition ${
+                selectedImage === index ? 'bg-white w-6' : 'bg-white/50'
+              }`}
+              aria-label={`Go to image ${index + 1}`}
+            />
+          ))}
+        </div>
+      </div>
+      
+      {/* Thumbnail Gallery */}
+      <div className="grid grid-cols-4 gap-2">
+        {images.map((img, index) => (
+          <div
+            key={index}
+            onClick={() => setSelectedImage(index)}
+            className={`relative aspect-square bg-gray-100 rounded-lg cursor-pointer overflow-hidden transition ${
+              selectedImage === index ? 'ring-2 ring-primary' : 'hover:ring-2 hover:ring-gray-300'
+            }`}
+          >
+            <Image
+              src={img}
+              alt={`${name} ${index + 1}`}
+              fill
+              className="object-cover"
+              loading="lazy"
+            />
+          </div>
+        ))}
+      </div>
+    </>
+  );
+});
+
+ImageGallery.displayName = 'ImageGallery';
+
+function ProductDetailClient({ product }: ProductDetailClientProps) {
   const router = useRouter();
   const { user } = useAuth();
   const { addToCart } = useCart();
   const { addToFavourites, removeFromFavourites, isFavourite } = useFavourites();
-  const [selectedImage, setSelectedImage] = useState(0);
   const [selectedColor, setSelectedColor] = useState(product.colors?.[0] || '');
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || '');
   const [quantity, setQuantity] = useState(1);
@@ -36,45 +130,40 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   const [showReviewSuccess, setShowReviewSuccess] = useState(false);
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
   const [reviews, setReviews] = useState<any[]>([]);
+  const [reviewsLoaded, setReviewsLoaded] = useState(false);
 
   const productKey = (product as any).firestoreId || String(product.id);
-
-  // Load reviews from Firestore in real-time (no orderBy to avoid index requirement)
-  useEffect(() => {
-    const q = query(
-      collection(db, 'reviews'),
-      where('productId', '==', productKey)
-    );
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const data: any[] = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      // Sort client-side by createdAt descending
-      data.sort((a, b) => {
-        const aTime = a.createdAt?.toDate?.()?.getTime() || 0;
-        const bTime = b.createdAt?.toDate?.()?.getTime() || 0;
-        return bTime - aTime;
-      });
-      setReviews(data);
-    });
-    return () => unsubscribe();
-  }, [productKey]);
-
   const isProductFavourite = isFavourite(product.id);
 
-  // Auto-slide images every 3 seconds
+  // Memoize discount calculation
+  const discount = useMemo(() => 
+    product.originalPrice
+      ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+      : 0,
+    [product.originalPrice, product.price]
+  );
+
+  // Load reviews only when reviews tab is active (lazy loading)
   useEffect(() => {
-    const interval = setInterval(() => {
-      setSelectedImage((prev) => (prev + 1) % product.images.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [product.images.length]);
-
-  const handlePrevImage = () => {
-    setSelectedImage((prev) => (prev - 1 + product.images.length) % product.images.length);
-  };
-
-  const handleNextImage = () => {
-    setSelectedImage((prev) => (prev + 1) % product.images.length);
-  };
+    if (activeTab === 'reviews' && !reviewsLoaded) {
+      const q = query(
+        collection(db, 'reviews'),
+        where('productId', '==', productKey)
+      );
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const data: any[] = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        // Sort client-side by createdAt descending
+        data.sort((a, b) => {
+          const aTime = a.createdAt?.toDate?.()?.getTime() || 0;
+          const bTime = b.createdAt?.toDate?.()?.getTime() || 0;
+          return bTime - aTime;
+        });
+        setReviews(data);
+        setReviewsLoaded(true);
+      });
+      return () => unsubscribe();
+    }
+  }, [productKey, activeTab, reviewsLoaded]);
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -93,10 +182,6 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
       alert('Link copied to clipboard!');
     }
   };
-
-  const discount = product.originalPrice
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
-    : 0;
 
   const handleAddToCart = () => {
     if (!user) {
@@ -177,94 +262,30 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* Product Images */}
           <div className="bg-white rounded-lg shadow-md p-4 md:p-8">
-            {/* Main Image with Share and Favourite Buttons */}
-            <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden mb-4 group">
-              <Image
-                src={product.images[selectedImage]}
-                alt={product.name}
-                fill
-                className="object-cover"
-                priority
-              />
-              {discount > 0 && (
-                <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full font-semibold text-sm z-10">
-                  -{discount}%
-                </div>
-              )}
-              
-              {/* Top Right Icons */}
-              <div className="absolute top-4 right-4 flex gap-2 z-10">
-                {/* Favourite Button */}
-                <button
-                  onClick={handleToggleFavourite}
-                  className={`bg-white/90 backdrop-blur-sm p-2 rounded-full hover:bg-white transition shadow-lg ${
-                    isProductFavourite ? 'bg-red-50' : ''
-                  }`}
-                  aria-label={isProductFavourite ? 'Remove from favourites' : 'Add to favourites'}
-                >
-                  <Heart className={`w-5 h-5 ${isProductFavourite ? 'fill-red-500 text-red-500' : 'text-gray-700'}`} />
-                </button>
-
-                {/* Share Button */}
-                <button
-                  onClick={handleShare}
-                  className="bg-white/90 backdrop-blur-sm p-2 rounded-full hover:bg-white transition shadow-lg"
-                  aria-label="Share product"
-                >
-                  <Share2 className="w-5 h-5 text-gray-700" />
-                </button>
-              </div>
-
-              {/* Navigation Arrows */}
+            {/* Top Right Icons */}
+            <div className="flex justify-end gap-2 mb-4">
+              {/* Favourite Button */}
               <button
-                onClick={handlePrevImage}
-                className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm p-2 rounded-full hover:bg-white transition opacity-0 group-hover:opacity-100 shadow-lg"
-                aria-label="Previous image"
+                onClick={handleToggleFavourite}
+                className={`bg-white p-2 rounded-full hover:bg-gray-50 transition shadow-md ${
+                  isProductFavourite ? 'bg-red-50' : ''
+                }`}
+                aria-label={isProductFavourite ? 'Remove from favourites' : 'Add to favourites'}
               >
-                <ChevronLeft className="w-6 h-6 text-gray-700" />
-              </button>
-              <button
-                onClick={handleNextImage}
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm p-2 rounded-full hover:bg-white transition opacity-0 group-hover:opacity-100 shadow-lg"
-                aria-label="Next image"
-              >
-                <ChevronRight className="w-6 h-6 text-gray-700" />
+                <Heart className={`w-5 h-5 ${isProductFavourite ? 'fill-red-500 text-red-500' : 'text-gray-700'}`} />
               </button>
 
-              {/* Image Indicators */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-                {product.images.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setSelectedImage(index)}
-                    className={`w-2 h-2 rounded-full transition ${
-                      selectedImage === index ? 'bg-white w-6' : 'bg-white/50'
-                    }`}
-                    aria-label={`Go to image ${index + 1}`}
-                  />
-                ))}
-              </div>
+              {/* Share Button */}
+              <button
+                onClick={handleShare}
+                className="bg-white p-2 rounded-full hover:bg-gray-50 transition shadow-md"
+                aria-label="Share product"
+              >
+                <Share2 className="w-5 h-5 text-gray-700" />
+              </button>
             </div>
             
-            {/* Thumbnail Gallery */}
-            <div className="grid grid-cols-4 gap-2">
-              {product.images.map((img, index) => (
-                <div
-                  key={index}
-                  onClick={() => setSelectedImage(index)}
-                  className={`relative aspect-square bg-gray-100 rounded-lg cursor-pointer overflow-hidden transition ${
-                    selectedImage === index ? 'ring-2 ring-primary' : 'hover:ring-2 hover:ring-gray-300'
-                  }`}
-                >
-                  <Image
-                    src={img}
-                    alt={`${product.name} ${index + 1}`}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              ))}
-            </div>
+            <ImageGallery images={product.images} name={product.name} discount={discount} />
           </div>
 
           {/* Product Info */}
@@ -580,3 +601,5 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
     </div>
   );
 }
+
+export default memo(ProductDetailClient);
