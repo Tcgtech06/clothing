@@ -39,6 +39,7 @@ interface Order {
     requestedAt: any;
     status: 'pending' | 'approved' | 'rejected' | 'refunded';
     returnStatus?: 'pending' | 'approved' | 'pickup-scheduled' | 'picked-up' | 'refund-completed';
+    adminNotes?: string;
     returnTrackingHistory?: Array<{
       status: string;
       date: string;
@@ -663,7 +664,7 @@ export default function OrdersPage() {
                       </div>
                       
                       {/* Admin Notes */}
-                      {order.returnRequest.adminNotes && (
+                      {order.returnRequest?.adminNotes && (
                         <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                           <p className="text-xs font-semibold text-blue-800 mb-1">Admin Notes:</p>
                           <p className="text-sm text-blue-900">{order.returnRequest.adminNotes}</p>

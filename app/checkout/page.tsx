@@ -345,14 +345,6 @@ export default function CheckoutPage() {
                   )}
                 </div>
 
-                {/* Debug logging */}
-                {console.log('Render state:', { 
-                  savedAddressesCount: savedAddresses.length, 
-                  isEditingAddress, 
-                  selectedAddressId,
-                  showingCards: savedAddresses.length > 0 && !isEditingAddress 
-                })}
-
                 {savedAddresses.length > 0 && !isEditingAddress ? (
                   <div className="space-y-3">
                     {savedAddresses.map((address) => (
