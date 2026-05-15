@@ -21,6 +21,8 @@ interface Product {
   };
 }
 
+import Image from 'next/image';
+
 export default function ProductCard({ product }: { product: Product }) {
   const router = useRouter();
   
@@ -49,10 +51,12 @@ export default function ProductCard({ product }: { product: Product }) {
       {/* Product Image - Clickable - Responsive Height */}
       <Link href={productLink}>
         <div className="relative h-48 sm:h-64 md:h-72 lg:h-80 bg-gray-100 overflow-hidden cursor-pointer">
-          <img
+          <Image
             src={product.images[0]}
             alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+            fill
+            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+            className="object-cover group-hover:scale-105 transition duration-300"
             loading="lazy"
           />
           {/* Loyalty Points Badge */}

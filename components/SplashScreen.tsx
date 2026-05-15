@@ -21,12 +21,12 @@ export default function SplashScreen() {
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-white splash-screen">
       <div className="flex flex-col items-center justify-center gap-4">
         {/* Logo with animation */}
-        <div className="splash-logo">
+        <div className="splash-logo animate-pulse">
           <Image
             src="/logo (2).png"
             alt="LE WORE"
-            width={250}
-            height={250}
+            width={280}
+            height={280}
             className="object-contain"
             priority
           />
