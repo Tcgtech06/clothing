@@ -150,7 +150,7 @@ export default function InventoryTab() {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">{product.category}</td>
-                    <td className="px-6 py-4 text-sm font-semibold text-gray-900">₹{product.price.toLocaleString('en-IN')}</td>
+                    <td className="px-6 py-4 text-sm font-semibold text-gray-900">€{product.price.toLocaleString('fr-FR')}</td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
                         <Package className="w-4 h-4 text-gray-400" />

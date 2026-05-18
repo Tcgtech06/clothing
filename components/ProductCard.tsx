@@ -143,7 +143,7 @@ export default function ProductCard({ product }: { product: Product }) {
         {/* Price and Add to Cart */}
         <div className="flex items-center justify-between gap-2">
           <div>
-            <p className="text-lg sm:text-xl md:text-2xl font-bold text-primary">₹{product.price.toLocaleString('en-IN')}</p>
+            <p className="text-lg sm:text-xl md:text-2xl font-bold text-primary">€{product.price.toLocaleString('fr-FR')}</p>
           </div>
           <CheckoutButton 
             productName={product.name} 

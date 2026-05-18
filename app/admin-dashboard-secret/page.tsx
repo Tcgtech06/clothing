@@ -55,8 +55,8 @@ interface ReturnRequest {
   customerEmail: string;
   customerName: string;
   reason: string;
-  paymentMethod: 'upi' | 'bank';
-  upiId?: string;
+  paymentMethod: 'paypal' | 'bank';
+  paypalEmail?: string;
   accountNumber?: string;
   ifscCode?: string;
   accountHolderName?: string;
@@ -549,7 +549,7 @@ function AdminDashboard() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {[
             { label: 'Total Orders', value: stats.totalOrders, icon: Package, color: 'text-blue-500' },
-            { label: 'Total Revenue', value: `₹${stats.totalRevenue.toLocaleString('en-IN')}`, icon: DollarSign, color: 'text-green-500' },
+            { label: 'Total Revenue', value: `€${stats.totalRevenue.toLocaleString('fr-FR')}`, icon: DollarSign, color: 'text-green-500' },
             { label: 'New Orders', value: stats.newOrders, icon: TrendingUp, color: 'text-orange-500' },
             { label: 'Customers', value: stats.totalCustomers, icon: Users, color: 'text-purple-500' },
           ].map(({ label, value, icon: Icon, color }) => (
@@ -593,7 +593,7 @@ function AdminDashboard() {
                           {order.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm font-semibold">₹{order.total.toLocaleString('en-IN')}</td>
+                      <td className="px-6 py-4 text-sm font-semibold">€{order.total.toLocaleString('fr-FR')}</td>
                       <td className="px-6 py-4">
                         <button onClick={() => setSelectedOrder(order)} className="text-primary hover:underline text-sm font-medium">
                           View
@@ -677,7 +677,7 @@ function AdminDashboard() {
                       <h3 className="font-semibold text-gray-800 mb-1 truncate">{product.name}</h3>
                       <p className="text-sm text-gray-500 mb-2 truncate">{product.description}</p>
                       <div className="flex items-center justify-between mb-3">
-                        <span className="text-lg font-bold text-primary">₹{product.price?.toLocaleString('en-IN')}</span>
+                        <span className="text-lg font-bold text-primary">€{product.price?.toLocaleString('fr-FR')}</span>
                         <span className="text-xs text-gray-500">{product.loyaltyPoints || 0} pts</span>
                       </div>
                       <div className="flex gap-2">
@@ -753,7 +753,7 @@ function AdminDashboard() {
                           <p className="text-xs text-gray-500">{returnReq.customerEmail}</p>
                         </td>
                         <td className="px-6 py-4 text-sm font-semibold">
-                          ₹{returnReq.total.toLocaleString('en-IN')}
+                          €{returnReq.total.toLocaleString('fr-FR')}
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-900">
                           {formatDate(returnReq.requestedAt)}
@@ -837,7 +837,7 @@ function AdminDashboard() {
                             <h4 className="font-semibold text-gray-800 mb-1">{item.name}</h4>
                             <div className="space-y-1">
                               <p className="text-sm text-gray-600">
-                                <span className="font-medium">Price:</span> ₹{item.price?.toLocaleString('en-IN')} × {item.quantity}
+                                <span className="font-medium">Price:</span> €{item.price?.toLocaleString('fr-FR')} × {item.quantity}
                               </p>
                               {item.color && (
                                 <p className="text-sm text-gray-600 flex items-center gap-2">
@@ -855,7 +855,7 @@ function AdminDashboard() {
                                 </p>
                               )}
                               <p className="text-sm font-semibold text-primary">
-                                Subtotal: ₹{((item.price || 0) * (item.quantity || 1)).toLocaleString('en-IN')}
+                                Subtotal: €{((item.price || 0) * (item.quantity || 1)).toLocaleString('fr-FR')}
                               </p>
                             </div>
                           </div>
@@ -867,7 +867,7 @@ function AdminDashboard() {
                 
                 <div>
                   <p className="text-sm text-gray-600">Total</p>
-                  <p className="text-2xl font-bold text-primary">₹{selectedOrder.total.toLocaleString('en-IN')}</p>
+                  <p className="text-2xl font-bold text-primary">€{selectedOrder.total.toLocaleString('fr-FR')}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600 mb-2">Update Status</p>
@@ -943,11 +943,11 @@ function AdminDashboard() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Price (₹)</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Price (€)</label>
                     <input type="number" value={productForm.price} onChange={e => setProductForm(f => ({ ...f, price: Number(e.target.value) }))} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Original Price (₹)</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Original Price (€)</label>
                     <input type="number" value={productForm.originalPrice} onChange={e => setProductForm(f => ({ ...f, originalPrice: Number(e.target.value) }))} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary" />
                   </div>
                 </div>
@@ -1078,7 +1078,7 @@ function AdminDashboard() {
                 <div className="bg-primary/5 border border-primary/20 p-4 rounded-lg">
                   <p className="text-sm text-gray-600 mb-1">Refund Amount</p>
                   <p className="text-3xl font-bold text-primary">
-                    ₹{selectedReturn.total.toLocaleString('en-IN')}
+                    €{selectedReturn.total.toLocaleString('fr-FR')}
                   </p>
                 </div>
 
@@ -1100,11 +1100,11 @@ function AdminDashboard() {
                         {selectedReturn.paymentMethod}
                       </span>
                     </div>
-                    {selectedReturn.paymentMethod === 'upi' ? (
+                    {selectedReturn.paymentMethod === 'paypal' ? (
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">UPI ID</span>
+                        <span className="text-sm text-gray-600">PayPal Email</span>
                         <span className="font-mono font-semibold text-gray-800">
-                          {selectedReturn.upiId}
+                          {selectedReturn.paypalEmail}
                         </span>
                       </div>
                     ) : (
@@ -1142,7 +1142,7 @@ function AdminDashboard() {
                           {item.name} x {item.quantity}
                         </span>
                         <span className="font-semibold">
-                          ₹{(item.price * item.quantity).toLocaleString('en-IN')}
+                          €{(item.price * item.quantity).toLocaleString('fr-FR')}
                         </span>
                       </div>
                     )) || selectedReturn.products.map((product: string, index: number) => (
@@ -1202,7 +1202,7 @@ function AdminDashboard() {
                           <div key={index} className="bg-white border border-gray-200 p-2 rounded text-xs">
                             <p className="font-semibold text-gray-800">{track.status}</p>
                             <p className="text-gray-600">{track.description}</p>
-                            <p className="text-gray-500">{new Date(track.date).toLocaleString('en-IN')}</p>
+                            <p className="text-gray-500">{new Date(track.date).toLocaleString('fr-FR')}</p>
                           </div>
                         ))}
                       </div>

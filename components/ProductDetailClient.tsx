@@ -170,7 +170,7 @@ function ProductDetailClient({ product }: ProductDetailClientProps) {
       try {
         await navigator.share({
           title: product.name,
-          text: `Check out ${product.name} - ₹${product.price.toLocaleString('en-IN')}`,
+          text: `Check out ${product.name} - €${product.price.toLocaleString('fr-FR')}`,
           url: window.location.href,
         });
       } catch (err) {
@@ -296,10 +296,10 @@ function ProductDetailClient({ product }: ProductDetailClientProps) {
             {/* Price */}
             <div className="mb-6">
               <div className="flex items-center gap-3">
-                <span className="text-3xl md:text-4xl font-bold text-primary">₹{product.price.toLocaleString('en-IN')}</span>
+                <span className="text-3xl md:text-4xl font-bold text-primary">€{product.price.toLocaleString('fr-FR')}</span>
                 {product.originalPrice && (
                   <span className="text-xl md:text-2xl text-gray-400 line-through">
-                    ₹{product.originalPrice.toLocaleString('en-IN')}
+                    €{product.originalPrice.toLocaleString('fr-FR')}
                   </span>
                 )}
               </div>
@@ -584,7 +584,7 @@ function ProductDetailClient({ product }: ProductDetailClientProps) {
                           <p className="font-semibold text-gray-800 text-sm">{review.userName}</p>
                           <p className="text-xs text-gray-400">
                             {review.createdAt?.toDate
-                              ? review.createdAt.toDate().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+                              ? review.createdAt.toDate().toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
                               : 'Just now'}
                           </p>
                         </div>

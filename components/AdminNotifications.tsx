@@ -99,7 +99,7 @@ export default function AdminNotifications() {
         
         // Show notifications ONLY for NEW orders (not status updates)
         if (diffMinutes < 60 && change.type === 'added') {
-          const notificationMessage = `Order #${doc.id.substring(0, 8).toUpperCase()} - ₹${data.total} from ${data.customerName}`;
+          const notificationMessage = `Order #${doc.id.substring(0, 8).toUpperCase()} - €${data.total} from ${data.customerName}`;
           
           // Check if notification already exists
           try {
@@ -172,7 +172,7 @@ export default function AdminNotifications() {
         if (diffMinutes < 60 && data.status === 'pending') {
           const notificationData = {
             title: '🔄 Return Request',
-            message: `Return for Order #${data.orderId?.substring(0, 8).toUpperCase()} - ₹${data.total}`,
+            message: `Return for Order #${data.orderId?.substring(0, 8).toUpperCase()} - €${data.total}`,
             type: 'return' as const,
             createdAt: data.requestedAt,
             read: false,

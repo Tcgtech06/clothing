@@ -37,7 +37,7 @@ export default function SupportPage() {
     const encodedMessage = encodeURIComponent(message);
     
     // WhatsApp number (remove + and spaces)
-    const whatsappNumber = '919791962802';
+    const whatsappNumber = '339791962802';
     
     // Redirect to WhatsApp
     window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, '_blank');
@@ -133,10 +133,10 @@ export default function SupportPage() {
                 <div>
                   <h3 className="font-semibold text-gray-800">Phone Support</h3>
                   <a 
-                    href="tel:+911800123456"
+                    href="tel:+331800123456"
                     className="text-sm text-green-600 hover:text-green-700 hover:underline"
                   >
-                    +91 1800-123-4567
+                    +33 1800-123-4567
                   </a>
                   <p className="text-xs text-gray-500 mt-1">Mon-Sat: 9 AM - 6 PM</p>
                 </div>
@@ -181,7 +181,7 @@ export default function SupportPage() {
                   What payment methods do you accept?
                 </summary>
                 <p className="text-sm text-gray-600 mt-2 pl-4">
-                  We accept UPI, Credit/Debit Cards, Net Banking, and Cash on Delivery. Online payments are processed securely through Razorpay. COD is available for orders under ₹50,000.
+                  We accept PayPal, Credit/Debit Cards, Bank Transfer, and Cash on Delivery. Online payments are processed securely through Razorpay. COD is available for orders under €500.
                 </p>
               </details>
 
@@ -190,7 +190,7 @@ export default function SupportPage() {
                   How do I request a return or refund?
                 </summary>
                 <p className="text-sm text-gray-600 mt-2 pl-4">
-                  Go to &quot;My Orders&quot;, select the delivered order, and click &quot;Return Product&quot;. Choose your reason, select refund method (UPI or Bank Transfer), and submit. Our team will review and process your request within 24-48 hours.
+                  Go to &quot;My Orders&quot;, select the delivered order, and click &quot;Return Product&quot;. Choose your reason, select refund method (PayPal or Bank Transfer), and submit. Our team will review and process your request within 24-48 hours.
                 </p>
               </details>
 
@@ -208,7 +208,7 @@ export default function SupportPage() {
                   Do you offer free shipping?
                 </summary>
                 <p className="text-sm text-gray-600 mt-2 pl-4">
-                  Yes! We offer free standard shipping on all orders above ₹999. For orders below ₹999, a nominal shipping fee of ₹99 applies.
+                  Yes! We offer free standard shipping on all orders above €99. For orders below €99, a nominal shipping fee of €10 applies.
                 </p>
               </details>
 
@@ -235,7 +235,7 @@ export default function SupportPage() {
                   How long does it take to receive my refund?
                 </summary>
                 <p className="text-sm text-gray-600 mt-2 pl-4">
-                  Once your return is approved and picked up, refunds are processed within 5-7 business days. UPI refunds are faster (1-2 days) while bank transfers may take 5-7 days depending on your bank.
+                  Once your return is approved and picked up, refunds are processed within 5-7 business days. PayPal refunds are faster (1-2 days) while bank transfers may take 5-7 days depending on your bank.
                 </p>
               </details>
 
@@ -253,7 +253,7 @@ export default function SupportPage() {
                   How do I contact customer support?
                 </summary>
                 <p className="text-sm text-gray-600 mt-2 pl-4">
-                  You can reach us via email at support@eshop.com, call us at +91 1800-123-4567 (Mon-Sat, 9 AM - 6 PM), or use our live chat feature available 24/7 on this page.
+                  You can reach us via email at support@eshop.com, call us at +33 1800-123-4567 (Mon-Sat, 9 AM - 6 PM), or use our live chat feature available 24/7 on this page.
                 </p>
               </details>
             </div>

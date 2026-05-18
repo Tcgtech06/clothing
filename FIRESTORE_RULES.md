@@ -8,10 +8,11 @@
 4. Replace ALL existing rules with the rules below
 5. Click **Publish**
 
-```javascript
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // FORCE UPDATE: Added to trigger the Publish button in Firebase Console
+
 
     // Admins - allow read for authentication, no write from client
     match /admins/{adminId} {
@@ -103,9 +104,6 @@ service cloud.firestore {
     }
   }
 }
-```
-
-## Important Notes
 
 ### User Votes Collection
 - **Read**: Public (anyone can see poll results)

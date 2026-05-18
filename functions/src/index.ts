@@ -164,7 +164,7 @@ export const sendNewOrderNotification = functions.firestore
 
           const payload = JSON.stringify({
             title: "🛍️ New Order Received",
-            body: `Order #${orderIdShort} - ₹${orderData.total} from ${orderData.customerName}`,
+            body: `Order #${orderIdShort} - €${orderData.total} from ${orderData.customerName}`,
             icon: "/icon-192x192.png",
             badge: "/icon-192x192.png",
             data: {
@@ -195,7 +195,7 @@ export const sendNewOrderNotification = functions.firestore
       // Create admin notification in Firestore
       await admin.firestore().collection("adminNotifications").add({
         title: "🛍️ New Order Received",
-        message: `Order #${orderIdShort} - ₹${orderData.total} from ${orderData.customerName}`,
+        message: `Order #${orderIdShort} - €${orderData.total} from ${orderData.customerName}`,
         type: "order",
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
         read: false,

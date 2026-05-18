@@ -138,7 +138,7 @@ export default function CheckoutPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           amount: getCartTotal(),
-          currency: 'INR',
+          currency: 'EUR',
         }),
       });
 
@@ -426,7 +426,7 @@ export default function CheckoutPage() {
                           value={formData.phone}
                           onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                           className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                          placeholder="+91 98765 43210"
+                          placeholder="+33 98765 43210"
                         />
                       </div>
                     </div>
@@ -547,7 +547,7 @@ export default function CheckoutPage() {
                     <CreditCard className="w-5 h-5 text-gray-600" />
                     <div>
                       <p className="font-semibold text-gray-800">Online Payment</p>
-                      <p className="text-sm text-gray-600">UPI, Cards, Net Banking</p>
+                      <p className="text-sm text-gray-600">PayPal, Cards, Bank Transfer</p>
                     </div>
                   </label>
                 </div>
@@ -566,7 +566,7 @@ export default function CheckoutPage() {
                         {item.product.name} x {item.quantity}
                       </span>
                       <span className="font-semibold">
-                        ₹{(item.product.price * item.quantity).toLocaleString('en-IN')}
+                        €{(item.product.price * item.quantity).toLocaleString('fr-FR')}
                       </span>
                     </div>
                   ))}
@@ -575,7 +575,7 @@ export default function CheckoutPage() {
                 <div className="border-t pt-3 space-y-2 mb-4">
                   <div className="flex justify-between text-gray-600">
                     <span>Subtotal</span>
-                    <span>₹{getCartTotal().toLocaleString('en-IN')}</span>
+                    <span>€{getCartTotal().toLocaleString('fr-FR')}</span>
                   </div>
                   <div className="flex justify-between text-gray-600">
                     <span>Shipping</span>
@@ -583,7 +583,7 @@ export default function CheckoutPage() {
                   </div>
                   <div className="flex justify-between text-lg font-bold text-gray-800">
                     <span>Total</span>
-                    <span className="text-primary">₹{getCartTotal().toLocaleString('en-IN')}</span>
+                    <span className="text-primary">€{getCartTotal().toLocaleString('fr-FR')}</span>
                   </div>
                 </div>
 

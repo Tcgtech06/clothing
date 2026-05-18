@@ -133,13 +133,13 @@ export default function AnalyticsTab() {
     for (let i = 6; i >= 0; i--) {
       const d = new Date(today);
       d.setDate(d.getDate() - i);
-      const key = d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+      const key = d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
       dailyMap[key] = { count: 0, revenue: 0 };
     }
     orders.forEach((o: any) => {
       if (o.createdAt) {
         const d = o.createdAt.toDate ? o.createdAt.toDate() : new Date(o.createdAt);
-        const key = d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+        const key = d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
         if (dailyMap[key]) {
           dailyMap[key].count += 1;
           dailyMap[key].revenue += o.total || 0;
@@ -151,8 +151,8 @@ export default function AnalyticsTab() {
     // Recent activity
     const recentActivity = orders.slice(0, 5).map((o: any) => ({
       label: `Order from ${o.customerName || 'Customer'}`,
-      value: `₹${(o.total || 0).toLocaleString('en-IN')}`,
-      time: o.createdAt?.toDate ? o.createdAt.toDate().toLocaleDateString('en-IN') : 'Recently',
+      value: `€${(o.total || 0).toLocaleString('fr-FR')}`,
+      time: o.createdAt?.toDate ? o.createdAt.toDate().toLocaleDateString('fr-FR') : 'Recently',
       type: 'order' as const,
     }));
 
@@ -196,7 +196,7 @@ export default function AnalyticsTab() {
           { label: 'Total Users', value: data.totalUsers, icon: Users, color: 'bg-blue-500', light: 'bg-blue-50', text: 'text-blue-600' },
           { label: 'Total Orders', value: data.totalOrders, icon: ShoppingBag, color: 'bg-purple-500', light: 'bg-purple-50', text: 'text-purple-600' },
           { label: 'Products Sold', value: data.totalProductsSold, icon: Package, color: 'bg-green-500', light: 'bg-green-50', text: 'text-green-600' },
-          { label: 'Total Revenue', value: `₹${data.totalRevenue.toLocaleString('en-IN')}`, icon: DollarSign, color: 'bg-orange-500', light: 'bg-orange-50', text: 'text-orange-600' },
+          { label: 'Total Revenue', value: `€${data.totalRevenue.toLocaleString('fr-FR')}`, icon: DollarSign, color: 'bg-orange-500', light: 'bg-orange-50', text: 'text-orange-600' },
         ].map(({ label, value, icon: Icon, color, light, text }) => (
           <div key={label} className="bg-white rounded-xl shadow-md p-5">
             <div className="flex items-center justify-between mb-3">
@@ -255,7 +255,7 @@ export default function AnalyticsTab() {
               { label: 'Delivered', value: data.deliveredOrders, icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-50' },
               { label: 'Pending', value: data.pendingOrders, icon: Clock, color: 'text-yellow-600', bg: 'bg-yellow-50' },
               { label: 'Returned', value: data.returnedOrders, icon: RotateCcw, color: 'text-red-600', bg: 'bg-red-50' },
-              { label: 'Avg Order', value: `₹${data.avgOrderValue.toLocaleString('en-IN')}`, icon: TrendingUp, color: 'text-blue-600', bg: 'bg-blue-50' },
+              { label: 'Avg Order', value: `€${data.avgOrderValue.toLocaleString('fr-FR')}`, icon: TrendingUp, color: 'text-blue-600', bg: 'bg-blue-50' },
             ].map(({ label, value, icon: Icon, color, bg }) => (
               <div key={label} className={`${bg} rounded-lg p-4`}>
                 <Icon className={`w-6 h-6 ${color} mb-2`} />
@@ -298,7 +298,7 @@ export default function AnalyticsTab() {
                 />
                 {count > 0 && (
                   <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap z-10">
-                    {count} orders · ₹{revenue.toLocaleString('en-IN')}
+                    {count} orders · €{revenue.toLocaleString('fr-FR')}
                   </div>
                 )}
               </div>
@@ -328,7 +328,7 @@ export default function AnalyticsTab() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-800 truncate">{p.name}</p>
-                    <p className="text-xs text-gray-500">{p.qty} units · ₹{p.revenue.toLocaleString('en-IN')}</p>
+                    <p className="text-xs text-gray-500">{p.qty} units · €{p.revenue.toLocaleString('fr-FR')}</p>
                   </div>
                   <div className="text-right">
                     <span className="text-sm font-bold text-green-600">{p.qty}</span>
@@ -354,7 +354,7 @@ export default function AnalyticsTab() {
                 <div key={category}>
                   <div className="flex justify-between mb-1">
                     <span className="text-sm font-medium text-gray-700">{category}</span>
-                    <span className="text-sm font-bold text-gray-800">₹{revenue.toLocaleString('en-IN')}</span>
+                    <span className="text-sm font-bold text-gray-800">€{revenue.toLocaleString('fr-FR')}</span>
                   </div>
                   <div className="w-full bg-gray-100 rounded-full h-2">
                     <div

@@ -72,7 +72,7 @@ export default function CartPage() {
                       {item.selectedSize && <span className="ml-2 md:ml-3">Size: {item.selectedSize}</span>}
                     </div>
                     <p className="text-lg md:text-xl font-bold text-primary mt-1 md:mt-2">
-                      ₹{item.product.price.toLocaleString('en-IN')}
+                      €{item.product.price.toLocaleString('fr-FR')}
                     </p>
                     
                     {/* Mobile: Quantity and Delete */}
@@ -100,7 +100,7 @@ export default function CartPage() {
                       </button>
                     </div>
                     <p className="text-xs md:text-sm text-gray-600 mt-1 md:hidden">
-                      Subtotal: ₹{(item.product.price * item.quantity).toLocaleString('en-IN')}
+                      Subtotal: €{(item.product.price * item.quantity).toLocaleString('fr-FR')}
                     </p>
                   </div>
 
@@ -130,7 +130,7 @@ export default function CartPage() {
                     </div>
 
                     <p className="text-sm text-gray-600 mt-2">
-                      Subtotal: ₹{(item.product.price * item.quantity).toLocaleString('en-IN')}
+                      Subtotal: €{(item.product.price * item.quantity).toLocaleString('fr-FR')}
                     </p>
                   </div>
                 </div>
@@ -146,7 +146,7 @@ export default function CartPage() {
               <div className="space-y-2 md:space-y-3 mb-3 md:mb-4">
                 <div className="flex justify-between text-sm md:text-base text-gray-600">
                   <span>Subtotal ({getCartCount()} items)</span>
-                  <span>₹{getCartTotal().toLocaleString('en-IN')}</span>
+                  <span>€{getCartTotal().toLocaleString('fr-FR')}</span>
                 </div>
                 <div className="flex justify-between text-sm md:text-base text-gray-600">
                   <span>Shipping</span>
@@ -154,7 +154,7 @@ export default function CartPage() {
                 </div>
                 <div className="border-t pt-2 md:pt-3 flex justify-between text-base md:text-lg font-bold text-gray-800">
                   <span>Total</span>
-                  <span className="text-primary">₹{getCartTotal().toLocaleString('en-IN')}</span>
+                  <span className="text-primary">€{getCartTotal().toLocaleString('fr-FR')}</span>
                 </div>
               </div>
 

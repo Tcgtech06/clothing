@@ -71,7 +71,7 @@ This application sends automatic WhatsApp notifications when customers place ord
 
 ### Pricing:
 - Free for first 1,000 conversations per month
-- After that: varies by country (India: ~₹0.40 per conversation)
+- After that: varies by country (India: ~€0.40 per conversation)
 
 ---
 
@@ -103,7 +103,7 @@ This application sends automatic WhatsApp notifications when customers place ord
 
 ### Pricing:
 - Varies by service
-- Usually starts at ₹500-2000/month
+- Usually starts at €500-2000/month
 - Includes message credits
 
 ---

@@ -78,8 +78,8 @@ User Journey:
 
 ### ✅ **Payment Methods Supported:**
 - Credit/Debit Cards (Visa, Mastercard, RuPay, etc.)
-- UPI (Google Pay, PhonePe, Paytm, etc.)
-- Net Banking (All major banks)
+- PayPal (Google Pay, PhonePe, Paytm, etc.)
+- Bank Transfer (All major banks)
 - Wallets (Paytm, PhonePe, Mobikwik, etc.)
 
 ### ✅ **Security Features:**
@@ -234,7 +234,7 @@ Dashboard: https://dashboard.razorpay.com/
 
 ### **Support:**
 - Email: support@razorpay.com
-- Phone: +91-80-6890-6890
+- Phone: +33-80-6890-6890
 - Dashboard: https://dashboard.razorpay.com/
 
 ### **Your Implementation Files:**

@@ -16,13 +16,13 @@ export async function POST(request: NextRequest) {
       `Email: ${orderData.customerEmail}\n\n` +
       `📍 *Shipping Address:*\n${orderData.shippingAddress}\n\n` +
       `🛒 *Order Items:*\n${productList}\n\n` +
-      `💰 *Total Amount:* ₹${orderData.total.toLocaleString('en-IN')}\n` +
+      `💰 *Total Amount:* €${orderData.total.toLocaleString('fr-FR')}\n` +
       `💳 *Payment Method:* ${orderData.paymentMethod}\n` +
       `✅ *Payment Status:* ${orderData.paymentStatus === 'paid' ? 'Paid' : 'Pending (COD)'}\n\n` +
-      `⏰ *Order Time:* ${new Date().toLocaleString('en-IN')}`;
+      `⏰ *Order Time:* ${new Date().toLocaleString('fr-FR')}`;
 
     // WhatsApp number
-    const whatsappNumber = '919791962802';
+    const whatsappNumber = '339791962802';
 
     // Option 1: Using Twilio (Recommended - requires Twilio account)
     // Uncomment and configure when you have Twilio credentials

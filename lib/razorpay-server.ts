@@ -16,7 +16,7 @@ function getRazorpayInstance() {
 }
 
 // Create Razorpay order
-export async function createRazorpayOrder(amount: number, currency: string = 'INR') {
+export async function createRazorpayOrder(amount: number, currency: string = 'EUR') {
   try {
     const options = {
       amount: amount * 100, // Razorpay expects amount in paise (1 INR = 100 paise)

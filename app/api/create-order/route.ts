@@ -4,7 +4,7 @@ import { createRazorpayOrder } from '@/lib/razorpay-server';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { amount, currency = 'INR' } = body;
+    const { amount, currency = 'EUR' } = body;
 
     // Validate amount
     if (!amount || amount <= 0) {

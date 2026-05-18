@@ -31,8 +31,8 @@ interface Order {
   returnRequest?: {
     id: string;
     reason: string;
-    paymentMethod: 'upi' | 'bank';
-    upiId?: string;
+    paymentMethod: 'paypal' | 'bank';
+    paypalEmail?: string;
     accountNumber?: string;
     ifscCode?: string;
     accountHolderName?: string;
@@ -137,8 +137,8 @@ export default function OrdersPage() {
   const [showReturnModal, setShowReturnModal] = useState(false);
   const [returnForm, setReturnForm] = useState({
     reason: '',
-    paymentMethod: 'upi' as 'upi' | 'bank',
-    upiId: '',
+    paymentMethod: 'paypal' as 'paypal' | 'bank',
+    paypalEmail: '',
     accountNumber: '',
     ifscCode: '',
     accountHolderName: ''
@@ -276,7 +276,7 @@ export default function OrdersPage() {
   const formatDate = (timestamp: any) => {
     if (!timestamp) return 'N/A';
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-    return date.toLocaleDateString('en-IN', { 
+    return date.toLocaleDateString('fr-FR', { 
       year: 'numeric', 
       month: 'short', 
       day: 'numeric',
@@ -322,16 +322,16 @@ export default function OrdersPage() {
     }
 
     // Validate payment method
-    if (returnForm.paymentMethod === 'upi') {
-      if (!returnForm.upiId.trim()) {
-        alert('Please provide your UPI ID');
+    if (returnForm.paymentMethod === 'paypal') {
+      if (!returnForm.paypalEmail.trim()) {
+        alert('Please provide your PayPal Email');
         return;
       }
       
-      // Validate UPI ID format (should contain @ symbol)
-      const upiRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+$/;
-      if (!upiRegex.test(returnForm.upiId.trim())) {
-        alert('Please enter a valid UPI ID (e.g., yourname@paytm, 9876543210@ybl)');
+      // Validate PayPal Email format (should contain @ symbol)
+      const paypalRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!paypalRegex.test(returnForm.paypalEmail.trim())) {
+        alert('Please enter a valid PayPal Email (e.g., youremail@example.com)');
         return;
       }
     }
@@ -383,8 +383,8 @@ export default function OrdersPage() {
         customerPhone: selectedOrder.customerPhone || user?.phoneNumber || '',
         reason: returnForm.reason.trim(),
         paymentMethod: returnForm.paymentMethod,
-        ...(returnForm.paymentMethod === 'upi' ? { 
-          upiId: returnForm.upiId.trim() 
+        ...(returnForm.paymentMethod === 'paypal' ? { 
+          paypalEmail: returnForm.paypalEmail.trim() 
         } : {
           accountNumber: returnForm.accountNumber.trim(),
           ifscCode: returnForm.ifscCode.trim().toUpperCase(),
@@ -401,8 +401,8 @@ export default function OrdersPage() {
           email: selectedOrder.customerEmail,
           phone: selectedOrder.customerPhone || user?.phoneNumber || '',
           method: returnForm.paymentMethod,
-          ...(returnForm.paymentMethod === 'upi' ? {
-            upiId: returnForm.upiId.trim()
+          ...(returnForm.paymentMethod === 'paypal' ? {
+            paypalEmail: returnForm.paypalEmail.trim()
           } : {
             accountNumber: returnForm.accountNumber.trim(),
             ifscCode: returnForm.ifscCode.trim().toUpperCase(),
@@ -423,8 +423,8 @@ export default function OrdersPage() {
           id: returnRef.id,
           reason: returnRequestData.reason,
           paymentMethod: returnRequestData.paymentMethod,
-          ...(returnForm.paymentMethod === 'upi' ? { 
-            upiId: returnForm.upiId 
+          ...(returnForm.paymentMethod === 'paypal' ? { 
+            paypalEmail: returnForm.paypalEmail 
           } : {
             accountNumber: returnForm.accountNumber,
             ifscCode: returnForm.ifscCode,
@@ -442,8 +442,8 @@ export default function OrdersPage() {
       setSelectedOrder(null);
       setReturnForm({
         reason: '',
-        paymentMethod: 'upi',
-        upiId: '',
+        paymentMethod: 'paypal',
+        paypalEmail: '',
         accountNumber: '',
         ifscCode: '',
         accountHolderName: ''
@@ -820,10 +820,10 @@ export default function OrdersPage() {
                               <button
                                 onClick={() => {
                                   setSelectedOrder(order);
-                                  // Pre-fill UPI ID from user profile if available
+                                  // Pre-fill PayPal Email from user profile if available
                                   setReturnForm(prev => ({
                                     ...prev,
-                                    upiId: userData?.upiId || ''
+                                    paypalEmail: userData?.paypalEmail || ''
                                   }));
                                   setShowReturnModal(true);
                                 }}
@@ -841,7 +841,7 @@ export default function OrdersPage() {
                       <div className="flex-1">
                         <p className="text-sm text-gray-600">Total</p>
                         <p className="text-xl md:text-2xl font-bold text-primary">
-                          ₹{order.total.toLocaleString('en-IN')}
+                          €{order.total.toLocaleString('fr-FR')}
                         </p>
                       </div>
                     </div>
@@ -935,7 +935,7 @@ export default function OrdersPage() {
                             <p className="text-sm md:text-base font-semibold text-gray-800">{track.status}</p>
                             <p className="text-xs md:text-sm text-gray-600">{track.description}</p>
                             <p className="text-[10px] md:text-xs text-gray-500 mt-1">
-                              {new Date(track.date).toLocaleString('en-IN')}
+                              {new Date(track.date).toLocaleString('fr-FR')}
                             </p>
                           </div>
                         </div>
@@ -954,7 +954,7 @@ export default function OrdersPage() {
                             <p className="text-sm md:text-base font-semibold text-gray-800">{track.status}</p>
                             <p className="text-xs md:text-sm text-gray-600">{track.description}</p>
                             <p className="text-[10px] md:text-xs text-gray-500 mt-1">
-                              {new Date(track.date).toLocaleString('en-IN')}
+                              {new Date(track.date).toLocaleString('fr-FR')}
                             </p>
                           </div>
                         </div>
@@ -976,14 +976,14 @@ export default function OrdersPage() {
                           {item.name} x {item.quantity}
                         </span>
                         <span className="font-semibold">
-                          ₹{(item.price * item.quantity).toLocaleString('en-IN')}
+                          €{(item.price * item.quantity).toLocaleString('fr-FR')}
                         </span>
                       </div>
                     ))}
                   </div>
                   <div className="flex justify-between font-bold text-base md:text-lg mt-3 md:mt-4 pt-3 md:pt-4 border-t">
                     <span>Total</span>
-                    <span className="text-primary">₹{selectedOrder.total.toLocaleString('en-IN')}</span>
+                    <span className="text-primary">€{selectedOrder.total.toLocaleString('fr-FR')}</span>
                   </div>
                 </div>
 
@@ -995,8 +995,8 @@ export default function OrdersPage() {
                     </p>
                     <p className="text-xs md:text-sm text-blue-700 mt-1">
                       <strong>Refund Method:</strong> {selectedOrder.returnRequest.paymentMethod.toUpperCase()}
-                      {selectedOrder.returnRequest.paymentMethod === 'upi' 
-                        ? ` - ${selectedOrder.returnRequest.upiId}`
+                      {selectedOrder.returnRequest.paymentMethod === 'paypal' 
+                        ? ` - ${selectedOrder.returnRequest.paypalEmail}`
                         : ` - ${selectedOrder.returnRequest.accountNumber}`
                       }
                     </p>
@@ -1020,8 +1020,8 @@ export default function OrdersPage() {
                     setShowReturnModal(false);
                     setReturnForm({
                       reason: '',
-                      paymentMethod: 'upi',
-                      upiId: '',
+                      paymentMethod: 'paypal',
+                      paypalEmail: '',
                       accountNumber: '',
                       ifscCode: '',
                       accountHolderName: ''
@@ -1055,7 +1055,7 @@ export default function OrdersPage() {
                   </div>
                   <p className="text-sm text-gray-600 mb-1">Total Amount</p>
                   <p className="text-xl font-bold text-primary">
-                    ₹{selectedOrder.total.toLocaleString('en-IN')}
+                    €{selectedOrder.total.toLocaleString('fr-FR')}
                   </p>
                 </div>
 
@@ -1080,14 +1080,14 @@ export default function OrdersPage() {
                   </label>
                   <div className="grid grid-cols-2 gap-4">
                     <button
-                      onClick={() => setReturnForm({ ...returnForm, paymentMethod: 'upi' })}
+                      onClick={() => setReturnForm({ ...returnForm, paymentMethod: 'paypal' })}
                       className={`p-4 border-2 rounded-lg transition ${
-                        returnForm.paymentMethod === 'upi'
+                        returnForm.paymentMethod === 'paypal'
                           ? 'border-primary bg-primary/5'
                           : 'border-gray-300 hover:border-gray-400'
                       }`}
                     >
-                      <p className="font-semibold text-gray-800">UPI</p>
+                      <p className="font-semibold text-gray-800">PayPal</p>
                       <p className="text-xs text-gray-500 mt-1">Google Pay, PhonePe, etc.</p>
                     </button>
                     <button
@@ -1104,21 +1104,21 @@ export default function OrdersPage() {
                   </div>
                 </div>
 
-                {/* UPI Details */}
-                {returnForm.paymentMethod === 'upi' && (
+                {/* PayPal Details */}
+                {returnForm.paymentMethod === 'paypal' && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      UPI ID <span className="text-red-500">*</span>
+                      PayPal Email <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
-                      value={returnForm.upiId}
-                      onChange={(e) => setReturnForm({ ...returnForm, upiId: e.target.value })}
+                      value={returnForm.paypalEmail}
+                      onChange={(e) => setReturnForm({ ...returnForm, paypalEmail: e.target.value })}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                       placeholder="yourname@paytm or 9876543210@ybl"
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                      Enter your UPI ID (e.g., yourname@paytm, phonenumber@ybl, yourname@oksbi)
+                      Enter your PayPal Email (e.g., youremail@example.com)
                     </p>
                   </div>
                 )}
@@ -1213,8 +1213,8 @@ export default function OrdersPage() {
                       setShowReturnModal(false);
                       setReturnForm({
                         reason: '',
-                        paymentMethod: 'upi',
-                        upiId: '',
+                        paymentMethod: 'paypal',
+                        paypalEmail: '',
                         accountNumber: '',
                         ifscCode: '',
                         accountHolderName: ''
@@ -1271,7 +1271,7 @@ export default function OrdersPage() {
                     )}
                     <div className="flex-1">
                       <p className="text-sm font-medium text-gray-800">{product.name}</p>
-                      <p className="text-xs text-gray-500">₹{product.price}</p>
+                      <p className="text-xs text-gray-500">€{product.price}</p>
                     </div>
                   </div>
                 ))}
