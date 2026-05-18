@@ -15,6 +15,7 @@ interface UserData {
   loyaltyPoints?: number;
   gender?: 'male' | 'female' | 'transgender' | null;
   upiId?: string;
+  paypalEmail?: string;
 }
 
 interface AuthContextType {
@@ -53,6 +54,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           loyaltyPoints: data.loyaltyPoints || 0,
           gender: data.gender || null,
           upiId: data.upiId || '',
+          paypalEmail: data.paypalEmail || '',
         });
       } else {
         setUserData({
@@ -62,6 +64,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           photoURL: currentUser.photoURL,
           gender: null,
           upiId: '',
+          paypalEmail: '',
         });
       }
     } catch (error) {
@@ -73,6 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         photoURL: currentUser.photoURL,
         gender: null,
         upiId: '',
+        paypalEmail: '',
       });
     }
   };

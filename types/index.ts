@@ -39,8 +39,9 @@ export interface ReturnRequest {
   customerEmail: string;
   customerName: string;
   reason: string;
-  paymentMethod: 'upi' | 'bank';
+  paymentMethod: 'paypal' | 'bank' | 'upi';
   upiId?: string;
+  paypalEmail?: string;
   accountNumber?: string;
   ifscCode?: string;
   accountHolderName?: string;
