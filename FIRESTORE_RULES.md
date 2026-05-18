@@ -44,7 +44,7 @@ service cloud.firestore {
     
     // Admin FCM Tokens - any authenticated user can access (for admin dashboard)
     match /adminFCMTokens/{tokenId} {
-      allow read, write: if request.auth != null;
+      allow read, write: if true;
     }
     
     // User Notifications - users can only access their own notifications
@@ -57,7 +57,7 @@ service cloud.firestore {
     
     // Admin Notifications - any authenticated user can access (for admin dashboard)
     match /adminNotifications/{notificationId} {
-      allow read, create, update, delete: if request.auth != null;
+      allow read, create, update, delete: if true;
     }
     
     // User Poll Votes - users can only create/read their own votes

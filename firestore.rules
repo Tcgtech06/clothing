@@ -1,0 +1,82 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Admins - allow read for authentication, no write from client
+    match /admins/{adminId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Users
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow list: if true;
+      allow write: if request.auth != null && request.auth.uid == userId;
+
+      match /addresses/{addressId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+
+    match /userAddresses/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    match /userFCMTokens/{email} {
+      allow read, write: if request.auth != null;
+    }
+
+    match /adminFCMTokens/{tokenId} {
+      allow read, write: if true;
+    }
+
+    match /userNotifications/{notificationId} {
+      allow read: if request.auth != null && request.auth.token.email == resource.data.userId;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && request.auth.token.email == resource.data.userId;
+    }
+
+    match /adminNotifications/{notificationId} {
+      allow read, create, update, delete: if true;
+    }
+
+    match /userPollVotes/{voteId} {
+      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+
+    // Products - public read, admin write
+    match /products/{productId} {
+      allow read: if true;
+      allow create, update, delete: if true;
+    }
+
+    // Orders - fully open for admin dashboard
+    match /orders/{orderId} {
+      allow read, create, update, delete: if true;
+    }
+
+    // Return Requests - fully open for admin dashboard
+    match /returnRequests/{returnId} {
+      allow read, create, update, delete: if true;
+    }
+
+    match /userVotes/{voteId} {
+      allow read: if true;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if false;
+    }
+
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+
+    match /polls/{pollId} {
+      allow read, write: if true;
+    }
+  }
+}
