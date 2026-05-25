@@ -43,8 +43,8 @@ export async function openRazorpayModal(
     key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
     amount: options.amount * 100, // Amount in paise
     currency: options.currency,
-    name: 'Layara', // Your business name
-    description: options.description || 'Purchase from Layara',
+    name: 'LASRO', // Your business name
+    description: options.description || 'Purchase from LASRO',
     order_id: options.orderId,
     prefill: {
       name: options.name,

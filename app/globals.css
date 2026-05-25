@@ -20,7 +20,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(to bottom, #FAF5FF, #F3E8FF, #E9D5FF);
+  background: linear-gradient(to bottom, #F5EEE8, #EBDCD3, #F5EEE8);
   min-height: 100vh;
 }
 

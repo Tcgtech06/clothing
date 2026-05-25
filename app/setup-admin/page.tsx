@@ -47,7 +47,7 @@ export default function SetupAdminPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-rose-900 via-rose-800 to-indigo-900 flex items-center justify-center px-4">
       <div className="max-w-md w-full">
         {/* Header */}
         <div className="text-center mb-8">
@@ -55,7 +55,7 @@ export default function SetupAdminPage() {
             <Shield className="w-10 h-10 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Admin Setup</h1>
-          <p className="text-purple-200">One-time setup to create admin account</p>
+          <p className="text-rose-200">One-time setup to create admin account</p>
         </div>
 
         {/* Setup Form */}
@@ -69,7 +69,7 @@ export default function SetupAdminPage() {
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
                 placeholder="admin"
               />
             </div>
@@ -82,7 +82,7 @@ export default function SetupAdminPage() {
                 type="text"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
                 placeholder="Admin@123"
               />
             </div>
@@ -95,7 +95,7 @@ export default function SetupAdminPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
                 placeholder="admin@eshop.com"
               />
             </div>
@@ -130,7 +130,7 @@ export default function SetupAdminPage() {
           <button
             onClick={handleSetup}
             disabled={status === 'loading' || status === 'success'}
-            className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-gradient-to-r from-rose-600 to-indigo-600 text-white py-3 rounded-lg font-semibold hover:from-rose-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {status === 'loading' ? 'Creating Admin Account...' : 
              status === 'success' ? 'Admin Account Created ✓' : 
@@ -165,8 +165,8 @@ export default function SetupAdminPage() {
 
         {/* Footer */}
         <div className="text-center mt-6">
-          <p className="text-sm text-purple-200">
-            After setup, login at <span className="font-mono bg-purple-800 px-2 py-1 rounded">/admin-login</span>
+          <p className="text-sm text-rose-200">
+            After setup, login at <span className="font-mono bg-rose-800 px-2 py-1 rounded">/admin-login</span>
           </p>
         </div>
       </div>

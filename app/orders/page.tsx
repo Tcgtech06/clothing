@@ -650,7 +650,7 @@ export default function OrdersPage() {
                       <div className="flex items-center gap-2 mt-2">
                         <span className={`text-xs px-3 py-1 rounded-full font-semibold ${
                           order.returnRequest.returnStatus === 'refund-completed' ? 'bg-green-100 text-green-800' :
-                          order.returnRequest.returnStatus === 'picked-up' ? 'bg-purple-100 text-purple-800' :
+                          order.returnRequest.returnStatus === 'picked-up' ? 'bg-rose-100 text-rose-800' :
                           order.returnRequest.returnStatus === 'pickup-scheduled' ? 'bg-indigo-100 text-indigo-800' :
                           order.returnRequest.returnStatus === 'approved' ? 'bg-blue-100 text-blue-800' :
                           'bg-yellow-100 text-yellow-800'

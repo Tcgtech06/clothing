@@ -161,8 +161,8 @@ export default function Navigation() {
           </div>
 
           {/* Logo - Center */}
-          <Link href="/" className="text-xl font-bold text-primary">
-            Layara
+          <Link href="/" className="flex items-center">
+            <img src="/logo.jpeg" alt="Logo" className="h-8 w-auto object-contain rounded" />
           </Link>
 
           {/* Right Side Icons */}
@@ -198,8 +198,8 @@ export default function Navigation() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
-              <Link href="/" className="text-2xl font-bold text-primary">
-                Layara
+              <Link href="/" className="flex items-center">
+                <img src="/logo.jpeg" alt="Logo" className="h-10 w-auto object-contain rounded" />
               </Link>
             </div>
             <div className="flex items-center space-x-1">

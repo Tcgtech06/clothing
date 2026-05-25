@@ -477,7 +477,7 @@ function AdminDashboard() {
 
   const statusColor = (s: string) => {
     if (s === 'delivered') return 'bg-green-100 text-green-800';
-    if (s === 'shipped') return 'bg-purple-100 text-purple-800';
+    if (s === 'shipped') return 'bg-rose-100 text-rose-800';
     if (s === 'processing') return 'bg-yellow-100 text-yellow-800';
     if (s === 'new') return 'bg-blue-100 text-blue-800';
     return 'bg-gray-100 text-gray-800';
@@ -554,7 +554,7 @@ function AdminDashboard() {
             { label: 'Total Orders', value: stats.totalOrders, icon: Package, color: 'text-blue-500' },
             { label: 'Total Revenue', value: `₹${stats.totalRevenue.toLocaleString('en-IN')}`, icon: DollarSign, color: 'text-green-500' },
             { label: 'New Orders', value: stats.newOrders, icon: TrendingUp, color: 'text-orange-500' },
-            { label: 'Customers', value: stats.totalCustomers, icon: Users, color: 'text-purple-500' },
+            { label: 'Customers', value: stats.totalCustomers, icon: Users, color: 'text-rose-500' },
           ].map(({ label, value, icon: Icon, color }) => (
             <div key={label} className="bg-white rounded-lg shadow-md p-6 flex items-center justify-between">
               <div>
@@ -892,7 +892,7 @@ function AdminDashboard() {
                     <button 
                       onClick={() => updateOrderStatus(selectedOrder.id, 'shipped')} 
                       disabled={selectedOrder.status === 'shipped' || selectedOrder.status === 'nearby' || selectedOrder.status === 'out-for-delivery' || selectedOrder.status === 'delivered'}
-                      className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-4 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Package className="w-4 h-4" />Shipped
                     </button>
@@ -1184,7 +1184,7 @@ function AdminDashboard() {
                     </button>
                     <button
                       onClick={() => updateReturnTrackingStatus(selectedReturn.id, 'picked-up')}
-                      className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-4 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                       disabled={selectedReturn.returnStatus === 'picked-up' || selectedReturn.returnStatus === 'refund-completed'}
                     >
                       Product Picked Up

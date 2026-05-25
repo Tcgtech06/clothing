@@ -19,7 +19,7 @@ export default function ProtectedAdminRoute({ children }: { children: React.Reac
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full mb-4 animate-pulse">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-rose-600 rounded-full mb-4 animate-pulse">
             <Shield className="w-8 h-8 text-white" />
           </div>
           <p className="text-gray-600">Verifying admin access...</p>

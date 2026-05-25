@@ -9,20 +9,33 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: '#A855F7', // Lavender - Main brand color
-        secondary: '#C084FC', // Lighter Lavender
-        accent: '#9333EA', // Darker Lavender for accents
+        primary: '#C49A8A', // Rose Gold Nude
+        secondary: '#EBDCD3', 
+        accent: '#A97C6C', 
+        rose: {
+          50: '#F5EEE8',  // Soft Beige (Background)
+          100: '#EBDCD3',
+          200: '#E1CABE',
+          300: '#D7B9A9',
+          400: '#CDA894',
+          500: '#C49A8A', // Rose Gold Nude
+          600: '#A97C6C',
+          700: '#8E5E4E',
+          800: '#734131',
+          900: '#582413',
+          950: '#4A1C0E',
+        },
         lavender: {
-          50: '#FAF5FF',
-          100: '#F3E8FF',
-          200: '#E9D5FF',
-          300: '#D8B4FE',
-          400: '#C084FC',
-          500: '#A855F7',
-          600: '#9333EA',
-          700: '#7E22CE',
-          800: '#6B21A8',
-          900: '#581C87',
+          50: '#F5EEE8',
+          100: '#EBDCD3',
+          200: '#E1CABE',
+          300: '#D7B9A9',
+          400: '#CDA894',
+          500: '#C49A8A',
+          600: '#A97C6C',
+          700: '#8E5E4E',
+          800: '#734131',
+          900: '#582413',
         },
         peach: {
           50: '#FFF5F3',

@@ -80,14 +80,14 @@ export default function Home() {
   const featuredProducts = products.slice(0, 6);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 via-purple-100/50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-b from-rose-50 via-rose-100/50 to-rose-50">
       {/* Hero Slideshow Section */}
       <HeroSlideshow />
 
       {/* Featured Products */}
       <section className="max-w-7xl mx-auto px-4 py-12 md:py-16">
         <div className="text-center mb-10 md:mb-12">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 bg-gradient-to-r from-purple-600 via-purple-500 to-purple-700 bg-clip-text text-transparent">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 bg-gradient-to-r from-rose-600 via-rose-500 to-rose-700 bg-clip-text text-transparent">
             Featured Collection
           </h2>
           <p className="text-gray-600 text-sm md:text-base max-w-2xl mx-auto">
@@ -111,7 +111,7 @@ export default function Home() {
         <div className="text-center mt-10">
           <Link
             href="/category"
-            className="inline-block bg-gradient-to-r from-purple-500 to-purple-600 text-white px-8 py-3 md:px-10 md:py-4 rounded-full hover:from-purple-600 hover:to-purple-700 transition font-semibold text-sm md:text-base shadow-lg hover:shadow-xl transform hover:scale-105"
+            className="inline-block bg-gradient-to-r from-rose-500 to-rose-600 text-white px-8 py-3 md:px-10 md:py-4 rounded-full hover:from-rose-600 hover:to-rose-700 transition font-semibold text-sm md:text-base shadow-lg hover:shadow-xl transform hover:scale-105"
           >
             View All Products
           </Link>
@@ -119,10 +119,10 @@ export default function Home() {
       </section>
 
       {/* Categories Preview */}
-      <section className="bg-gradient-to-b from-purple-100/30 to-purple-50 py-12 md:py-16">
+      <section className="bg-gradient-to-b from-rose-100/30 to-rose-50 py-12 md:py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-10 md:mb-12">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 bg-gradient-to-r from-purple-600 via-purple-500 to-purple-700 bg-clip-text text-transparent">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 bg-gradient-to-r from-rose-600 via-rose-500 to-rose-700 bg-clip-text text-transparent">
               Shop by Category
             </h2>
             <p className="text-gray-600 text-sm md:text-base">
@@ -135,11 +135,11 @@ export default function Home() {
               <Link
                 key={category}
                 href="/category"
-                className="group relative overflow-hidden bg-purple-50/80 backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 cursor-pointer text-center transform hover:scale-105"
+                className="group relative overflow-hidden bg-rose-50/80 backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 cursor-pointer text-center transform hover:scale-105"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-100 to-purple-200 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-rose-100 to-rose-200 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="relative z-10">
-                  <h3 className="font-bold text-base md:text-lg text-gray-800 group-hover:text-purple-600 transition">
+                  <h3 className="font-bold text-base md:text-lg text-gray-800 group-hover:text-rose-600 transition">
                     {category}
                   </h3>
                   <p className="text-xs text-gray-500 mt-2 hidden md:block">Explore Collection</p>
@@ -151,7 +151,7 @@ export default function Home() {
       </section>
 
       {/* Newsletter Section */}
-      <section className="bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 py-12 md:py-16">
+      <section className="bg-gradient-to-r from-rose-500 via-rose-600 to-rose-700 py-12 md:py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 md:mb-4">
             Join Our Exclusive Club
@@ -163,9 +163,9 @@ export default function Home() {
             <input
               type="email"
               placeholder="Enter your email"
-              className="flex-1 px-4 md:px-6 py-3 md:py-4 rounded-full focus:outline-none focus:ring-4 focus:ring-white/50 text-sm md:text-base bg-purple-50"
+              className="flex-1 px-4 md:px-6 py-3 md:py-4 rounded-full focus:outline-none focus:ring-4 focus:ring-white/50 text-sm md:text-base bg-rose-50"
             />
-            <button className="bg-purple-50 text-purple-600 px-6 md:px-8 py-3 md:py-4 rounded-full hover:bg-purple-100 transition font-semibold text-sm md:text-base shadow-lg">
+            <button className="bg-rose-50 text-rose-600 px-6 md:px-8 py-3 md:py-4 rounded-full hover:bg-rose-100 transition font-semibold text-sm md:text-base shadow-lg">
               Subscribe
             </button>
           </div>

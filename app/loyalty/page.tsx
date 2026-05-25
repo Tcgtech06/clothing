@@ -24,7 +24,7 @@ export default function LoyaltyPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-b from-purple-50 via-purple-100/50 to-purple-50">
+      <div className="min-h-screen bg-gradient-to-b from-rose-50 via-rose-100/50 to-rose-50">
         <div className="max-w-7xl mx-auto px-4 py-8">
           {/* Back Button */}
           <button
@@ -72,7 +72,7 @@ export default function LoyaltyPage() {
                 return (
                   <div
                     key={reward.id}
-                    className={`bg-purple-50/60 backdrop-blur-sm rounded-lg p-6 shadow-md hover:shadow-lg transition ${
+                    className={`bg-rose-50/60 backdrop-blur-sm rounded-lg p-6 shadow-md hover:shadow-lg transition ${
                       canRedeem ? 'cursor-pointer' : 'opacity-60'
                     }`}
                   >
@@ -98,7 +98,7 @@ export default function LoyaltyPage() {
           {/* Points History */}
           <div>
             <h2 className="text-2xl font-bold mb-6 text-gray-800">Points History</h2>
-            <div className="bg-purple-50/60 backdrop-blur-sm rounded-lg shadow-md overflow-hidden">
+            <div className="bg-rose-50/60 backdrop-blur-sm rounded-lg shadow-md overflow-hidden">
               {history.map((item, index) => (
                 <div
                   key={item.id}

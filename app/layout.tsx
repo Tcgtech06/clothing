@@ -24,15 +24,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <title>Layara - Premium Fashion</title>
-        <meta name="description" content="Layara - Your Premium Fashion Destination" />
+        <title>LASRO - Premium Fashion</title>
+        <meta name="description" content="LASRO - Your Premium Fashion Destination" />
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#A855F7" />
+        <meta name="theme-color" content="#C49A8A" />
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
-      <body className="bg-gradient-to-b from-purple-50 via-purple-100 to-purple-50">
+      <body className="bg-gradient-to-b from-rose-50 via-rose-100 to-rose-50">
         <AdminAuthProvider>
           <AuthProvider>
             <PushNotificationProvider>

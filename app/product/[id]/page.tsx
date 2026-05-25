@@ -101,7 +101,7 @@ export default function ProductPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-purple-50 via-purple-100/50 to-purple-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-rose-50 via-rose-100/50 to-rose-50">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600 text-sm">Loading...</p>

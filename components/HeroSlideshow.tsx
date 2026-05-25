@@ -34,7 +34,7 @@ const slides = [
     subtitle: 'Check out the latest trending products',
     buttonText: 'Explore Now',
     icon: TrendingUp,
-    gradient: 'from-purple-500 to-pink-500',
+    gradient: 'from-rose-500 to-pink-500',
   },
 ];
 

@@ -159,8 +159,8 @@ export default function CheckoutPage() {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: data.amount,
         currency: data.currency,
-        name: 'Layara',
-        description: 'Purchase from Layara',
+        name: 'LASRO',
+        description: 'Purchase from LASRO',
         order_id: data.orderId,
         prefill: {
           name: formData.name,
@@ -309,7 +309,7 @@ export default function CheckoutPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-b from-purple-50 via-purple-100/50 to-purple-50">
+      <div className="min-h-screen bg-gradient-to-b from-rose-50 via-rose-100/50 to-rose-50">
         <div className="max-w-7xl mx-auto px-4 py-8">
           {/* Back Button */}
           <button
@@ -327,7 +327,7 @@ export default function CheckoutPage() {
             {/* Shipping & Payment Details */}
             <div className="lg:col-span-2 space-y-6">
               {/* Shipping Address */}
-              <div className="bg-purple-50/60 backdrop-blur-sm rounded-lg shadow-md p-6">
+              <div className="bg-rose-50/60 backdrop-blur-sm rounded-lg shadow-md p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-bold flex items-center gap-2">
                     <MapPin className="w-5 h-5 text-primary" />
@@ -508,7 +508,7 @@ export default function CheckoutPage() {
               </div>
 
               {/* Payment Method */}
-              <div className="bg-purple-50/60 backdrop-blur-sm rounded-lg shadow-md p-6">
+              <div className="bg-rose-50/60 backdrop-blur-sm rounded-lg shadow-md p-6">
                 <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
                   <Wallet className="w-5 h-5 text-primary" />
                   Payment Method
@@ -556,7 +556,7 @@ export default function CheckoutPage() {
 
             {/* Order Summary */}
             <div className="lg:col-span-1">
-              <div className="bg-purple-50/60 backdrop-blur-sm rounded-lg shadow-md p-6 sticky top-20">
+              <div className="bg-rose-50/60 backdrop-blur-sm rounded-lg shadow-md p-6 sticky top-20">
                 <h2 className="text-xl font-bold mb-4 text-gray-800">Order Summary</h2>
                 
                 <div className="space-y-3 mb-4 max-h-60 overflow-y-auto">

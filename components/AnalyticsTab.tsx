@@ -194,7 +194,7 @@ export default function AnalyticsTab() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: 'Total Users', value: data.totalUsers, icon: Users, color: 'bg-blue-500', light: 'bg-blue-50', text: 'text-blue-600' },
-          { label: 'Total Orders', value: data.totalOrders, icon: ShoppingBag, color: 'bg-purple-500', light: 'bg-purple-50', text: 'text-purple-600' },
+          { label: 'Total Orders', value: data.totalOrders, icon: ShoppingBag, color: 'bg-rose-500', light: 'bg-rose-50', text: 'text-rose-600' },
           { label: 'Products Sold', value: data.totalProductsSold, icon: Package, color: 'bg-green-500', light: 'bg-green-50', text: 'text-green-600' },
           { label: 'Total Revenue', value: `₹${data.totalRevenue.toLocaleString('en-IN')}`, icon: DollarSign, color: 'bg-orange-500', light: 'bg-orange-50', text: 'text-orange-600' },
         ].map(({ label, value, icon: Icon, color, light, text }) => (

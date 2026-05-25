@@ -101,16 +101,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-purple-50 to-purple-100 flex items-center justify-center px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-rose-100 via-rose-50 to-rose-100 flex items-center justify-center px-4 py-8">
       <div className="max-w-md w-full">
         {/* Logo/Brand */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-primary mb-2">Layara</h1>
+        <div className="text-center mb-8 flex flex-col items-center">
+          <img src="/logo.jpeg" alt="Logo" className="h-16 w-auto object-contain mb-4 rounded-xl shadow-sm" />
           <p className="text-gray-600">Welcome back! Please login to your account</p>
         </div>
 
         {/* Login Card */}
-        <div className="bg-purple-50/80 backdrop-blur-sm rounded-2xl shadow-xl p-8">
+        <div className="bg-rose-50/80 backdrop-blur-sm rounded-2xl shadow-xl p-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Login</h2>
 
           {/* Success Message */}
@@ -202,7 +202,7 @@ export default function LoginPage() {
               <div className="w-full border-t border-gray-300"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-purple-50/80 text-gray-500">Or continue with</span>
+              <span className="px-4 bg-rose-50/80 text-gray-500">Or continue with</span>
             </div>
           </div>
 
@@ -210,7 +210,7 @@ export default function LoginPage() {
           <button
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 bg-purple-50/80 border-2 border-purple-200 text-gray-700 py-3 rounded-lg hover:bg-purple-100/80 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-3 bg-rose-50/80 border-2 border-rose-200 text-gray-700 py-3 rounded-lg hover:bg-rose-100/80 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
