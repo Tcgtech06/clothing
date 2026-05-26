@@ -43,7 +43,7 @@ export default function ForgotPasswordPage() {
       <div className="max-w-md w-full">
         {/* Logo/Brand */}
         <div className="text-center mb-8 flex flex-col items-center">
-          <img src="/logo.jpeg" alt="Logo" className="h-16 w-auto object-contain mb-4 rounded-xl shadow-sm" />
+          <img src="/lasro1.png" alt="Logo" className="h-16 w-auto object-contain mb-4 rounded-xl shadow-sm" />
           <p className="text-gray-600">Reset your password</p>
         </div>
 

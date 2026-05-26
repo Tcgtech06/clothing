@@ -74,8 +74,8 @@ export function PushNotificationProvider({ children }: { children: ReactNode }) 
         // Show a welcome notification
         sendNotification('Notifications Enabled! 🔔', {
           body: 'You will now receive order updates and notifications',
-          icon: '/icon-192x192.png',
-          badge: '/icon-192x192.png',
+          icon: '/lasro1.png',
+          badge: '/lasro1.png',
         });
         return true;
       } else {
@@ -149,8 +149,8 @@ export function PushNotificationProvider({ children }: { children: ReactNode }) 
       if (document.hidden && registration) {
         // Send notification through service worker for background notifications
         registration.showNotification(title, {
-          icon: '/icon-192x192.png',
-          badge: '/icon-192x192.png',
+          icon: '/lasro1.png',
+          badge: '/lasro1.png',
           requireInteraction: false,
           ...options,
         });

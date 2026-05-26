@@ -28,8 +28,9 @@ export default function RootLayout({
         <meta name="description" content="LASRO - Your Premium Fashion Destination" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#C49A8A" />
-        <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" href="/icon-192x192.png" />
+        <link rel="icon" type="image/png" href="/lasro1.png" />
+        <link rel="apple-touch-icon" href="/lasro1.png" />
+        <link rel="shortcut icon" href="/lasro1.png" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body className="bg-gradient-to-b from-rose-50 via-rose-100 to-rose-50">

@@ -162,7 +162,7 @@ export default function Navigation() {
 
           {/* Logo - Center */}
           <Link href="/" className="flex items-center">
-            <img src="/logo.jpeg" alt="Logo" className="h-8 w-auto object-contain rounded" />
+            <img src="/lasro1.png" alt="Logo" className="h-12 w-auto object-contain rounded" />
           </Link>
 
           {/* Right Side Icons */}
@@ -199,7 +199,7 @@ export default function Navigation() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
               <Link href="/" className="flex items-center">
-                <img src="/logo.jpeg" alt="Logo" className="h-10 w-auto object-contain rounded" />
+                <img src="/lasro1.png" alt="Logo" className="h-16 w-auto object-contain rounded" />
               </Link>
             </div>
             <div className="flex items-center space-x-1">
