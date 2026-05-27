@@ -8,17 +8,48 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+        serif: ['Playfair Display', 'serif'],
+        body: ['Cormorant Garamond', 'serif'],
+      },
       colors: {
-        primary: '#C49A8A', // Rose Gold Nude
-        secondary: '#EBDCD3', 
-        accent: '#A97C6C', 
+        background: '#fdfcfa',
+        foreground: '#1a1a1a',
+        card: '#ffffff',
+        'card-foreground': '#1a1a1a',
+        popover: '#ffffff',
+        'popover-foreground': '#1a1a1a',
+        primary: '#000000',
+        'primary-foreground': '#ffffff',
+        secondary: '#f5f0eb',
+        'secondary-foreground': '#1a1a1a',
+        muted: '#f5f0eb',
+        'muted-foreground': '#6b6b6b',
+        accent: '#e8d5c4',
+        'accent-foreground': '#1a1a1a',
+        destructive: '#d4183d',
+        'destructive-foreground': '#ffffff',
+        border: '#00000014',
+        input: 'transparent',
+        'input-background': '#fdfcfa',
+        'switch-background': '#e8d5c4',
+        ring: '#e8d5c4',
+        beige: '#f5f0eb',
+        'nude-pink': '#e8d5c4',
+        ivory: '#fdfcfa',
+        'rose-gold': '#b76e79',
+        'luxury-black': '#000000',
+        'soft-gray': '#6b6b6b',
+        
+        // Retaining old shade variations to avoid breaking existing code
         rose: {
-          50: '#F5EEE8',  // Soft Beige (Background)
+          50: '#F5EEE8',
           100: '#EBDCD3',
           200: '#E1CABE',
           300: '#D7B9A9',
           400: '#CDA894',
-          500: '#C49A8A', // Rose Gold Nude
+          500: '#C49A8A',
           600: '#A97C6C',
           700: '#8E5E4E',
           800: '#734131',

@@ -163,7 +163,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background text-foreground">
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Back Button */}
         <button
@@ -176,7 +176,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* Product Images */}
-          <div className="bg-white rounded-lg shadow-md p-4 md:p-8">
+          <div className="bg-card text-card-foreground rounded-lg shadow-md p-4 md:p-8">
             {/* Main Image with Share and Favourite Buttons */}
             <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden mb-4 group">
               <Image
@@ -268,8 +268,8 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           </div>
 
           {/* Product Info */}
-          <div className="bg-white rounded-lg shadow-md p-4 md:p-8">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">{product.name}</h1>
+          <div className="bg-card text-card-foreground rounded-lg shadow-md p-4 md:p-8">
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">{product.name}</h1>
             
             {/* Rating */}
             {/* Price */}
@@ -432,7 +432,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
         </div>
 
         {/* Description and Reviews Tabs */}
-        <div className="bg-white rounded-lg shadow-md p-4 md:p-8">
+        <div className="bg-card text-card-foreground rounded-lg shadow-md p-4 md:p-8">
           <div className="border-b mb-6">
             <div className="flex gap-4 md:gap-8">
               <button
@@ -496,7 +496,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               <p className="text-gray-600 mb-6">{reviews.length} customer {reviews.length === 1 ? 'review' : 'reviews'}</p>
 
               {/* Write a Review Form */}
-              <div className="bg-gray-50 rounded-lg p-6 mb-6">
+              <div className="bg-muted text-muted-foreground rounded-lg p-6 mb-6">
                 <h4 className="text-lg font-bold mb-4 flex items-center gap-2">
                   <MessageSquare className="w-5 h-5 text-primary" />
                   Write a Review
@@ -554,7 +554,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               ) : (
                 <div className="space-y-4">
                   {reviews.map((review) => (
-                    <div key={review.id} className="bg-white border border-gray-100 rounded-lg p-4 shadow-sm">
+                    <div key={review.id} className="bg-card border border-border rounded-lg p-4 shadow-sm">
                       <div className="flex items-center gap-3 mb-2">
                         <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
                           <UserIcon className="w-5 h-5 text-primary" />
