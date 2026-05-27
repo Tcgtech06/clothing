@@ -15,19 +15,19 @@ const config: Config = {
       },
       colors: {
         background: '#fdfcfa',
-        foreground: '#1a1a1a',
+        foreground: '#6b6b6b',
         card: '#ffffff',
-        'card-foreground': '#1a1a1a',
+        'card-foreground': '#6b6b6b',
         popover: '#ffffff',
-        'popover-foreground': '#1a1a1a',
+        'popover-foreground': '#6b6b6b',
         primary: '#b76e79', // Rose Gold for primary accents
         'primary-foreground': '#ffffff',
         secondary: '#f5f0eb', // Beige
-        'secondary-foreground': '#1a1a1a',
+        'secondary-foreground': '#6b6b6b',
         muted: '#f5f0eb',
         'muted-foreground': '#6b6b6b',
         accent: '#e8d5c4', // Nude Pink
-        'accent-foreground': '#1a1a1a',
+        'accent-foreground': '#6b6b6b',
         destructive: '#d4183d',
         'destructive-foreground': '#ffffff',
         border: '#00000014',
@@ -41,7 +41,7 @@ const config: Config = {
         'rose-gold': '#b76e79',
         'luxury-black': '#000000',
         'soft-gray': '#6b6b6b',
-        
+
         // Retaining old shade variations to avoid breaking existing code
         rose: {
           50: '#F5EEE8',
