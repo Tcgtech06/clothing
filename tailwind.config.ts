@@ -20,13 +20,13 @@ const config: Config = {
         'card-foreground': '#1a1a1a',
         popover: '#ffffff',
         'popover-foreground': '#1a1a1a',
-        primary: '#000000',
+        primary: '#b76e79', // Rose Gold for primary accents
         'primary-foreground': '#ffffff',
-        secondary: '#f5f0eb',
+        secondary: '#f5f0eb', // Beige
         'secondary-foreground': '#1a1a1a',
         muted: '#f5f0eb',
         'muted-foreground': '#6b6b6b',
-        accent: '#e8d5c4',
+        accent: '#e8d5c4', // Nude Pink
         'accent-foreground': '#1a1a1a',
         destructive: '#d4183d',
         'destructive-foreground': '#ffffff',
