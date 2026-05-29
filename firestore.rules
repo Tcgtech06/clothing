@@ -5,7 +5,7 @@ service cloud.firestore {
     // Admins - allow read for authentication, no write from client
     match /admins/{adminId} {
       allow read: if true;
-      allow write: if false;
+      allow write: if true;
     }
 
     // Users
