@@ -14,15 +14,28 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
-// Initialize Firebase
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-const db = getFirestore(app);
-const storage = getStorage(app);
-const auth = getAuth(app);
+// Initialize Firebase only if the config has an API key (prevents build errors on Netlify)
+let app;
+let db;
+let storage;
+let auth;
+
+if (firebaseConfig.apiKey) {
+  app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+  db = getFirestore(app);
+  storage = getStorage(app);
+  auth = getAuth(app);
+} else {
+  console.warn("Firebase configuration is missing! Using mock instances to prevent build failure.");
+  app = getApps().length > 0 ? getApps()[0] : null;
+  db = {} as any;
+  storage = {} as any;
+  auth = {} as any;
+}
 
 // Analytics (only in browser)
 let analytics;
-if (typeof window !== 'undefined') {
+if (app && typeof window !== 'undefined') {
   analytics = getAnalytics(app);
 }
 
