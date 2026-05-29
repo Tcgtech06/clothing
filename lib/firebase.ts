@@ -15,10 +15,10 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase only if the config has an API key (prevents build errors on Netlify)
-let app;
-let db;
-let storage;
-let auth;
+let app: any;
+let db: any;
+let storage: any;
+let auth: any;
 
 if (firebaseConfig.apiKey) {
   app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
@@ -34,7 +34,7 @@ if (firebaseConfig.apiKey) {
 }
 
 // Analytics (only in browser)
-let analytics;
+let analytics: any;
 if (app && typeof window !== 'undefined') {
   analytics = getAnalytics(app);
 }
