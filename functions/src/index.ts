@@ -79,15 +79,14 @@ export const sendOrderStatusNotification = functions.firestore
       }
 
       // VAPID keys
-      const vapidPublicKey = process.env.VAPID_PUBLIC_KEY ||
-        "BPL-rJODSb6phARIC3tnKmYdnABSOyo8bIs-HP5mJeMaKv4AVPWynM8XDUnnM_CH5FS1nX9EDQM5twMJvaJ5XEQ";
+      const vapidPublicKey = process.env.VAPID_PUBLIC_KEY || "";
       const vapidPrivateKey = process.env.VAPID_PRIVATE_KEY || "";
 
       if (!vapidPrivateKey) {
         console.error("VAPID_PRIVATE_KEY not set");
       } else {
         webpush.setVapidDetails(
-          "mailto:tcgtechnology01@gmail.com",
+          "mailto:your-email@example.com",
           vapidPublicKey,
           vapidPrivateKey
         );
@@ -151,13 +150,12 @@ export const sendNewOrderNotification = functions.firestore
       if (adminTokensSnapshot.empty) {
         console.log("No admin FCM tokens found");
       } else {
-        const vapidPublicKey = process.env.VAPID_PUBLIC_KEY ||
-          "BPL-rJODSb6phARIC3tnKmYdnABSOyo8bIs-HP5mJeMaKv4AVPWynM8XDUnnM_CH5FS1nX9EDQM5twMJvaJ5XEQ";
+        const vapidPublicKey = process.env.VAPID_PUBLIC_KEY || "";
         const vapidPrivateKey = process.env.VAPID_PRIVATE_KEY || "";
 
         if (vapidPrivateKey) {
           webpush.setVapidDetails(
-            "mailto:tcgtechnology01@gmail.com",
+            "mailto:your-email@example.com",
             vapidPublicKey,
             vapidPrivateKey
           );

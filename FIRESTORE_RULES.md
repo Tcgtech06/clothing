@@ -3,7 +3,7 @@
 ## ACTION REQUIRED - Update in Firebase Console
 
 1. Go to https://console.firebase.google.com/
-2. Select project: **vilvah**
+2. Select project: **your-project-id**
 3. Click **Firestore Database** → **Rules** tab
 4. Replace ALL existing rules with the rules below
 5. Click **Publish**

@@ -3,7 +3,7 @@
 ## Step 1: Enable FCM in Firebase Console
 
 1. Go to https://console.firebase.google.com/
-2. Select your project: **vilvah**
+2. Select your project: **your-project-id**
 3. Click on **Project Settings** (gear icon) → **Cloud Messaging** tab
 4. You'll see **Cloud Messaging API (Legacy)** - this is already enabled by default
 

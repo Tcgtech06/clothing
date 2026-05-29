@@ -34,7 +34,7 @@ firebase init functions
 ```
 
 When prompted, select:
-- **Use an existing project** → Select **vilvah**
+- **Use an existing project** → Select **your-project-id**
 - **Language**: JavaScript
 - **ESLint**: Yes
 - **Install dependencies**: Yes
@@ -70,7 +70,7 @@ This will take 2-3 minutes. You'll see:
 ## Step 8: Update Firestore Rules
 
 1. Go to Firebase Console: https://console.firebase.google.com/
-2. Select project: **vilvah**
+2. Select project: **your-project-id**
 3. Go to **Firestore Database** → **Rules**
 4. Add these rules:
 
@@ -124,7 +124,7 @@ Run terminal as administrator (Windows) or use `sudo` (Mac/Linux)
 ```bash
 firebase use --add
 ```
-Then select **vilvah** project
+Then select **your-project-id** project
 
 ### "Functions not deploying"
 Check `functions/package.json` - make sure it has:
